@@ -1,0 +1,38 @@
+---
+/** Page section: consistent spacing, optional heading block, tone (default / alt / dark). */
+import { noBreakHyphens } from '../lib/text';
+interface Props {
+  id?: string;
+  tone?: 'default' | 'alt' | 'dark';
+  eyebrow?: string;
+  title?: string;
+  intro?: string;
+  center?: boolean;
+  tight?: boolean;
+  narrow?: boolean;
+  class?: string;
+  [key: `data-${string}`]: string | boolean | undefined;
+}
+const { id, tone = 'default', eyebrow, title, intro, center = false, tight = false, narrow = false, class: className, ...rest } = Astro.props;
+const hasHead = eyebrow || title || intro || Astro.slots.has('head');
+---
+
+<section
+  id={id}
+  class:list={['section', tone === 'alt' && 'tone-alt', tone === 'dark' && 'tone-dark', tight && 'section--tight', className]}
+  {...rest}
+>
+  <div class:list={['container', narrow && 'container--narrow']}>
+    {
+      hasHead && (
+        <div class:list={['section-head', center && 'section-head--center']} data-reveal-children>
+          {eyebrow && <p class="eyebrow">{eyebrow}</p>}
+          {title && <h2 set:html={noBreakHyphens(title)} />}
+          <slot name="head" />
+          {intro && <p class="lead">{intro}</p>}
+        </div>
+      )
+    }
+    <slot />
+  </div>
+</section>

@@ -1,0 +1,135 @@
+---
+/**
+ * "Is Evenmont a fit?" — honest limits. With `fit` items it shows two columns (a great
+ * fit / not a fit yet); scenario pages pass only `items` for the "Not a fit (yet)" list.
+ */
+import Section from '../Section.astro';
+import Icon from '../Icon.astro';
+
+interface Props {
+  items?: string[];
+  fit?: string[];
+  tight?: boolean;
+}
+const all = [
+  'You need validated manufacturing for pharma or medical devices.',
+  'You run several plants and need advanced production scheduling.',
+  'You’re looking for the cheapest hourly developer.',
+  'You want to go live next week without your team’s time.',
+];
+const { items = all, fit, tight = false } = Astro.props;
+---
+
+<Section id="not-a-fit" title={fit ? 'Is Evenmont a fit?' : 'Not a fit (yet)'} tight={tight}>
+  <div class:list={['fitcols', fit && 'fitcols--two']}>
+    {
+      fit && (
+        <div class="fitcol fitcol--yes" data-reveal>
+          <h3>
+            <Icon name="circle-check" size={24} />A great fit
+          </h3>
+          <ul role="list">
+            {fit.map((item) => (
+              <li>
+                <Icon name="check" size={20} />
+                <span>{item}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )
+    }
+    <div class="fitcol fitcol--no" data-reveal>
+      {
+        fit && (
+          <h3>
+            <Icon name="circle-minus" size={24} />
+            Not a fit (yet)
+          </h3>
+        )
+      }
+      <ul role="list">
+        {
+          items.map((item) => (
+            <li>
+              <Icon name="x" size={20} />
+              <span>{item}</span>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </div>
+</Section>
+
+<style is:global>
+  .fitcols {
+    display: grid;
+    gap: var(--space-5);
+  }
+  .fitcol {
+    padding: var(--space-6) var(--space-5);
+    border-radius: 20px;
+    border: 1px solid var(--border);
+    background-color: var(--surface);
+  }
+  .fitcol h3 {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    margin-bottom: var(--space-4);
+  }
+  .fitcol ul {
+    display: grid;
+    gap: var(--space-1);
+  }
+  .fitcol li {
+    display: grid;
+    grid-template-columns: 24px minmax(0, 1fr);
+    gap: var(--space-3);
+    padding: var(--space-3) 0;
+    border-top: 1px solid var(--border);
+    font-weight: 600;
+  }
+  .fitcol li .icon {
+    margin-top: 0.15em;
+  }
+  .fitcol--yes {
+    border-color: transparent;
+    background-color: var(--heading);
+    color: var(--em-sand);
+  }
+  .fitcol--yes h3 {
+    color: var(--em-sand);
+  }
+  .fitcol--yes h3 .icon,
+  .fitcol--yes li .icon {
+    color: var(--rule);
+  }
+  .fitcol--yes li {
+    border-top-color: rgba(246, 242, 234, 0.18);
+  }
+  .fitcol--no h3 .icon,
+  .fitcol--no li .icon {
+    color: var(--text-muted);
+  }
+  .fitcols:not(.fitcols--two) .fitcol--no {
+    padding: 0;
+    border: 0;
+    background: none;
+  }
+  .fitcols:not(.fitcols--two) .fitcol--no ul {
+    gap: var(--space-3) var(--space-6);
+  }
+  @media (min-width: 768px) {
+    .fitcols--two {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+    .fitcol {
+      padding: var(--space-7) var(--space-6);
+    }
+    .fitcols:not(.fitcols--two) .fitcol--no ul {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+</style>

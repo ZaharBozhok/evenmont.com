@@ -1,0 +1,227 @@
+[
+  {
+    "id": "services",
+    "order": 1,
+    "name": "Services & projects",
+    "tab": "Services",
+    "chip": "We sell services",
+    "profile": "For agencies, consultancies, IT and professional services firms.",
+    "seo": {
+      "title": "Odoo for services & projects firms | Evenmont",
+      "description": "Odoo for agencies, consultancies and professional services firms: margin by project, invoices from timesheets, contractor payouts. Fixed-price phases."
+    },
+    "h1": "Projects, hours, contractors and books — in one system.",
+    "sumPhrase": "in one system.",
+    "sub": "For agencies, consultancies, IT and professional services firms. See margin by project, bill from timesheets, pay contractors without spreadsheets.",
+    "pains": [
+      "You find out a project lost money after it’s over.",
+      "Contractor invoices hide in email threads.",
+      "Month-end close is a spreadsheet marathon."
+    ],
+    "outcomes": [
+      "Live project margin",
+      "Invoices from approved hours",
+      "Contractor rates, invoices and payouts in one flow",
+      "Faster close"
+    ],
+    "beforeAfter": [
+      {
+        "today": "You find out a project lost money after it’s over",
+        "after": "Live margin by project and customer",
+        "icon": "percent"
+      },
+      {
+        "today": "Hours in one tool, invoices built by hand in another",
+        "after": "Invoices from approved hours",
+        "icon": "receipt-text"
+      },
+      {
+        "today": "Contractors paid from email",
+        "after": "Rates, timesheets, invoices and payouts in one flow",
+        "icon": "users"
+      },
+      {
+        "today": "Twelve tools, copy-paste between them",
+        "after": "One system, every number entered once",
+        "icon": "layers"
+      },
+      {
+        "today": "Close drags on",
+        "after": "A faster close, together with your accountant",
+        "icon": "calendar-check"
+      }
+    ],
+    "apps": [
+      "CRM",
+      "Sales",
+      "Project",
+      "Timesheets",
+      "Accounting",
+      "Recruitment",
+      "Website",
+      "Our contractor module"
+    ],
+    "integrations": [],
+    "card": {
+      "apps": "CRM, Sales, Project, Timesheets, Accounting, our contractor module",
+      "outcome": "Margin by project, invoices from hours, contractor payouts"
+    },
+    "package": "launch-services",
+    "image": "scenario-services",
+    "imageAlt": "A small team working together around a table with a laptop and printed plans"
+  },
+  {
+    "id": "distribution",
+    "order": 2,
+    "name": "Distribution & e-commerce",
+    "tab": "Distribution",
+    "chip": "We sell products",
+    "profile": "For wholesalers, importers and e-commerce brands with their own warehouse.",
+    "seo": {
+      "title": "Odoo for distribution & e-commerce | Evenmont",
+      "description": "Odoo for wholesalers, importers and e-commerce brands: real-time stock, real unit costs, faster shipping — with your accountant in the loop."
+    },
+    "h1": "Inventory that matches the books.",
+    "sumPhrase": "matches the books.",
+    "sub": "For wholesalers, importers and e-commerce brands with their own warehouse. Real-time stock, real unit costs, faster shipping — with your accountant in the loop.",
+    "pains": [
+      "The system says 40. The shelf says 12.",
+      "We oversold on Amazon again.",
+      "Inventory and the books never match at month-end."
+    ],
+    "outcomes": [
+      "Stock accuracy with barcode scanning",
+      "Landed costs in unit cost",
+      "Reorder rules from real sales",
+      "One stock count for every channel",
+      "Automated sales tax"
+    ],
+    "beforeAfter": [
+      {
+        "today": "Stock counts nobody trusts",
+        "after": "Real-time inventory with barcode scanning",
+        "icon": "scan-barcode"
+      },
+      {
+        "today": "Unit costs that leave out freight and duties",
+        "after": "Landed costs in every unit cost",
+        "icon": "truck"
+      },
+      {
+        "today": "Reordering by gut feel",
+        "after": "Reorder rules from real sales",
+        "icon": "repeat"
+      },
+      {
+        "today": "Overselling across channels",
+        "after": "One stock count for every channel",
+        "icon": "shopping-cart"
+      },
+      {
+        "today": "Sales tax worked out by hand",
+        "after": "Automated sales tax",
+        "icon": "landmark"
+      },
+      {
+        "today": "Inventory and the books never match at month-end",
+        "after": "Inventory that matches the books",
+        "icon": "scale"
+      }
+    ],
+    "apps": [
+      "Sales",
+      "Purchase",
+      "Inventory",
+      "Barcode",
+      "Accounting",
+      "eCommerce"
+    ],
+    "integrations": [
+      "Storefront & marketplace connectors",
+      "Avalara"
+    ],
+    "card": {
+      "apps": "Sales, Purchase, Inventory, Barcode, Accounting, eCommerce + connectors",
+      "outcome": "Accurate stock, real unit costs, faster shipping"
+    },
+    "package": "launch-products",
+    "image": "scenario-distribution",
+    "imageAlt": "A warehouse worker scanning stock on a shelf with a handheld barcode scanner"
+  },
+  {
+    "id": "manufacturing",
+    "order": 3,
+    "name": "Light manufacturing",
+    "tab": "Manufacturing",
+    "chip": "We make products",
+    "profile": "For assembly and make-to-order manufacturers.",
+    "seo": {
+      "title": "Odoo for light manufacturing | Evenmont",
+      "description": "Odoo for assembly and make-to-order manufacturers: bills of materials, work orders, real unit costs and lot traceability, connected to sales and the books."
+    },
+    "h1": "Your production plan, off the whiteboard.",
+    "sumPhrase": "off the whiteboard.",
+    "sub": "For assembly and make-to-order manufacturers. Bills of materials, work orders, real unit costs and lot traceability — connected to sales and the books.",
+    "pains": [
+      "The production plan lives on a whiteboard.",
+      "We don’t know what a unit really costs us.",
+      "A recall would take us a week to trace."
+    ],
+    "outcomes": [
+      "Unit cost roll-up",
+      "Work orders and capacity",
+      "Lot/serial traceability",
+      "Quality checks",
+      "Purchasing driven by demand"
+    ],
+    "beforeAfter": [
+      {
+        "today": "Production planned on a whiteboard",
+        "after": "Work orders, bills of materials and real unit costs",
+        "icon": "kanban"
+      },
+      {
+        "today": "Nobody knows what a unit really costs",
+        "after": "Unit cost roll-up from materials and operations",
+        "icon": "calculator"
+      },
+      {
+        "today": "Capacity is a guess",
+        "after": "Work orders and capacity in one plan",
+        "icon": "factory"
+      },
+      {
+        "today": "A recall would take a week to trace",
+        "after": "Lot and serial traceability",
+        "icon": "search"
+      },
+      {
+        "today": "Quality checks happen on paper",
+        "after": "Quality checks built into production",
+        "icon": "clipboard-check"
+      },
+      {
+        "today": "Purchasing by gut feel",
+        "after": "Purchasing driven by demand",
+        "icon": "trending-up"
+      }
+    ],
+    "apps": [
+      "Manufacturing",
+      "Quality",
+      "Inventory",
+      "Barcode",
+      "Purchase",
+      "Sales",
+      "Accounting"
+    ],
+    "integrations": [],
+    "card": {
+      "apps": "Everything in distribution + Manufacturing, Quality",
+      "outcome": "Unit costs, production plan, lot traceability"
+    },
+    "package": "launch-make",
+    "image": "scenario-manufacturing",
+    "imageAlt": "Two people at work at a bench in a small manufacturing workshop"
+  }
+]

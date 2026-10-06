@@ -1,0 +1,147 @@
+---
+/** Footer — all pages, neutral core styling in the page's mood. */
+import Logo from './Logo.astro';
+import PartnerBadge from './PartnerBadge.astro';
+import T from './T.astro';
+import { footerNav, legalLine, settings, type Mood } from '../lib/site';
+
+interface Props {
+  mood: Mood;
+}
+const { mood } = Astro.props;
+const partner = mood !== 'client';
+---
+
+<footer class="site-footer" id="site-footer" data-sticky-hide>
+  <div class="container">
+    <div class="site-footer__top">
+      <div class="site-footer__brand">
+        <a href="/" class="site-footer__logo">
+          <Logo
+            mood={mood}
+            tone={mood === 'partner-dark' ? 'dark' : 'light'}
+            variant="descriptor"
+            alt={partner ? 'Evenmont home' : 'Evenmont — Finance-first Odoo implementation. Home'}
+            lazy
+          />
+        </a>
+        {partner && <p class="site-footer__descriptor">{settings.descriptor}</p>}
+        <p class="site-footer__tagline">{settings.tagline}</p>
+      </div>
+      <nav class="site-footer__nav" aria-label="Footer">
+        {
+          footerNav.map((col) => (
+            <div>
+              <h2 class="site-footer__title">{col.title}</h2>
+              <ul role="list">
+                {col.links.map((link) => (
+                  <li>
+                    <a href={link.href}>{link.label}</a>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))
+        }
+      </nav>
+    </div>
+
+    <div class="site-footer__legal">
+      <p><T v={legalLine()} /></p>
+      <div class="site-footer__odoo">
+        <p>Odoo is a trademark of Odoo S.A.</p>
+        <PartnerBadge />
+      </div>
+    </div>
+  </div>
+</footer>
+
+<style is:global>
+  .site-footer {
+    padding-top: var(--space-8);
+    padding-bottom: max(var(--space-7), env(safe-area-inset-bottom));
+    border-top: 1px solid var(--border);
+    background-color: var(--bg);
+    color: var(--text);
+  }
+  .site-footer__top {
+    display: grid;
+    gap: var(--space-7);
+  }
+  .site-footer__logo {
+    display: inline-block;
+  }
+  .site-footer__logo .logo {
+    width: min(260px, 100%);
+    height: auto;
+  }
+  .site-footer__descriptor {
+    margin-top: var(--space-2);
+    color: var(--text-muted);
+    font-size: var(--fs-small);
+    font-weight: 600;
+  }
+  .site-footer__tagline {
+    margin-top: var(--space-4);
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 1.375rem;
+    line-height: 1.2;
+    color: var(--heading);
+  }
+  .site-footer__nav {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--space-6) var(--space-5);
+  }
+  .site-footer__title {
+    margin-bottom: var(--space-2);
+    font-family: var(--font-sans);
+    font-size: var(--fs-small);
+    font-weight: 700;
+    letter-spacing: 0.01em;
+    color: var(--text-muted);
+  }
+  .site-footer__nav a {
+    display: inline-flex;
+    align-items: center;
+    min-height: var(--tap);
+    color: var(--text);
+    font-weight: 600;
+    text-decoration: none;
+  }
+  .site-footer__nav a:hover {
+    text-decoration: underline;
+    text-underline-offset: 0.25em;
+  }
+  .site-footer__legal {
+    display: grid;
+    gap: var(--space-5);
+    margin-top: var(--space-8);
+    padding-top: var(--space-6);
+    border-top: 1px solid var(--border);
+    color: var(--text-muted);
+    font-size: var(--fs-small);
+    line-height: 1.6;
+  }
+  .site-footer__legal p {
+    max-width: 88ch;
+  }
+  .site-footer__odoo {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-4);
+  }
+  @media (min-width: 768px) {
+    .site-footer__nav {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+  }
+  @media (min-width: 1024px) {
+    .site-footer__top {
+      grid-template-columns: minmax(0, 1fr) minmax(0, 2fr);
+      gap: var(--space-8);
+    }
+  }
+</style>

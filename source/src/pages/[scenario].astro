@@ -1,0 +1,382 @@
+---
+/**
+ * Scenario template — /services, /distribution, /manufacturing.
+ * Content comes from src/content/scenarios.json, FAQ from src/content/faq/<id>.json,
+ * the package ⚑ from src/content/terms.json.
+ */
+import '../styles/tone-light.css';
+import { getCollection, type CollectionEntry } from 'astro:content';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import SumLine from '../components/SumLine.astro';
+import Button from '../components/Button.astro';
+import Section from '../components/Section.astro';
+import BeforeAfter from '../components/BeforeAfter.astro';
+import CasesSection from '../components/sections/CasesSection.astro';
+import Timeline from '../components/Timeline.astro';
+import PackageCard from '../components/PackageCard.astro';
+import Faq from '../components/sections/Faq.astro';
+import FinalCta from '../components/sections/FinalCta.astro';
+import NotAFit from '../components/sections/NotAFit.astro';
+import ScreenMock from '../components/illustrations/ScreenMock.astro';
+import PainVisual from '../components/illustrations/PainVisual.astro';
+import Icon from '../components/Icon.astro';
+import LinkArrow from '../components/LinkArrow.astro';
+import Included from '../components/Included.astro';
+import { getTerms } from '../lib/terms';
+import { appIcon, appLabel } from '../lib/apps';
+import type { IconName } from '../icons/lucide';
+
+export async function getStaticPaths() {
+  const scenarios = await getCollection('scenarios');
+  return scenarios.map((entry) => ({ params: { scenario: entry.id }, props: { entry } }));
+}
+
+interface Props {
+  entry: CollectionEntry<'scenarios'>;
+}
+const { entry } = Astro.props;
+const s = entry.data;
+const terms = await getTerms();
+const pkg = terms.pkg(s.package);
+const keep = terms.pkg('keep');
+const card = (p: typeof pkg) => ({ name: p.name, audience: p.for, includes: p.includes.map(terms.fmt), price: terms.price(p), from: p.price !== null });
+const stepIcons: Record<string, IconName> = { 'fit-call': 'video', blueprint: 'map', build: 'layers', 'go-live': 'calendar-check', keep: 'life-buoy' };
+// On a scenario page the build takes only this scenario's time.
+const buildTime = s.id === 'services' ? terms.vars.buildServices : terms.vars.buildProducts;
+const steps = terms.process.steps.map((st) => ({
+  name: st.name,
+  get: terms.fmt(st.get),
+  time: st.id === 'build' ? buildTime : terms.fmt(st.time),
+  price: terms.fmt(st.price),
+  icon: stepIcons[st.id],
+}));
+const before = s.h1.slice(0, s.h1.length - s.sumPhrase.length).trimEnd();
+const screen = { services: 'projects', distribution: 'inventory', manufacturing: 'production' } as const;
+---
+
+<BaseLayout title={s.seo.title} description={s.seo.description}>
+  <section class="shero tone-dark ledger" data-hero data-animate>
+    <div class="container shero__grid">
+      <div class="shero__copy">
+        <p class="eyebrow">{s.name}</p>
+        <h1 class="hero-title">{before} <SumLine text={s.sumPhrase} delay={200} /></h1>
+        <p class="shero__profile">{s.profile}</p>
+        <p class="hero-sub shero__sub">{s.sub.startsWith(s.profile) ? s.sub.slice(s.profile.length).trim() : s.sub}</p>
+        <div class="btn-row btn-row--stack shero__actions">
+          <Button href="/book">{terms.fmt('Book a {fitCallShort} fit call')}</Button>
+          <Button href="#package" variant="secondary">See the package</Button>
+        </div>
+      </div>
+      <div class="shero__art tone-light">
+        <ScreenMock kind={screen[s.id]} />
+      </div>
+    </div>
+  </section>
+
+  <Section id="familiar" title="Sound familiar?">
+    <ul class="spains" role="list" data-reveal-children>
+      {
+        s.pains.map((pain, n) => (
+          <li class="pain card">
+            <PainVisual scenario={s.id} index={n} />
+            <p>{pain}</p>
+          </li>
+        ))
+      }
+    </ul>
+  </Section>
+
+  <Section id="what-changes" title="What changes" tone="alt">
+    <BeforeAfter rows={s.beforeAfter} caption={`What changes for ${s.name.toLowerCase()}: today compared with Evenmont`} />
+  </Section>
+
+  <Section id="setup" title="What we set up">
+    <div class="setup">
+      <div class="appwin card" data-reveal>
+        <div class="appwin__bar" aria-hidden="true">
+          <span></span><span></span><span></span>
+          <p>evenmont-demo.odoo.com</p>
+        </div>
+        <h3 class="appwin__title">Odoo apps</h3>
+        <ul class="appwin__grid" role="list">
+          {
+            s.apps.map((a) => (
+              <li>
+                <span class:list={['appwin__icon', a === 'Accounting' && 'appwin__icon--core']}>
+                  <Icon name={appIcon(a)} size={24} />
+                </span>
+                <span>{appLabel(a)}</span>
+              </li>
+            ))
+          }
+        </ul>
+        {
+          s.integrations.length > 0 && (
+            <div class="appwin__int">
+              <h3 class="appwin__sub">Integrations</h3>
+              <ul class="appwin__chips" role="list">
+                {s.integrations.map((a) => (
+                  <li>
+                    <Icon name="plug" size={14} />
+                    {a}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )
+        }
+      </div>
+      <div class="setup__get">
+        <h3>What you get</h3>
+        <ul class="outcomes" role="list" data-reveal-children>
+          {
+            s.outcomes.map((o) => (
+              <li>
+                <span class="outcomes__icon">
+                  <Icon name="check" size={18} />
+                </span>
+                {o}
+              </li>
+            ))
+          }
+        </ul>
+      </div>
+    </div>
+    <Included />
+  </Section>
+
+  <CasesSection scenario={s.id} title={`${s.tab} case studies`} />
+
+  <Section id="process" title="How we work" tone="alt">
+    <Timeline steps={steps} />
+    <p class="snote">{terms.fmt(terms.process.note)}</p>
+  </Section>
+
+  <Section id="package" title="Your package">
+    <div class="spkg">
+      <PackageCard {...card(pkg)} featured />
+      <PackageCard {...card(keep)} />
+    </div>
+    <div class="spkg__foot">
+      <p class="spkg__note">{terms.licensesNote} Every project starts with a Blueprint ({terms.vars.blueprintFee}), credited toward the project.</p>
+      <LinkArrow href="/#pricing">All packages</LinkArrow>
+    </div>
+  </Section>
+
+  {
+    s.id === 'manufacturing' && (
+      <NotAFit
+        tight
+        items={[
+          'You need validated manufacturing for pharma or medical devices.',
+          'You run several plants and need advanced production scheduling.',
+        ]}
+      />
+    )
+  }
+
+  <Faq id={s.id} />
+  <FinalCta />
+</BaseLayout>
+
+<style>
+  .shero {
+    padding-top: var(--space-6);
+    padding-bottom: var(--space-9);
+    overflow: hidden;
+  }
+  .shero__grid {
+    display: grid;
+    gap: var(--space-8);
+    align-items: center;
+  }
+  .shero h1 {
+    max-width: 15em;
+  }
+  .shero__profile {
+    margin-top: var(--space-5);
+    color: var(--text-muted);
+    font-weight: 700;
+  }
+  .shero__sub {
+    margin-top: var(--space-2);
+    max-width: 36em;
+  }
+  .shero__actions {
+    margin-top: var(--space-6);
+  }
+  .shero__art {
+    background: none;
+  }
+  @media (min-width: 1024px) {
+    .shero {
+      padding-top: var(--space-8);
+    }
+    .shero__grid {
+      grid-template-columns: minmax(0, 6fr) minmax(0, 6fr);
+      gap: var(--space-8);
+    }
+  }
+  .spains {
+    display: grid;
+    gap: var(--space-4);
+  }
+  @media (min-width: 768px) {
+    .spains {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: var(--space-5);
+    }
+  }
+  .setup {
+    display: grid;
+    gap: var(--space-7);
+    align-items: center;
+  }
+  .appwin {
+    padding: 0 0 var(--space-5);
+    overflow: hidden;
+  }
+  .appwin__bar {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 10px var(--space-4);
+    border-bottom: 1px solid var(--border);
+    background-color: color-mix(in srgb, var(--surface-alt) 45%, var(--surface));
+  }
+  .appwin__bar span {
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    background-color: color-mix(in srgb, var(--text-muted) 35%, transparent);
+  }
+  .appwin__bar p {
+    flex: 1;
+    margin-right: 33px;
+    color: var(--text-muted);
+    font-size: 11px;
+    font-weight: 700;
+    text-align: center;
+  }
+  .appwin__title,
+  .appwin__sub {
+    margin: var(--space-5) var(--space-5) var(--space-4);
+    color: var(--text-muted);
+    font-size: var(--fs-small);
+    font-weight: 800;
+  }
+  .appwin__grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(92px, 1fr));
+    gap: var(--space-4) var(--space-2);
+    padding: 0 var(--space-5);
+  }
+  .appwin__grid li {
+    display: grid;
+    justify-items: center;
+    gap: var(--space-2);
+    color: var(--heading);
+    font-size: var(--fs-xs);
+    font-weight: 700;
+    text-align: center;
+    line-height: 1.25;
+  }
+  .appwin__icon {
+    display: grid;
+    place-items: center;
+    width: 56px;
+    height: 56px;
+    border-radius: 16px;
+    background-color: var(--surface-alt);
+    color: var(--heading);
+  }
+  /* Finance first: Accounting is the one filled tile. */
+  .appwin__icon--core {
+    background-color: var(--heading);
+    color: var(--em-sand);
+  }
+  .appwin__int {
+    margin-top: var(--space-2);
+    border-top: 1px dashed var(--border);
+  }
+  .appwin__chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+    padding: 0 var(--space-5);
+  }
+  .appwin__chips li {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 10px;
+    border-radius: var(--radius-pill);
+    background-color: var(--surface-alt);
+    color: var(--heading);
+    font-size: var(--fs-xs);
+    font-weight: 700;
+  }
+  .setup__get h3 {
+    margin-bottom: var(--space-4);
+  }
+  .outcomes {
+    display: grid;
+    gap: var(--space-3);
+  }
+  .outcomes li {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    padding: var(--space-4);
+    border-radius: 14px;
+    border: 1px solid var(--border);
+    background-color: var(--surface);
+    color: var(--heading);
+    font-weight: 700;
+    line-height: 1.4;
+  }
+  .outcomes__icon {
+    display: grid;
+    place-items: center;
+    width: 32px;
+    height: 32px;
+    flex: none;
+    border-radius: 50%;
+    background-color: var(--rule);
+    color: var(--on-accent);
+  }
+  @media (min-width: 900px) {
+    .setup {
+      grid-template-columns: minmax(0, 6fr) minmax(0, 5fr);
+      gap: var(--space-8);
+    }
+  }
+  .snote {
+    max-width: none;
+    margin-top: var(--space-6);
+    padding-top: var(--space-5);
+    border-top: 1px solid var(--border);
+    font-weight: 700;
+  }
+  .spkg {
+    display: grid;
+    gap: var(--space-5);
+  }
+  @media (min-width: 768px) {
+    .spkg {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      align-items: start;
+    }
+  }
+  .spkg__foot {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-4);
+    margin-top: var(--space-5);
+  }
+  .spkg__note {
+    font-weight: 600;
+  }
+</style>

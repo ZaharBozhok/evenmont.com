@@ -1,0 +1,61 @@
+---
+/** Cases on home and scenario pages. Home: cards follow the selected scenario. */
+import { getCollection } from 'astro:content';
+import CaseCard from '../CaseCard.astro';
+import LinkArrow from '../LinkArrow.astro';
+import Section from '../Section.astro';
+
+interface Props {
+  title?: string;
+  /** Only show cases for one scenario (scenario pages). */
+  scenario?: 'services' | 'distribution' | 'manufacturing';
+  limit?: number;
+  tone?: 'default' | 'alt';
+}
+const { title = 'Companies like yours, on even ground.', scenario, limit = 3, tone = 'default' } = Astro.props;
+const scenarios = await getCollection('scenarios');
+const nameOf = (id: string) => scenarios.find((s) => s.id === id)?.data.name ?? id;
+const all = (await getCollection('cases')).sort((a, b) => a.data.order - b.data.order);
+const cases = (scenario ? all.filter((c) => c.data.scenario === scenario) : all).slice(0, limit);
+---
+
+{
+  cases.length > 0 && (
+    <Section id="cases" title={title} tone={tone}>
+      <div class="cases-grid" data-case-list={scenario ? undefined : ''} data-count={cases.length} data-reveal-children>
+        {cases.map((entry) => (
+          <CaseCard entry={entry} scenarioName={nameOf(entry.data.scenario)} />
+        ))}
+      </div>
+      <p class="cases-more">
+        <LinkArrow href="/cases">All case studies</LinkArrow>
+      </p>
+    </Section>
+  )
+}
+
+<style is:global>
+  .cases-grid {
+    display: grid;
+    gap: var(--space-5);
+  }
+  @media (min-width: 768px) {
+    .cases-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+    .cases-grid[data-count='1'] {
+      grid-template-columns: minmax(0, 560px);
+    }
+  }
+  @media (min-width: 1024px) {
+    .cases-grid:not([data-count='1'], [data-count='2']) {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+    .cases-grid[data-count='2'] {
+      max-width: 920px;
+    }
+  }
+  .cases-more {
+    margin-top: var(--space-5);
+  }
+</style>

@@ -1,0 +1,80 @@
+---
+/**
+ * Client wordmark — DEMO: invented marks for the fictional preview clients, drawn as
+ * neutral one-color SVG (currentColor) so the strip stays calm. Replace with the real
+ * logos (SVG, one color) once clients approve being listed.
+ */
+interface Props {
+  name: string;
+}
+const { name } = Astro.props;
+
+type Mark = { glyph: string; text: string; x: number; size: number; weight: number; spacing: number; upper?: boolean; sub?: string };
+const marks: Record<string, Mark> = {
+  'Fieldwork Collective': {
+    glyph: '<circle cx="14" cy="16" r="11"/><path d="M5 19c4-3 7-3 9 0s6 3 9 0M5 13c4-3 7-3 9 0s6 3 9 0"/>',
+    text: 'Fieldwork',
+    sub: 'COLLECTIVE',
+    x: 32, size: 15, weight: 800, spacing: 0.2,
+  },
+  'Copperline Home Goods': {
+    glyph: '<rect x="3" y="5" width="22" height="22" rx="11"/><path d="M9 21V11h10"/>',
+    text: 'copperline',
+    x: 32, size: 17, weight: 700, spacing: -0.2,
+  },
+  'Tallis Woodworks': {
+    glyph: '<path d="M4 27h20M8 27V9h12v18M8 14h12"/>',
+    text: 'TALLIS',
+    sub: 'WOODWORKS',
+    x: 32, size: 15, weight: 800, spacing: 3, upper: true,
+  },
+  'Ridgeway Engineering': {
+    glyph: '<path d="M2 25l7-10 5 6 5-9 7 13"/>',
+    text: 'RIDGEWAY',
+    x: 34, size: 15, weight: 700, spacing: 2.2, upper: true,
+  },
+  'Harbor Supply Co.': {
+    glyph: '<circle cx="14" cy="8" r="3"/><path d="M14 11v15M6 18a8 8 0 0 0 16 0M9 15h10"/>',
+    text: 'Harbor Supply',
+    x: 32, size: 15.5, weight: 700, spacing: 0,
+  },
+  'Kestrel Signworks': {
+    glyph: '<path d="M3 12l11 7 11-7M7 20l7 5 7-5"/>',
+    text: 'KESTREL',
+    x: 34, size: 16, weight: 800, spacing: 1.5, upper: true,
+  },
+};
+const m = marks[name] ?? { glyph: '<circle cx="14" cy="16" r="10"/>', text: name, x: 32, size: 15, weight: 700, spacing: 0 };
+---
+
+<svg class="client-logo" viewBox="0 0 150 32" role="img" aria-label={name} data-placeholder="true" focusable="false">
+  <g fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" set:html={m.glyph} />
+  {
+    m.sub ? (
+      <>
+        <text x={m.x} y="16" font-size={m.size} font-weight={m.weight} letter-spacing={m.spacing}>
+          {m.text}
+        </text>
+        <text x={m.x} y="28" font-size="8.5" font-weight="700" letter-spacing="2.4">
+          {m.sub}
+        </text>
+      </>
+    ) : (
+      <text x={m.x} y="22" font-size={m.size} font-weight={m.weight} letter-spacing={m.spacing}>
+        {m.text}
+      </text>
+    )
+  }
+</svg>
+
+<style is:global>
+  .client-logo {
+    width: 150px;
+    height: 32px;
+    color: var(--text-muted);
+  }
+  .client-logo text {
+    fill: currentColor;
+    font-family: var(--font-sans);
+  }
+</style>

@@ -1,0 +1,163 @@
+{
+  "$comment": "Site-wide settings. Values marked in `demo.fields` are invented for the pre-release preview; the build lists them so the team replaces them before launch. Values in {{LIKE_THIS}} are open placeholders.",
+  "siteName": "Evenmont",
+  "siteUrl": "https://evenmont.com",
+  "tagline": "Everything adds up.",
+  "secondaryLine": "Business on even ground.",
+  "descriptor": "Finance-first Odoo implementation",
+  "prerelease": true,
+  "demo": {
+    "$comment": "Invented values for the CEO preview. Replace each one with the real value, then remove it from this list. `prerelease: true` keeps the whole site out of search engines (noindex + robots Disallow).",
+    "fields": [
+      "legal.regNo",
+      "legal.businessNameRegNo",
+      "legal.vatNo",
+      "legal.registeredOffice",
+      "legal.directors",
+      "contact.phoneUs",
+      "links.bookingUrl",
+      "links.formEndpoint",
+      "links.certLinks",
+      "links.odooAppsStoreUrl",
+      "links.founderVideoUrl",
+      "odooPartnerBadge",
+      "founders",
+      "partnerContact.name",
+      "partnerFirms",
+      "whiteLabelCases",
+      "proof"
+    ]
+  },
+  "legal": {
+    "legalName": "JITO LTD",
+    "country": "Cyprus",
+    "regNo": "HE 432178",
+    "businessNameRegNo": "BN 118904",
+    "vatNo": "CY 10432178X",
+    "registeredOffice": "41 Griva Digeni Avenue, 3036 Limassol, Cyprus",
+    "directors": "Alex Kovac, Elena Sorel"
+  },
+  "contact": {
+    "email": "hello@evenmont.com",
+    "securityEmail": "security@evenmont.com",
+    "phoneUs": "+1 (646) 555-0142"
+  },
+  "links": {
+    "bookingUrl": "demo",
+    "partnerBookingUrl": "demo",
+    "formEndpoint": "demo",
+    "certLinks": "https://www.odoo.com/partners",
+    "clutchUrl": "/#reviews",
+    "cpaRulesNoteUrl": "/downloads/evenmont-cpa-rules-note.pdf",
+    "founderVideoUrl": "demo",
+    "odooAppsStoreUrl": "https://apps.odoo.com/apps/modules",
+    "codeSamplesUrl": "/downloads/evenmont-code-sample.pdf",
+    "socialLinks": []
+  },
+  "odooPartnerBadge": "Odoo Ready Partner",
+  "founders": [
+    {
+      "name": "Alex Kovac",
+      "role": "Co-founder, finance & Blueprints",
+      "bio": "Ran finance for a 60-person distributor and moved it from QuickBooks and spreadsheets to Odoo. Leads every Blueprint and owns scope and price."
+    },
+    {
+      "name": "Elena Sorel",
+      "role": "Co-founder, delivery & partnerships",
+      "bio": "Nine years as an Odoo consultant across services, distribution and light manufacturing. Runs delivery and works directly with your accountant."
+    }
+  ],
+  "partnerContact": {
+    "name": "Elena Sorel",
+    "role": "Co-founder, runs partnerships"
+  },
+  "downloads": {
+    "clientOnePager": "/downloads/evenmont-client-one-pager.pdf",
+    "partnerOnePager": "/downloads/evenmont-partner-one-pager.pdf",
+    "sampleSow": "/downloads/evenmont-sample-sow.pdf",
+    "sampleWeeklyReport": "/downloads/evenmont-sample-weekly-report.pdf",
+    "samplePartnerAgreement": "/downloads/evenmont-sample-partner-agreement.pdf",
+    "samplePayoutStatement": "/downloads/evenmont-sample-payout-statement.pdf",
+    "cpaRulesNote": "/downloads/evenmont-cpa-rules-note.pdf",
+    "readinessChecklist": "/downloads/evenmont-odoo-readiness-checklist.pdf",
+    "codeSample": "/downloads/evenmont-code-sample.pdf"
+  },
+  "analytics": {
+    "$comment": "Slot for a cookieless analytics tool (e.g. Plausible, Fathom, Umami, Cloudflare Web Analytics). Disabled: nothing loads until enabled is true and src is set.",
+    "enabled": false,
+    "src": "",
+    "domain": "evenmont.com"
+  },
+  "partnerFirms": [
+    "Raman & Ellis CPAs · Denver, CO",
+    "Northgate Accounting Group · Austin, TX",
+    "Blue Pine Bookkeeping · Asheville, NC",
+    "Summit Ledger Advisors · Portland, OR"
+  ],
+  "whiteLabelCases": [
+    {
+      "who": "Digital agency · New York · 40 people",
+      "what": "Odoo eCommerce and inventory for a DTC apparel brand",
+      "facts": [
+        "Delivered under the agency’s brand",
+        "Live in 9 weeks, fixed price",
+        "Code and documentation handed to the agency"
+      ]
+    },
+    {
+      "who": "Odoo integrator · Chicago · 12 people",
+      "what": "A custom manufacturing module and a v15 → v17 migration for three of their clients",
+      "facts": [
+        "Senior developers inside their sprints",
+        "Tests and technical docs for every module",
+        "No client contact without them"
+      ]
+    }
+  ],
+  "proof": {
+    "$comment": "DEMO: rating, certifications and stats are invented for the preview. Replace with real, verifiable numbers (and link the review source) before launch.",
+    "rating": {
+      "value": "4.9",
+      "count": 32,
+      "source": "Clutch"
+    },
+    "certifications": [
+      {
+        "id": "partner",
+        "ring": "Odoo partner · Ready · 2026",
+        "center": "Partner",
+        "caption": "Odoo Ready Partner"
+      },
+      {
+        "id": "functional",
+        "ring": "Odoo certified · Functional",
+        "center": "v17",
+        "caption": "4 functional consultants"
+      },
+      {
+        "id": "technical",
+        "ring": "Odoo certified · Technical",
+        "center": "v17",
+        "caption": "2 technical consultants"
+      }
+    ],
+    "stats": [
+      {
+        "value": "40+",
+        "label": "Odoo projects delivered"
+      },
+      {
+        "value": "96%",
+        "label": "delivered on the fixed price"
+      },
+      {
+        "value": "3 days",
+        "label": "median month-end close after go-live"
+      },
+      {
+        "value": "12",
+        "label": "US states with Evenmont clients"
+      }
+    ]
+  }
+}

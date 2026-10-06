@@ -1,0 +1,291 @@
+---
+/**
+ * Home hero illustration — "many tools → one system".
+ * Source chips (the tools a growing company juggles) send data along thin lines;
+ * amber pulses travel in, the lines merge into one thick connector, and a light
+ * dashboard card settles into place: skeleton rows fill with numbers, gross margin
+ * appears with its sum line, the mini chart rises, "Books balanced".
+ *
+ * ≥640px: horizontal, 6 chips → card on the right. Phone: 5 badges → funnel → card.
+ * Motion runs once via the .scene keyframe system in base.css (transform, opacity,
+ * stroke-dashoffset only). Without JS or with reduced motion the final composition
+ * shows as is. Decorative: the same message is in the H1 and the sub copy.
+ */
+import { icons, type IconName } from '../../icons/lucide';
+
+/** Inline scene timing for one part: keyframes, duration, delay, easing. */
+const k = (name: string, t: number, d: number, e?: string) =>
+  `--k:k-${name};--t:${t}ms;--d:${Math.round(d)}ms${e ? `;--e:${e}` : ''}`;
+const SETTLE = 'var(--ease-settle)';
+const INOUT = 'cubic-bezier(.45,0,.2,1)';
+const PULSE = 'cubic-bezier(.5,0,.3,1)';
+
+const icon = (name: IconName, x: number, y: number, size: number) =>
+  `<svg x="${x}" y="${y}" width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">${icons[name]}</svg>`;
+
+const rows = [
+  { label: 'Sales orders', value: '$412,800', key: 'hs__ever' },
+  { label: 'Inventory on hand', value: '$96,450', key: 'hs__pine' },
+  { label: 'Billable hours', value: '1,284 h', key: 'hs__amber' },
+  { label: 'Open invoices', value: '$58,210', key: 'hs__keyd' },
+];
+const skelW = [92, 118, 104, 96];
+
+/* ---- ≥640px geometry (viewBox 0 0 612 470) ---- */
+const chips: { label: string; icon: IconName }[] = [
+  { label: 'Spreadsheets', icon: 'sheet' },
+  { label: 'CRM', icon: 'users' },
+  { label: 'Accounting', icon: 'calculator' },
+  { label: 'Inventory', icon: 'package' },
+  { label: 'Email', icon: 'mail' },
+  { label: 'Time tracking', icon: 'clock' },
+];
+const W = 172; // chip width
+const cy = (i: number) => 62 + i * 72;
+const M = { x: 272, y: 242 }; // merge point
+const line = (i: number) => `M${W} ${cy(i)}C${W + 50} ${cy(i)} ${M.x - 40} ${M.y} ${M.x} ${M.y}`;
+const C = { x: 314, y: 42, w: 286, h: 400 };
+const L = C.x + 24;
+const R = C.x + C.w - 24;
+const rowY = (i: number) => 134 + i * 36;
+const bars = [16, 24, 20, 30, 27, 38, 48];
+
+/* ---- Phone geometry (viewBox 0 0 350 470) ---- */
+const badges: { label: string; icon: IconName }[] = [
+  { label: 'Sheets', icon: 'sheet' },
+  { label: 'CRM', icon: 'users' },
+  { label: 'Invoices', icon: 'receipt-text' },
+  { label: 'Inventory', icon: 'package' },
+  { label: 'Email', icon: 'mail' },
+];
+const bx = (i: number) => 35 + i * 70;
+const mM = { x: 175, y: 178 };
+const mLine = (i: number) => (bx(i) === mM.x ? `M175 88V${mM.y}` : `M${bx(i)} 88C${bx(i)} 132 ${mM.x} 136 ${mM.x} ${mM.y}`);
+const mC = { x: 10, y: 202, w: 330, h: 256 };
+const mL = mC.x + 20;
+const mR = mC.x + mC.w - 20;
+const mRowY = (i: number) => 284 + i * 32;
+const mBars = [14, 21, 18, 26, 24, 33, 42];
+---
+
+<div class="hs scene" data-animate aria-hidden="true">
+  <svg class="hs__wide" viewBox="0 0 612 470" focusable="false">
+    {chips.map((_, i) => <path class="hs__ln k" style={k('draw', 1000, 450 + i * 70, INOUT)} pathLength="1" d={line(i)} />)}
+    {chips.map((_, i) => <path class="pulse k" style={k('pulse', 1100, 1000 + i * 110, PULSE)} pathLength="1" d={line(i)} />)}
+    <path class="hs__thick k" style={k('draw', 420, 1550)} pathLength="1" d={`M${M.x} ${M.y}H${C.x}`} />
+    <path class="pulse hs__pthick k" style={k('pulse', 560, 1700, PULSE)} pathLength="1" d={`M${M.x} ${M.y}H${C.x}`} />
+    <circle class="hs__amber fb k" style={k('pop', 480, 1500, SETTLE)} cx={M.x} cy={M.y} r="6" />
+
+    {
+      chips.map((c, i) => (
+        <g class="hs__src k" style={k('slide', 560, i * 70)}>
+          <rect class="hs__pill" x="0.75" y={cy(i) - 22.25} width={W - 1.5} height="44.5" rx="22.25" />
+          <circle class="hs__ico" cx="24" cy={cy(i)} r="16" />
+          <g class="hs__glyph" set:html={icon(c.icon, 14, cy(i) - 10, 20)} />
+          <text x="50" y={cy(i) + 5} font-size="15">
+            {c.label}
+          </text>
+          <circle class="hs__muted" cx={W} cy={cy(i)} r="3.5" />
+        </g>
+      ))
+    }
+
+    <rect class="hs__back k" style={k('back', 800, 350)} x={C.x + 12} y={C.y + 12} width={C.w} height={C.h} rx="18" />
+    <g class="hs__card fb k" style={k('card', 900, 200, SETTLE)}>
+      <rect class="hs__white" x={C.x} y={C.y} width={C.w} height={C.h} rx="18" />
+      <rect class="hs__ever" x={L} y="64" width="26" height="26" rx="7" />
+      <rect class="hs__amber" x={L + 7} y="75.5" width="12" height="2.6" rx="1.3" />
+      <rect class="hs__amber" x={L + 7} y="80.5" width="12" height="2.6" rx="1.3" />
+      <text x={L + 36} y="82" font-size="14" font-weight="700">One system</text>
+      <rect class="hs__sage" x={R - 50} y="66" width="50" height="22" rx="11" />
+      <circle class="hs__pine" cx={R - 37} cy="77" r="3.5" />
+      <text class="hs__pine" x={R - 28} y="81.2" font-size="11.5" font-weight="700">Live</text>
+      <path class="hs__rule" d={`M${L} 106H${R}M${L} 266H${R}M${L} 386H${R}`} />
+
+      {
+        rows.map((_, i) => (
+          <g class="hs__skel k" style={k('out', 420, 1750 + i * 120)}>
+            <rect x={L} y={rowY(i) - 5} width={skelW[i]} height="10" rx="5" />
+            <rect x={R - 58} y={rowY(i) - 5} width="58" height="10" rx="5" />
+          </g>
+        ))
+      }
+      {
+        rows.map((r, i) => (
+          <g class="k" style={k('row', 520, 1750 + i * 120)}>
+            <rect class={r.key} x={L} y={rowY(i) - 5} width="10" height="10" rx="3" />
+            <text class="hs__stone" x={L + 20} y={rowY(i) + 4.5} font-size="13">
+              {r.label}
+            </text>
+            <text x={R} y={rowY(i) + 4.5} font-size="13.5" font-weight="700" text-anchor="end">
+              {r.value}
+            </text>
+            {i < rows.length - 1 && <path class="hs__rule" d={`M${L} ${rowY(i) + 18}H${R}`} />}
+          </g>
+        ))
+      }
+
+      <g class="hs__skel k" style={k('out', 420, 2250)}>
+        <rect x={L} y="284" width="150" height="10" rx="5" />
+        <rect x={L} y="306" width="112" height="34" rx="8" />
+        <rect x={R - 106} y="315" width="106" height="48" rx="6" />
+      </g>
+      <g class="k" style={k('rise', 600, 2250)}>
+        <text class="hs__stone" x={L} y="294" font-size="10.5" font-weight="700" letter-spacing="0.84">GROSS MARGIN · SEPTEMBER</text>
+        <text class="hs__big hs__ever" x={L} y="338" font-size="42">38.4%</text>
+      </g>
+      <rect class="hs__amber fb-l k" style={k('gx', 520, 2700)} x={L} y="349" width="118" height="5" rx="2.5" />
+      <rect class="hs__amber fb-l k" style={k('gx', 520, 2820)} x={L} y="358" width="118" height="5" rx="2.5" />
+      {
+        bars.map((h, i) => (
+          <rect
+            class:list={[i === bars.length - 1 ? 'hs__amber' : 'hs__bar', 'fb-b k']}
+            style={k('gy', 640, 2300 + i * 60, SETTLE)}
+            x={R - 106 + i * 16}
+            y={363 - h}
+            width="10"
+            height={h}
+            rx="2.5"
+          />
+        ))
+      }
+      <g class="k" style={k('fade', 600, 2950)}>
+        <g class="hs__ok" set:html={icon('circle-check', L - 1, 399, 18)} />
+        <text class="hs__stone" x={L + 25} y="412.5" font-size="12">Books balanced · synced 2 min ago</text>
+      </g>
+    </g>
+    <g class="hs__toast k" style={k('rise', 700, 3150, SETTLE)}>
+      <rect class="hs__toast-shadow" x="204" y="4" width="244" height="52" rx="14" />
+      <rect class="hs__white" x="200" y="-2" width="244" height="52" rx="14" />
+      <circle class="hs__toast-av" cx="226" cy="24" r="15" />
+      <text class="hs__toast-ini" x="226" y="28" text-anchor="middle">PR</text>
+      <text x="250" y="20" font-size="12" font-weight="800">Priya Raman, CPA</text>
+      <text class="hs__stone" x="250" y="37" font-size="11">Signed off the September close</text>
+      <g class="hs__ok" set:html={icon('circle-check', 418, 14, 18)} />
+    </g>
+  </svg>
+
+  <svg class="hs__tall" viewBox="0 0 350 470" focusable="false">
+    {badges.map((_, i) => <path class="hs__ln k" style={k('draw', 1000, 400 + i * 70, INOUT)} pathLength="1" d={mLine(i)} />)}
+    {badges.map((_, i) => <path class="pulse k" style={k('pulse', 1100, 900 + i * 100, PULSE)} pathLength="1" d={mLine(i)} />)}
+    <path class="hs__thick k" style={k('draw', 420, 1400)} pathLength="1" d={`M${mM.x} ${mM.y}V${mC.y}`} />
+    <path class="pulse hs__pthick k" style={k('pulse', 560, 1550, PULSE)} pathLength="1" d={`M${mM.x} ${mM.y}V${mC.y}`} />
+    <circle class="hs__amber fb k" style={k('pop', 480, 1350, SETTLE)} cx={mM.x} cy={mM.y} r="5.5" />
+
+    {
+      badges.map((b, i) => (
+        <g class="k" style={k('drop', 560, i * 70)}>
+          <circle class="hs__pill" cx={bx(i)} cy="30" r="24" />
+          <g class="hs__glyph" set:html={icon(b.icon, bx(i) - 11, 19, 22)} />
+          <text class="hs__muted" x={bx(i)} y="75" font-size="12.5" text-anchor="middle">
+            {b.label}
+          </text>
+        </g>
+      ))
+    }
+
+    <rect class="hs__back k" style={k('back', 800, 350)} x={mC.x + 10} y={mC.y + 10} width={mC.w - 20} height={mC.h} rx="18" />
+    <g class="hs__card fb k" style={k('card', 900, 200, SETTLE)}>
+      <rect class="hs__white" x={mC.x} y={mC.y} width={mC.w} height={mC.h} rx="18" />
+      <rect class="hs__ever" x={mL} y="222" width="24" height="24" rx="6.5" />
+      <rect class="hs__amber" x={mL + 6.5} y="232.5" width="11" height="2.4" rx="1.2" />
+      <rect class="hs__amber" x={mL + 6.5} y="237" width="11" height="2.4" rx="1.2" />
+      <text x={mL + 34} y="239" font-size="14" font-weight="700">One system</text>
+      <rect class="hs__sage" x={mR - 48} y="223" width="48" height="22" rx="11" />
+      <circle class="hs__pine" cx={mR - 36} cy="234" r="3.5" />
+      <text class="hs__pine" x={mR - 27} y="238.2" font-size="11.5" font-weight="700">Live</text>
+      <path class="hs__rule" d={`M${mL} 260H${mR}`} />
+      {
+        rows.slice(0, 3).map((_, i) => (
+          <g class="hs__skel k" style={k('out', 420, 1600 + i * 120)}>
+            <rect x={mL} y={mRowY(i) - 5} width={skelW[i]} height="10" rx="5" />
+            <rect x={mR - 58} y={mRowY(i) - 5} width="58" height="10" rx="5" />
+          </g>
+        ))
+      }
+      {
+        rows.slice(0, 3).map((r, i) => (
+          <g class="k" style={k('row', 520, 1600 + i * 120)}>
+            <rect class={r.key} x={mL} y={mRowY(i) - 5} width="10" height="10" rx="3" />
+            <text class="hs__stone" x={mL + 20} y={mRowY(i) + 4.5} font-size="13">
+              {r.label}
+            </text>
+            <text x={mR} y={mRowY(i) + 4.5} font-size="13.5" font-weight="700" text-anchor="end">
+              {r.value}
+            </text>
+            <path class="hs__rule" d={`M${mL} ${mRowY(i) + 16}H${mR}`} />
+          </g>
+        ))
+      }
+      <g class="hs__skel k" style={k('out', 420, 2000)}>
+        <rect x={mL} y="386" width="150" height="10" rx="5" />
+        <rect x={mL} y="406" width="96" height="30" rx="8" />
+        <rect x={mR - 94} y="412" width="94" height="42" rx="6" />
+      </g>
+      <g class="k" style={k('rise', 600, 2000)}>
+        <text class="hs__stone" x={mL} y="396" font-size="10.5" font-weight="700" letter-spacing="0.84">GROSS MARGIN · SEPTEMBER</text>
+        <text class="hs__big hs__ever" x={mL} y="434" font-size="36">38.4%</text>
+      </g>
+      <rect class="hs__amber fb-l k" style={k('gx', 520, 2450)} x={mL} y="442" width="98" height="4.5" rx="2.25" />
+      <rect class="hs__amber fb-l k" style={k('gx', 520, 2570)} x={mL} y="450" width="98" height="4.5" rx="2.25" />
+      {
+        mBars.map((h, i) => (
+          <rect
+            class:list={[i === mBars.length - 1 ? 'hs__amber' : 'hs__bar', 'fb-b k']}
+            style={k('gy', 640, 2050 + i * 60, SETTLE)}
+            x={mR - 94 + i * 14.3}
+            y={454 - h}
+            width="9"
+            height={h}
+            rx="2.25"
+          />
+        ))
+      }
+    </g>
+  </svg>
+</div>
+
+<style is:global>
+  .hs > svg {
+    width: 100%;
+    height: auto;
+    overflow: visible;
+    font-family: var(--font-sans);
+    font-weight: 600;
+  }
+  .hs__wide { display: none; }
+  .hs__tall { max-width: 400px; margin-inline: auto; }
+  @media (min-width: 640px) {
+    .hs__wide { display: block; max-width: 612px; }
+    .hs__tall { display: none; }
+  }
+  /* Sources on the dark band */
+  .hs__src { fill: var(--text); }
+  .hs__pill { fill: color-mix(in srgb, var(--text) 8%, var(--bg)); stroke: var(--border); stroke-width: 1.5; }
+  .hs__ico { fill: color-mix(in srgb, var(--text) 10%, transparent); }
+  .hs__glyph { color: var(--rule); }
+  .hs__muted { fill: var(--text-muted); }
+  .hs__ln, .hs__thick { fill: none; stroke-linecap: round; stroke-dasharray: 1; }
+  .hs__ln { stroke: color-mix(in srgb, var(--text-muted) 55%, transparent); stroke-width: 1.5; }
+  .hs__thick { stroke: var(--text); stroke-width: 6; }
+  .hs__pthick { --p0: 0.38; stroke-width: 6; stroke-dasharray: 0.35 1.6; }
+  .hs__amber { fill: var(--rule); }
+  .hs__back { fill: color-mix(in srgb, var(--text) 12%, var(--bg)); stroke: var(--border); }
+  /* The card: a light surface inside the dark hero band (client palette primitives) */
+  .hs__card { fill: var(--em-ink); font-variant-numeric: tabular-nums; }
+  .hs__white { fill: var(--em-white); }
+  .hs__ever { fill: var(--em-evergreen); }
+  .hs__pine { fill: var(--em-pine); }
+  .hs__sage { fill: var(--em-sage); }
+  .hs__stone { fill: var(--em-stone); }
+  .hs__keyd { fill: var(--em-sage); stroke: var(--em-pine); }
+  .hs__rule { fill: none; stroke: rgba(20, 32, 28, 0.09); }
+  .hs__skel { fill: rgba(20, 32, 28, 0.07); opacity: 0; }
+  .hs__bar { fill: color-mix(in srgb, var(--em-pine) 26%, var(--em-white)); }
+  .hs__big { font-family: var(--font-display); letter-spacing: -0.01em; }
+  .hs__ok { color: var(--em-pine); }
+  .hs__toast { fill: var(--em-ink); }
+  .hs__toast-shadow { fill: rgba(0, 0, 0, 0.18); }
+  .hs__toast-av { fill: color-mix(in srgb, var(--rule) 55%, var(--em-white)); }
+  .hs .hs__toast-ini { fill: var(--em-ink); font-size: 10px; font-weight: 800; }
+</style>

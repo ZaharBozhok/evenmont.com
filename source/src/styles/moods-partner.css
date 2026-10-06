@@ -1,0 +1,74 @@
+/* ==========================================================================
+   Partner moods — "Partner Desk" (light) and its dark white-label variant.
+   Split out of the kit's tokens.css (values unchanged, see brand-kit/tokens.css)
+   so client pages don't ship them. Imported only by the partner pages.
+   html[data-mood] outranks :root regardless of stylesheet order.
+   ========================================================================== */
+
+/* ---- Partner mood, light (accountants, CPAs, fractional CFOs) ---- */
+html[data-mood="partner"] {
+  --bg:            var(--em-paper);
+  --surface:       var(--em-white);
+  --surface-alt:   var(--em-mist);
+  --text:          var(--em-ink);
+  --text-muted:    var(--em-slate);
+  --heading:       var(--em-night);
+  --link:          var(--em-cobalt);
+  --border:        rgba(94, 102, 113, 0.25);
+  --accent:        var(--em-cobalt);
+  --on-accent:     var(--em-white);
+  --accent-edge:   transparent;
+  --rule:          var(--em-cobalt);
+  --focus:         var(--em-cobalt);
+  --success:       var(--em-evergreen);
+  --error:         var(--em-brick);
+  --dark-bg:        var(--em-night);
+  --on-dark:        var(--em-paper);
+  --on-dark-muted:  var(--em-mist);
+  --on-dark-link:   var(--em-sky);
+  --on-dark-focus:  var(--em-sky);
+  --chart-1: var(--em-night); --chart-2: var(--em-slate); --chart-3: var(--em-mist); --chart-highlight: var(--em-cobalt);
+}
+
+/* ---- Partner mood, dark (white-label for agencies & Odoo integrators) ---- */
+html[data-mood="partner-dark"] {
+  --bg:            var(--em-night);
+  --surface:       #123029;            /* cards on Night; Paper text 13.2:1 */
+  --surface-alt:   var(--em-evergreen);
+  --text:          var(--em-paper);
+  --text-muted:    #B7C4BE;            /* 8.9:1 on Night */
+  --heading:       var(--em-paper);
+  --link:          var(--em-sky);
+  --border:        rgba(247, 247, 244, 0.14);
+  --accent:        var(--em-cobalt);
+  --on-accent:     var(--em-white);
+  --accent-edge:   var(--em-sky);      /* Cobalt vs card surface is only 2.7:1 -> add 1px Sky edge */
+  --rule:          var(--em-sky);
+  --focus:         var(--em-sky);
+  --success:       #8FD1B5;
+  --error:         #FF9A8A;            /* 7.8:1 on Night */
+  --dark-bg:        #071A16;
+  --on-dark:        var(--em-paper);
+  --on-dark-muted:  #B7C4BE;
+  --on-dark-link:   var(--em-sky);
+  --on-dark-focus:  var(--em-sky);
+  --chart-1: var(--em-paper); --chart-2: var(--em-sky); --chart-3: #3A4F49; --chart-highlight: var(--em-cobalt);
+}
+
+/* Theme extensions for the partner moods (see theme.css) */
+html[data-mood="partner"] {
+  --on-dark-border: rgba(247, 247, 244, 0.18);
+  --on-dark-surface: #123029;                   /* partner-dark card surface */
+  --on-dark-accent-edge: var(--em-sky);         /* "On dark cards add a 1px Sky edge to Cobalt buttons" */
+  --on-dark-success: #8FD1B5;                   /* partner-dark success value */
+  --alt-link: var(--em-ink);                    /* "No Cobalt text on Mist — use Ink" */
+}
+
+html[data-mood="partner-dark"] {
+  color-scheme: dark;
+  --on-dark-border: rgba(247, 247, 244, 0.14);
+  --on-dark-surface: #123029;
+  --on-dark-accent-edge: var(--em-sky);
+  --on-dark-success: #8FD1B5;
+  --alt-link: var(--em-sky);                    /* Sky on Evergreen: 6.0:1 */
+}

@@ -1,0 +1,658 @@
+---
+/** /partners — partner program for CPAs, bookkeepers and fractional CFOs (partner mood, light). */
+import '../../styles/tone-light.css';
+import { getCollection } from 'astro:content';
+import { Picture } from 'astro:assets';
+import partnerDesk from '../../assets/placeholders/partner-desk.jpg';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import '../../styles/moods-partner.css';
+import SumLine from '../../components/SumLine.astro';
+import Button from '../../components/Button.astro';
+import Section from '../../components/Section.astro';
+import Icon from '../../components/Icon.astro';
+import T from '../../components/T.astro';
+import LinkArrow from '../../components/LinkArrow.astro';
+import Timeline from '../../components/Timeline.astro';
+import RiskTable from '../../components/RiskTable.astro';
+import Avatar from '../../components/Avatar.astro';
+import Faq from '../../components/sections/Faq.astro';
+import PartnerIntroForm from '../../components/forms/PartnerIntroForm.astro';
+import TwoColumns from '../../components/illustrations/TwoColumns.astro';
+import { settings } from '../../lib/site';
+import { getTerms } from '../../lib/terms';
+import { usd } from '../../lib/text';
+import type { IconName } from '../../icons/lucide';
+
+const terms = await getTerms();
+const fmt = terms.fmt;
+const coDelivery = (await getCollection('cases'))
+  .filter((c) => c.data.coDelivery && c.data.accountantQuote)
+  .sort((a, b) => a.data.order - b.data.order)
+  .slice(0, 2);
+
+const problems: { icon: IconName; text: string; note: string }[] = [
+  { icon: 'trending-up', text: 'Your clients outgrew QuickBooks.', note: 'More people, more stock, more workarounds.' },
+  { icon: 'package', text: 'Inventory doesn’t match the books.', note: 'And you’re the one asked to explain the gap.' },
+  { icon: 'timer', text: 'Cleanup eats your hours.', note: 'Hours you can’t bill at your normal rate.' },
+  { icon: 'message-circle', text: '“Which system should we use?” has no good answer.', note: 'Every option sounds like a big project.' },
+];
+
+const ways = [
+  {
+    name: 'Referral',
+    rows: [
+      ['You', 'Introduce us to a client'],
+      ['We', 'Sell, implement, support'],
+      ['Client relationship', 'Books and advice stay with you'],
+      ['Who invoices the client', 'Evenmont'],
+      ['You earn', 'Referral fee — or the same amount as a discount for your client'],
+    ],
+  },
+  {
+    name: 'Co-delivery',
+    rows: [
+      ['You', 'Own the accounting part: chart of accounts, opening balances, close process'],
+      ['We', 'Do all the technical work'],
+      ['Client relationship', 'Books and advice stay with you'],
+      ['Who invoices the client', 'Each of us for our own part'],
+      ['You earn', 'Your own hours at your own rate'],
+    ],
+  },
+];
+
+const getIcons: IconName[] = ['percent', 'graduation-cap', 'folder-open', 'stamp', 'layout-dashboard', 'repeat', 'user-round'];
+
+const risks = [
+  { concern: 'If the project fails, my reputation suffers.', answer: 'Fixed-price phases, a founder on every project, weekly demos, you see the status.' },
+  { concern: 'You’ll take my client.', answer: 'We never do bookkeeping, tax or financial advisory; non-solicit clause in the agreement.' },
+  { concern: 'I’ll get dragged into tech support.', answer: 'Technology, training and support are fully on us.' },
+  { concern: 'I might break CPA ethics rules.', answer: 'Written disclosure, attest-client option, fee-as-discount option.' },
+  { concern: 'It will take my time.', answer: fmt('No quotas, no minimums, no mandatory training; a handoff takes {handoff}.') },
+  { concern: 'I’ll be locked in.', answer: 'Free to join, no exclusivity, leave any time.' },
+  { concern: 'Who gets credit for the client?', answer: 'Deal registration, scheduled payouts, transparent statements.' },
+  { concern: 'My client’s data could be at risk.', answer: 'NDA, least-privilege access, hosting on Odoo.sh or the client’s server.' },
+  { concern: 'I’ll be liable if something goes wrong.', answer: 'The client signs the implementation contract with us, not with you.' },
+];
+
+const steps: { name: string; get: string; icon: IconName }[] = [
+  { name: 'Apply', get: 'The short form at the end of this page.', icon: 'pen-line' },
+  { name: fmt('{partnerIntroShort} intro'), get: 'A call with the founder who runs partnerships.', icon: 'video' },
+  { name: 'One-page agreement', get: 'Disclosure, fee option and non-solicit, on one page.', icon: 'file-signature' },
+  { name: 'First client', get: fmt('Register the introduction — it’s protected for {dealRegistration}.'), icon: 'user-check' },
+  { name: 'Payout', get: fmt('{feePercent} of the client’s fees, paid within {payoutDays} after the client pays.'), icon: 'banknote' },
+];
+
+const clientPromise = [
+  'Fixed price per phase. If we underestimate, that’s on us.',
+  'Stop after any phase. They pay only for what’s delivered.',
+  'Their code, their data, full documentation. No lock-in.',
+  fmt('{hypercare} of hypercare after go-live.'),
+];
+---
+
+<BaseLayout
+  mood="partner"
+  title="Partner program for CPAs & bookkeepers | Evenmont"
+  description="Refer a client or co-deliver Odoo projects with us. Fixed-price phases, no quotas, no fees to join — and your client stays your client."
+>
+  <section class="phero tone-dark ledger" data-hero data-animate>
+    <div class="container phero__grid">
+      <div class="phero__copy">
+        <p class="eyebrow">Partner program for CPAs, bookkeepers and fractional CFOs</p>
+        <h1 class="hero-title">
+          <SumLine text="Recommend Odoo with confidence." delay={200} /><br />
+          You keep the books — we build the system.
+        </h1>
+        <p class="hero-sub phero__sub">
+          Refer a client or co-deliver with us. Fixed-price phases, no quotas, no fees to join — and your client stays your
+          client.
+        </p>
+        <div class="btn-row btn-row--stack phero__actions">
+          <Button href="#apply">{fmt('Book a {partnerIntroShort} partner intro')}</Button>
+          <Button href={settings.downloads.partnerOnePager} variant="secondary" icon="file-down" download>Get the partner one-pager</Button>
+        </div>
+      </div>
+      <div class="phero__art">
+        <TwoColumns />
+      </div>
+    </div>
+  </section>
+
+  <Section id="problem" title="The problem">
+    <ul class="grid grid--4 problems" role="list" data-reveal-children>
+      {
+        problems.map((p) => (
+          <li class="problem card">
+            <span class="problem__icon" aria-hidden="true">
+              <Icon name={p.icon} size={22} />
+            </span>
+            <p>{p.text}</p>
+            <p class="problem__note">{p.note}</p>
+          </li>
+        ))
+      }
+    </ul>
+  </Section>
+
+  <Section id="ways" title="Two ways to work" tone="alt">
+    <div class="grid grid--2 ways">
+      {
+        ways.map((way) => (
+          <article class="way card">
+            <h3>{way.name}</h3>
+            <dl class="way__rows">
+              {way.rows.map(([k, v]) => (
+                <div>
+                  <dt>{k}</dt>
+                  <dd>{v}</dd>
+                </div>
+              ))}
+            </dl>
+          </article>
+        ))
+      }
+    </div>
+  </Section>
+
+  <Section id="what-you-get" title="What you get">
+    <ul class="gets" role="list" data-reveal-children>
+      {
+        terms.partner.whatYouGet.map((item, i) => (
+          <li class="get">
+            <span class="get__icon" aria-hidden="true">
+              <Icon name={getIcons[i % getIcons.length]} />
+            </span>
+            <p>{fmt(item)}</p>
+          </li>
+        ))
+      }
+    </ul>
+  </Section>
+
+  <Section id="risks" title="What you don’t risk" tone="dark">
+    <RiskTable rows={risks} caption="Partner concerns and how we handle them" />
+  </Section>
+
+  <Section id="cpa-rules" title="Built for CPA rules">
+    <div class="cpa-wrap">
+      <div class="cpa card">
+        <Icon name="scale" size={32} class="cpa__icon" />
+        <div>
+          <p class="lead">
+            Designed around AICPA rules on referral fees: written disclosure for every fee, and a no-fee option for attest
+            clients. State rules can be stricter — our agreement asks you to confirm yours.
+          </p>
+          <p class="cpa__link"><LinkArrow href={settings.links.cpaRulesNoteUrl}>Read our note on CPA rules</LinkArrow></p>
+        </div>
+      </div>
+      <div class="cpa__media">
+        <Picture
+          src={partnerDesk}
+          alt="A tidy desk with a laptop and printed documents"
+          width={960}
+          height={720}
+          widths={[400, 720, 960]}
+          sizes="(min-width: 1024px) 40vw, calc(100vw - 2 * clamp(20px, 4vw, 40px))"
+          formats={['avif', 'webp']}
+          loading="lazy"
+          decoding="async"
+          data-placeholder="true"
+        />
+      </div>
+    </div>
+  </Section>
+
+  <Section id="how-it-works" title="How it works" tone="alt">
+    <Timeline steps={steps} />
+  </Section>
+
+  <Section id="economics" title="Economics example" intro="An illustration, not a promise.">
+    <div class="grid grid--2 econ">
+      {
+        terms.economics.map((e) => (
+          <article class="econ__card card">
+            <h3>{e.label}</h3>
+            <table class="econ__table">
+              <caption class="visually-hidden">{`${e.label}: example fees`}</caption>
+              <tbody>
+                <tr>
+                  <th scope="row">{e.projectLabel}</th>
+                  <td>{usd(e.projectAmount)}</td>
+                </tr>
+                <tr>
+                  <th scope="row">{`Keep: ${usd(e.keepMonthly)} × ${e.keepMonths} months`}</th>
+                  <td>{usd(e.keepAmount)}</td>
+                </tr>
+                <tr class="econ__total">
+                  <th scope="row">Client pays</th>
+                  <td>
+                    <SumLine text={usd(e.total)} />
+                  </td>
+                </tr>
+                <tr class="econ__fee">
+                  <th scope="row">{`Your fee (${terms.vars.feePercent})`}</th>
+                  <td>
+                    <span class="num">{usd(e.fee)}</span>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </article>
+        ))
+      }
+    </div>
+    <p class="econ__note">{terms.partner.coDelivery}</p>
+  </Section>
+
+  <Section id="client" title="What your client gets" tone="alt">
+    <div class="client">
+      <div>
+        <p class="lead">
+          One system for sales, operations and the books — built in fixed-price phases, with you in the loop and a founder on
+          the project.
+        </p>
+        <div class="client__links">
+          <LinkArrow href="/">See the site for businesses</LinkArrow>
+          <LinkArrow href={settings.downloads.clientOnePager} download>Download the client one-pager</LinkArrow>
+        </div>
+      </div>
+      <div class="card">
+        <ul class="checks" role="list">
+          {clientPromise.map((p) => <li><Icon name="check" />{p}</li>)}
+        </ul>
+      </div>
+    </div>
+  </Section>
+
+  <Section id="proof" title="Proof for partners">
+    <div class="proofp">
+      {
+        coDelivery.map((c) => (
+          <article class="proofp__case card">
+            <p class="proofp__kicker">
+              Co-delivery case {c.data.placeholder && <span class="sample-label">Sample</span>}
+            </p>
+            <blockquote>
+              <p>“{c.data.accountantQuote?.text}”</p>
+            </blockquote>
+            <p class="proofp__who">
+              <Avatar name={c.data.accountantQuote?.name ?? ''} size={36} />
+              <span>
+                {c.data.accountantQuote?.name}, {c.data.accountantQuote?.firm}
+                <span class="proofp__client">with {c.data.company}</span>
+              </span>
+            </p>
+            <LinkArrow href={`/cases/${c.id}`}>
+              Read the case<span class="visually-hidden">: {c.data.company}</span>
+            </LinkArrow>
+          </article>
+        ))
+      }
+      <article class="proofp__docs card">
+        <h3>Samples to check</h3>
+        <ul class="proofp__list" role="list">
+          <li>
+            <a href={settings.downloads.samplePartnerAgreement} download><Icon name="file-down" />Sample partner agreement (PDF)</a>
+          </li>
+          <li>
+            <a href={settings.downloads.samplePayoutStatement} download><Icon name="file-down" />Sample payout statement (PDF)</a>
+          </li>
+        </ul>
+        <h3 class="proofp__sub">Partner list</h3>
+        <p class="muted proofp__firms-intro">Firms that agreed to be listed:</p>
+        <ul class="proofp__firms" role="list">
+          {settings.partnerFirms.map((firm) => <li>{firm}</li>)}
+        </ul>
+      </article>
+      <article class="proofp__contact card">
+        <Avatar name={settings.partnerContact.name} size={72} />
+        <div>
+          <h3><T v={settings.partnerContact.name} /></h3>
+          <p class="muted">{settings.partnerContact.role}</p>
+          <p class="proofp__reply">{fmt('We reply within {replyTime}.')}</p>
+        </div>
+      </article>
+    </div>
+  </Section>
+
+  <Faq id="partners" />
+
+  <section class="apply tone-dark" id="apply" data-sticky-hide>
+    <div class="container apply__grid">
+      <div class="apply__copy">
+        <h2>Apply</h2>
+        <p class="lead">
+          {fmt('Tell us about your firm, or book the {partnerIntroShort} intro directly. No quotas, no fees to join.')}
+        </p>
+        <Button href={settings.links.partnerBookingUrl === 'demo' ? '/book#booking' : settings.links.partnerBookingUrl} variant="secondary" icon="calendar">{fmt('Book a {partnerIntroShort} partner intro')}</Button>
+        <p class="apply__alt"><LinkArrow href="/">For businesses</LinkArrow></p>
+      </div>
+      <div class="apply__form tone-light card">
+        <PartnerIntroForm />
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .phero {
+    padding-top: var(--space-6);
+    padding-bottom: var(--space-9);
+    overflow: hidden;
+  }
+  .phero__grid {
+    display: grid;
+    gap: var(--space-8);
+    align-items: center;
+  }
+  .phero h1 {
+    max-width: 16em;
+  }
+  .phero__sub {
+    margin-top: var(--space-5);
+    max-width: 36em;
+  }
+  .phero__actions {
+    margin-top: var(--space-6);
+  }
+  .phero__art {
+    max-width: 520px;
+  }
+  @media (min-width: 1024px) {
+    .phero {
+      padding-top: var(--space-8);
+    }
+    .phero__grid {
+      grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+    }
+  }
+
+  .problem {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+  }
+  .problem > * {
+    margin: 0;
+  }
+  .problem__icon {
+    display: grid;
+    place-items: center;
+    width: 48px;
+    height: 48px;
+    margin-bottom: var(--space-2);
+    border-radius: 14px;
+    background-color: var(--surface-alt);
+    color: var(--heading);
+  }
+  .problem p {
+    font-size: var(--fs-h3);
+    font-weight: 700;
+    line-height: var(--lh-snug);
+    color: var(--heading);
+  }
+  .problem .problem__note {
+    margin-top: auto;
+    padding-top: var(--space-3);
+    border-top: 2px solid var(--rule);
+    color: var(--text-muted);
+    font-size: var(--fs-small);
+    font-weight: 600;
+    line-height: 1.45;
+  }
+
+  .way h3 {
+    padding-bottom: var(--space-4);
+    border-bottom: 2px solid var(--rule);
+  }
+  .way__rows {
+    display: grid;
+    margin-top: var(--space-2);
+  }
+  .way__rows div {
+    display: grid;
+    gap: 2px;
+    padding: var(--space-3) 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .way__rows div:last-child {
+    border-bottom: 0;
+  }
+  .way__rows dt {
+    color: var(--text-muted);
+    font-size: var(--fs-small);
+    font-weight: 700;
+  }
+  .way__rows dd {
+    margin: 0;
+    font-weight: 600;
+  }
+  @media (min-width: 1024px) {
+    .way__rows div {
+      grid-template-columns: 11rem minmax(0, 1fr);
+      gap: var(--space-4);
+    }
+  }
+
+  .gets {
+    display: grid;
+    gap: var(--space-4);
+  }
+  .get {
+    display: grid;
+    grid-template-columns: 48px minmax(0, 1fr);
+    gap: var(--space-4);
+    align-items: start;
+    padding: var(--space-4) 0;
+    border-top: 1px solid var(--border);
+  }
+  .get p {
+    font-weight: 600;
+    padding-top: var(--space-2);
+  }
+  .get__icon {
+    display: grid;
+    place-items: center;
+    width: 48px;
+    height: 48px;
+    border-radius: var(--radius-btn);
+    background-color: var(--surface-alt);
+    color: var(--heading);
+  }
+  @media (min-width: 768px) {
+    .gets {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      column-gap: var(--space-7);
+    }
+  }
+
+  .cpa-wrap {
+    display: grid;
+    gap: var(--space-5);
+    align-items: stretch;
+  }
+  .cpa__media {
+    overflow: hidden;
+    border-radius: var(--radius-card);
+    aspect-ratio: 4 / 3;
+    background-color: var(--surface-alt);
+  }
+  .cpa__media :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  @media (min-width: 1024px) {
+    .cpa-wrap {
+      grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+      gap: var(--space-6);
+      align-items: center;
+    }
+  }
+  .cpa {
+    display: grid;
+    gap: var(--space-5);
+  }
+  .cpa :global(.cpa__icon) {
+    color: var(--heading);
+  }
+  .cpa__link {
+    margin-top: var(--space-4);
+  }
+  @media (min-width: 768px) {
+    .cpa {
+      grid-template-columns: auto minmax(0, 1fr);
+      gap: var(--space-6);
+    }
+  }
+
+  .econ__table {
+    margin-top: var(--space-4);
+    font-variant-numeric: tabular-nums;
+  }
+  .econ__table th,
+  .econ__table td {
+    padding: var(--space-3) 0;
+    border-bottom: 1px solid var(--border);
+    text-align: left;
+    font-weight: 600;
+  }
+  .econ__table td {
+    text-align: right;
+    white-space: nowrap;
+    padding-left: var(--space-4);
+  }
+  .econ__table th {
+    color: var(--text);
+  }
+  .econ__total th,
+  .econ__total td {
+    border-bottom: 0;
+    font-weight: 700;
+  }
+  .econ__fee th,
+  .econ__fee td {
+    border-bottom: 0;
+    padding-top: var(--space-4);
+    color: var(--heading);
+    font-weight: 700;
+  }
+  .econ__fee .num {
+    font-size: 2rem;
+    line-height: 1;
+  }
+  .econ__note {
+    margin-top: var(--space-5);
+    font-weight: 700;
+  }
+
+  .client {
+    display: grid;
+    gap: var(--space-6);
+    align-items: start;
+  }
+  .client__links {
+    display: grid;
+    justify-items: start;
+    gap: var(--space-1);
+    margin-top: var(--space-4);
+  }
+  @media (min-width: 900px) {
+    .client {
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      gap: var(--space-8);
+    }
+  }
+
+  .proofp {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--space-5);
+  }
+  .proofp__kicker {
+    display: flex;
+    gap: var(--space-2);
+    align-items: center;
+    color: var(--text-muted);
+    font-size: var(--fs-small);
+    font-weight: 700;
+  }
+  .proofp__case blockquote p {
+    font-size: var(--fs-h3);
+    font-weight: 600;
+    color: var(--heading);
+  }
+  .proofp__who {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    color: var(--text);
+    font-size: var(--fs-small);
+    font-weight: 700;
+    line-height: 1.4;
+  }
+  .proofp__client {
+    display: block;
+    color: var(--text-muted);
+    font-weight: 600;
+  }
+  .proofp__firms li {
+    padding: var(--space-2) 0;
+    border-bottom: 1px solid var(--border);
+    font-weight: 600;
+  }
+  .proofp__firms-intro {
+    margin-bottom: var(--space-2);
+  }
+  .proofp__list a {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    min-height: var(--tap);
+    font-weight: 700;
+  }
+  .proofp__sub {
+    margin-top: var(--space-5);
+  }
+  .proofp__contact {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    gap: var(--space-4);
+    align-items: start;
+  }
+  .proofp__contact > * + * {
+    margin-top: 0;
+  }
+  .proofp__reply {
+    margin-top: var(--space-3);
+    font-weight: 700;
+  }
+  @media (min-width: 1024px) {
+    .proofp {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  .apply {
+    padding-block: var(--section-y);
+  }
+  .apply__grid {
+    display: grid;
+    gap: var(--space-7);
+    align-items: start;
+  }
+  .apply__copy {
+    display: grid;
+    gap: var(--space-5);
+    justify-items: start;
+  }
+  .apply__form {
+    background-color: var(--surface);
+  }
+  @media (min-width: 1024px) {
+    .apply__grid {
+      grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+      gap: var(--space-8);
+    }
+  }
+</style>

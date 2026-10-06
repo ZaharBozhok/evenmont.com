@@ -1,0 +1,297 @@
+---
+/**
+ * "Why Odoo" — a visual scorecard (no competitor prices): each cell shows a mark, cost
+ * level, time bar or flexibility dots above a short qualitative caption. The Odoo column
+ * is raised as "our pick". Stacked per row on phones.
+ */
+import Section from '../Section.astro';
+import Icon from '../Icon.astro';
+import { getTerms } from '../../lib/terms';
+
+const { comparison } = await getTerms();
+const last = comparison.columns.length - 1;
+const levels = [1, 2, 3];
+---
+
+<Section id="why-odoo" title="Why Odoo" intro="The usual alternatives, side by side. Qualitative on purpose — your Blueprint puts real numbers on it.">
+  <div class="score">
+    <table class="score__table rtable" role="table">
+      <caption class="visually-hidden">How Odoo with Evenmont compares with common alternatives</caption>
+      <thead role="rowgroup">
+        <tr role="row">
+          <td role="cell" class="score__corner"></td>
+          {
+            comparison.columns.map((col, i) => (
+              <th role="columnheader" scope="col" class:list={[i === last && 'is-ours']}>
+                {i === last && (
+                  <span class="score__pick">
+                    <Icon name="star" size={14} />
+                    Our pick
+                  </span>
+                )}
+                {col}
+              </th>
+            ))
+          }
+        </tr>
+      </thead>
+      <tbody role="rowgroup">
+        {
+          comparison.rows.map((row) => (
+            <tr role="row">
+              <th role="rowheader" scope="row">
+                {row.label}
+              </th>
+              {row.values.map((value, i) => {
+                const n = row.scores?.[i] ?? 0;
+                return (
+                  <td role="cell" class:list={[i === last && 'is-ours']}>
+                    <span class="rtable__label" aria-hidden="true">
+                      {comparison.columns[i]}
+                    </span>
+                    <span class="score__viz" aria-hidden="true">
+                      {row.kind === 'check' &&
+                        (row.marks?.[i] === 'yes' ? (
+                          <Icon name="circle-check" size={26} class="score__yes" />
+                        ) : (
+                          <Icon name="circle-minus" size={26} class="score__no" />
+                        ))}
+                      {row.kind === 'cost' && (
+                        <span class="score__cost">
+                          {levels.map((l) => (
+                            <span class:list={[l <= n && 'is-on']}>$</span>
+                          ))}
+                        </span>
+                      )}
+                      {row.kind === 'time' && (
+                        <span class="score__bar">
+                          {levels.map((l) => (
+                            <span class:list={[l <= n && 'is-on']} />
+                          ))}
+                        </span>
+                      )}
+                      {row.kind === 'dots' && (
+                        <span class="score__dots">
+                          {levels.map((l) => (
+                            <span class:list={[l <= n && 'is-on']} />
+                          ))}
+                        </span>
+                      )}
+                      {row.kind === 'text' && <Icon name={i === last ? 'user-check' : 'users'} size={24} class={i === last ? 'score__yes' : 'score__no'} />}
+                    </span>
+                    <span class="score__value">{value}</span>
+                  </td>
+                );
+              })}
+            </tr>
+          ))
+        }
+      </tbody>
+    </table>
+  </div>
+  <p class="score__honest">
+    <Icon name="message-circle" size={20} />
+    Odoo isn’t for everyone. On the first call we’ll tell you if it’s not a fit.
+  </p>
+</Section>
+
+<style is:global>
+  .score__table th,
+  .score__table td {
+    text-align: left;
+    vertical-align: top;
+  }
+  .score__table thead th {
+    color: var(--text-muted);
+    font-size: var(--fs-small);
+    font-weight: 700;
+    line-height: 1.35;
+  }
+  .score__table tbody th {
+    color: var(--heading);
+    font-weight: 700;
+    line-height: 1.35;
+  }
+  .score__viz {
+    display: flex;
+    align-items: center;
+    min-height: 28px;
+    margin-bottom: var(--space-2);
+  }
+  .score__yes {
+    color: var(--success);
+  }
+  .score__no {
+    color: color-mix(in srgb, var(--text-muted) 70%, transparent);
+  }
+  .score__cost {
+    display: inline-flex;
+    gap: 2px;
+    font-size: 1.25rem;
+    font-weight: 800;
+    color: color-mix(in srgb, var(--text-muted) 35%, transparent);
+  }
+  .score__cost .is-on {
+    color: var(--heading);
+  }
+  .score__bar {
+    display: inline-flex;
+    gap: 3px;
+  }
+  .score__bar span {
+    width: 26px;
+    height: 8px;
+    border-radius: 4px;
+    background-color: color-mix(in srgb, var(--text-muted) 22%, transparent);
+  }
+  .score__bar .is-on {
+    background-color: var(--link);
+  }
+  .score__dots {
+    display: inline-flex;
+    gap: 6px;
+  }
+  .score__dots span {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    border: 2px solid color-mix(in srgb, var(--text-muted) 40%, transparent);
+  }
+  .score__dots .is-on {
+    border-color: var(--heading);
+    background-color: var(--heading);
+  }
+  .score__value {
+    display: block;
+    color: var(--text-muted);
+    font-size: var(--fs-small);
+    line-height: 1.4;
+  }
+  .is-ours .score__value {
+    color: var(--heading);
+    font-weight: 700;
+  }
+  .score__pick {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    width: max-content;
+    margin-bottom: var(--space-2);
+    padding: 3px 10px;
+    border-radius: var(--radius-pill);
+    background-color: var(--rule);
+    color: var(--on-accent);
+    font-size: var(--fs-xs);
+    font-weight: 800;
+  }
+  .score__pick .icon {
+    fill: currentColor;
+  }
+  thead .is-ours {
+    color: var(--heading);
+  }
+  .score__honest {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    margin-top: var(--space-6);
+    font-weight: 700;
+    color: var(--heading);
+  }
+  .score__honest .icon {
+    color: var(--link);
+    flex: none;
+  }
+  @media (max-width: 767.98px) {
+    .score__corner {
+      display: none !important;
+    }
+    .score__table thead {
+      display: none !important;
+    }
+    .score__table tbody tr {
+      display: grid !important;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: var(--space-4) var(--space-3);
+      margin-bottom: var(--space-4);
+      padding: var(--space-5);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-card);
+      background-color: var(--surface);
+    }
+    .score__table tbody th {
+      grid-column: 1 / -1;
+      font-size: 1.0625rem;
+    }
+    .score__table td .rtable__label {
+      margin-bottom: var(--space-2);
+      font-size: var(--fs-xs);
+      line-height: 1.3;
+    }
+    /* phones: the alternatives show their mark only; the caption stays for screen readers */
+    .score__table td:not(.is-ours) .score__value {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      overflow: hidden;
+      clip-path: inset(50%);
+      white-space: nowrap;
+    }
+    .score__table td:not(.is-ours) .score__viz {
+      margin-bottom: 0;
+    }
+    .score__table td.is-ours {
+      grid-column: 1 / -1;
+      order: -1;
+      padding: var(--space-4);
+      border-radius: 12px;
+      background-color: color-mix(in srgb, var(--rule) 14%, var(--surface));
+      box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--rule) 60%, transparent);
+    }
+    .score__table tbody th {
+      order: -2;
+    }
+  }
+  @media (min-width: 768px) {
+    .score {
+      overflow-x: auto;
+      padding-top: var(--space-5);
+    }
+    .score__table {
+      border-collapse: separate;
+      border-spacing: 0;
+    }
+    .score__table th,
+    .score__table td {
+      padding: var(--space-5) var(--space-4);
+    }
+    .score__table thead th {
+      padding-top: var(--space-4);
+      vertical-align: bottom;
+    }
+    .score__table tbody th {
+      width: 22%;
+      padding-left: 0;
+    }
+    .score__table tbody tr + tr > * {
+      border-top: 1px solid var(--border);
+    }
+    .score__table .is-ours {
+      position: relative;
+      background-color: var(--surface);
+      box-shadow: -1px 0 0 var(--border), 1px 0 0 var(--border);
+    }
+    .score__table thead .is-ours {
+      border-radius: 16px 16px 0 0;
+      box-shadow: -1px 0 0 var(--border), 1px 0 0 var(--border), 0 -1px 0 var(--border), inset 0 4px 0 var(--rule);
+      padding-top: var(--space-5);
+    }
+    .score__table tbody tr:last-child .is-ours {
+      border-radius: 0 0 16px 16px;
+      box-shadow: -1px 0 0 var(--border), 1px 0 0 var(--border), 0 1px 0 var(--border), 0 18px 32px -18px rgba(20, 32, 28, 0.35);
+    }
+    .score__table tbody tr + tr > .is-ours {
+      border-top-color: color-mix(in srgb, var(--border) 60%, transparent);
+    }
+  }
+</style>

@@ -1,0 +1,29 @@
+---
+/** Button link: primary (accent fill) · secondary (outline) · 48px tall, 10px radius. */
+import Icon from './Icon.astro';
+import type { IconName } from '../icons/lucide';
+
+interface Props {
+  href: string;
+  variant?: 'primary' | 'secondary';
+  size?: 'md' | 'sm';
+  block?: boolean;
+  icon?: IconName;
+  arrow?: boolean;
+  class?: string;
+  download?: boolean;
+  [key: `data-${string}`]: string | undefined;
+}
+const { href, variant = 'primary', size = 'md', block = false, icon, arrow = false, class: className, download, ...rest } = Astro.props;
+---
+
+<a
+  href={href}
+  class:list={['btn', `btn--${variant}`, size === 'sm' && 'btn--sm', block && 'btn--block', className]}
+  download={download ? '' : undefined}
+  {...rest}
+>
+  {icon && <Icon name={icon} size={20} />}
+  <span><slot /></span>
+  {arrow && <Icon name="arrow-right" size={20} class="arrow-nudge" />}
+</a>

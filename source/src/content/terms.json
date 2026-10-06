@@ -1,0 +1,296 @@
+{
+  "$comment": "⚑ Business terms to be confirmed: prices, fees, timelines, promises. Every page reads them from this file. Text fields may use {name} to insert a value from \"vars\" (or a computed one: feePercent, keepPrice, blueprintFee). {{LIKE_THIS}} tokens are placeholders.",
+  "vars": {
+    "fitCall": "30 minutes",
+    "fitCallShort": "30-min",
+    "fitCallLong": "30-minute",
+    "partnerIntro": "20 minutes",
+    "partnerIntroShort": "20-min",
+    "blueprintTime": "1–3 weeks",
+    "buildServices": "1–3 months",
+    "buildProducts": "2–6 months",
+    "hypercare": "30 days",
+    "resultsCheck": "90 days",
+    "projectsPerQuarter": "4",
+    "feeMonths": "12 months",
+    "payoutDays": "30 days",
+    "dealRegistration": "12 months",
+    "handoff": "15 minutes",
+    "replyTime": "one business day",
+    "whiteLabelProjects": "2",
+    "whiteLabelPeople": "two people"
+  },
+  "process": {
+    "steps": [
+      {
+        "id": "fit-call",
+        "name": "Fit call",
+        "get": "An honest answer: is Odoo right for you?",
+        "time": "{fitCall}",
+        "price": "Free"
+      },
+      {
+        "id": "blueprint",
+        "name": "Blueprint",
+        "get": "Process map, baseline metrics, scope, fixed project price",
+        "time": "{blueprintTime}",
+        "price": "Fixed, credited to the project"
+      },
+      {
+        "id": "build",
+        "name": "Build",
+        "get": "Configuration in phases, a demo every week",
+        "time": "{buildServices} (services), {buildProducts} (inventory & manufacturing)",
+        "price": "Fixed per phase"
+      },
+      {
+        "id": "go-live",
+        "name": "Go-live",
+        "get": "Launch, team training, {hypercare} of hypercare",
+        "time": "{hypercare}",
+        "price": "Included"
+      },
+      {
+        "id": "keep",
+        "name": "Keep",
+        "get": "Managed Odoo: support, updates, improvements",
+        "time": "Monthly",
+        "price": "Retainer"
+      }
+    ],
+    "note": "{resultsCheck} after go-live we measure results against your Blueprint numbers."
+  },
+  "packages": [
+    {
+      "id": "fit-call",
+      "name": "Fit Call",
+      "for": "Everyone",
+      "includes": [
+        "{fitCall}",
+        "Honest assessment"
+      ],
+      "price": null,
+      "priceLabel": "Free"
+    },
+    {
+      "id": "blueprint",
+      "name": "Blueprint",
+      "for": "Ready to move",
+      "includes": [
+        "Process review",
+        "Baseline metrics",
+        "Plan",
+        "Fixed price"
+      ],
+      "price": 1500
+    },
+    {
+      "id": "launch-services",
+      "name": "Launch · Services",
+      "scenario": "services",
+      "for": "Service companies",
+      "includes": [
+        "CRM",
+        "Projects",
+        "Timesheets",
+        "Accounting",
+        "Contractors",
+        "QuickBooks migration"
+      ],
+      "price": 9500
+    },
+    {
+      "id": "launch-products",
+      "name": "Launch · Products",
+      "scenario": "distribution",
+      "for": "Distribution & e-commerce",
+      "includes": [
+        "Sales",
+        "Purchasing",
+        "Inventory",
+        "Barcode",
+        "Accounting",
+        "Storefront connection"
+      ],
+      "price": 15000
+    },
+    {
+      "id": "launch-make",
+      "name": "Launch · Make",
+      "scenario": "manufacturing",
+      "for": "Light manufacturing",
+      "includes": [
+        "Everything in Products",
+        "Bills of materials",
+        "Work orders",
+        "Unit costs"
+      ],
+      "price": 25000
+    },
+    {
+      "id": "custom",
+      "name": "Custom",
+      "for": "Complex processes",
+      "includes": [
+        "Integrations",
+        "Custom modules",
+        "Client portal"
+      ],
+      "price": null,
+      "priceLabel": "After Blueprint"
+    },
+    {
+      "id": "keep",
+      "name": "Keep",
+      "for": "After go-live",
+      "includes": [
+        "Support",
+        "Updates",
+        "Improvements"
+      ],
+      "price": 750,
+      "unit": "/month"
+    }
+  ],
+  "licensesNote": "Odoo licenses are billed separately by Odoo.",
+  "guarantees": [
+    "Fixed price per phase. If we underestimate, that’s on us.",
+    "Stop after any phase. You pay only for what’s delivered.",
+    "Your code, your data, full documentation. No lock-in.",
+    "Your Blueprint fee is credited toward the project.",
+    "{hypercare} of hypercare after go-live.",
+    "{resultsCheck} after go-live, we measure results against your Blueprint numbers."
+  ],
+  "calculator": {
+    "people": 4,
+    "hours": 5,
+    "rate": 45,
+    "weeks": 48
+  },
+  "partner": {
+    "feeRate": 0.1,
+    "whatYouGet": [
+      "{feePercent} of the client’s fees in the first {feeMonths}, paid within {payoutDays} after the client pays — or passed to your client as a discount",
+      "Free Odoo accounting training for your team",
+      "Ready materials: client one-pager, referral email template, written disclosure template",
+      "Deal registration protects your introduction for {dealRegistration}",
+      "Project and payout status in a partner portal",
+      "Referrals back to you when our clients need an accountant or CFO",
+      "One founder as your single point of contact"
+    ],
+    "economics": [
+      {
+        "label": "Service client",
+        "projectLabel": "Launch · Services",
+        "projectAmount": 12000,
+        "keepMonths": 6
+      },
+      {
+        "label": "Distributor",
+        "projectLabel": "Launch · Products",
+        "projectAmount": 15000,
+        "keepMonths": 6
+      }
+    ],
+    "coDelivery": "Co-delivery: your own hours at your own rate."
+  },
+  "whiteLabel": {
+    "commercials": [
+      {
+        "title": "Fixed price per scope",
+        "text": "A fixed quote before you send your proposal."
+      },
+      {
+        "title": "Monthly capacity block",
+        "text": "Reserved capacity each month for ongoing work."
+      }
+    ],
+    "payment": "Payment by milestones.",
+    "capacity": "We take {whiteLabelProjects} white-label projects at a time — currently up to {whiteLabelPeople} per project."
+  },
+  "comparison": {
+    "$comment": "Qualitative claims only — no competitor prices. Review before launch. kind: check (marks) · cost ($ levels, lower is better) · time (bar, shorter is faster) · dots (flexibility) · text; scores 1–3 per column.",
+    "columns": [
+      "QuickBooks + apps",
+      "NetSuite",
+      "Separate inventory tool",
+      "Odoo with Evenmont"
+    ],
+    "rows": [
+      {
+        "label": "One system for sales, operations and books",
+        "values": [
+          "No — several apps",
+          "Yes",
+          "No — stock lives outside the books",
+          "Yes"
+        ],
+        "marks": [
+          "no",
+          "yes",
+          "no",
+          "yes"
+        ],
+        "kind": "check"
+      },
+      {
+        "label": "Typical cost to run",
+        "values": [
+          "Low to start, grows with each app",
+          "High",
+          "Medium, plus sync upkeep",
+          "Low to medium"
+        ],
+        "kind": "cost",
+        "scores": [
+          2,
+          3,
+          2,
+          1
+        ]
+      },
+      {
+        "label": "Time to go live",
+        "values": [
+          "Weeks per app",
+          "Months",
+          "Weeks, plus integration",
+          "Weeks to months, in fixed phases"
+        ],
+        "kind": "time",
+        "scores": [
+          1,
+          3,
+          2,
+          2
+        ]
+      },
+      {
+        "label": "Flexibility for your process",
+        "values": [
+          "Low",
+          "High, with developer time",
+          "Low — inventory only",
+          "High"
+        ],
+        "kind": "dots",
+        "scores": [
+          1,
+          3,
+          1,
+          3
+        ]
+      },
+      {
+        "label": "Who sets up the books",
+        "values": [
+          "You and your accountant",
+          "The implementation partner",
+          "Your accountant, plus sync rules",
+          "Your accountant, together with us"
+        ],
+        "kind": "text"
+      }
+    ]
+  }
+}

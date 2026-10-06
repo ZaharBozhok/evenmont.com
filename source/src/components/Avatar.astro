@@ -1,0 +1,95 @@
+---
+/**
+ * Avatar: photo when available, otherwise an initials disc in Sage/Evergreen
+ * (the kit's recommended founder placeholder). Placeholder names show the peaks.
+ */
+import { Image } from 'astro:assets';
+import type { ImageMetadata } from 'astro';
+import { initials } from '../lib/text';
+
+interface Props {
+  name: string;
+  photo?: ImageMetadata;
+  size?: number;
+  class?: string;
+  /** 0–3: force a color (e.g. to tell two founders apart). */
+  tone?: number;
+}
+const { name, photo, size = 48, class: className, tone: forced } = Astro.props;
+const letters = initials(name);
+// A steady color per person, so monograms read as different people.
+const tone = forced ?? [...name].reduce((a, ch) => (a * 31 + ch.charCodeAt(0)) % 997, 7) % 4;
+---
+
+{
+  photo ? (
+    <Image src={photo} alt="" width={size} height={size} class:list={['avatar', className]} loading="lazy" decoding="async" />
+  ) : (
+    <span
+      class:list={['avatar', `avatar--t${tone}`, className]}
+      style={`--size:${size}px`}
+      data-placeholder={letters ? undefined : 'true'}
+      aria-hidden="true"
+    >
+      {letters ? (
+        letters
+      ) : (
+        <svg viewBox="0 0 120 47" focusable="false">
+          <polygon points="6,47 34,7 62,47" />
+          <polygon points="58,47 86,7 114,47" />
+        </svg>
+      )}
+    </span>
+  )
+}
+
+<style is:global>
+  .avatar {
+    display: inline-grid;
+    place-items: center;
+    flex: none;
+    width: var(--size, 48px);
+    height: var(--size, 48px);
+    border-radius: 50%;
+    background-color: var(--surface-alt);
+    color: var(--heading);
+    font-family: var(--font-sans);
+    font-weight: 800;
+    font-size: calc(var(--size, 48px) * 0.34);
+    letter-spacing: 0.02em;
+    line-height: 1;
+    object-fit: cover;
+  }
+  .avatar--t1 {
+    background-color: color-mix(in srgb, var(--rule) 38%, var(--surface));
+    color: var(--em-ink);
+  }
+  .avatar--t2 {
+    background-color: var(--heading);
+    color: var(--em-sand);
+  }
+  .avatar--t3 {
+    background-color: color-mix(in srgb, var(--link) 22%, var(--surface));
+  }
+  /* On dark bands (and the dark white-label page) the light mixes turn muddy: use solid
+     on-dark colors instead. */
+  .tone-dark .avatar,
+  html[data-mood='partner-dark'] .avatar {
+    background-color: var(--on-dark-muted);
+    color: var(--em-ink);
+  }
+  .tone-dark .avatar--t1,
+  html[data-mood='partner-dark'] .avatar--t1 {
+    background-color: var(--rule);
+  }
+  .tone-dark .avatar--t2,
+  html[data-mood='partner-dark'] .avatar--t2 {
+    background-color: var(--on-dark);
+    color: var(--dark-bg);
+  }
+  .avatar svg {
+    width: 52%;
+    height: auto;
+    fill: var(--heading);
+  }
+</style>

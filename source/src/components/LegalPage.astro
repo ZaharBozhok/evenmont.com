@@ -1,0 +1,76 @@
+---
+/** Core (neutral) layout for legal pages: light header, no hero band, optional draft notice. */
+import BaseLayout from '../layouts/BaseLayout.astro';
+
+interface Props {
+  title: string;
+  metaTitle: string;
+  description: string;
+  lead?: string;
+  /** Draft text awaiting legal review: shows a notice above the content. */
+  draft?: string;
+}
+const { title, metaTitle, description, lead, draft } = Astro.props;
+---
+
+<BaseLayout title={metaTitle} description={description} headerTone="light" stickyCta={false}>
+  <article class="legal">
+    <div class="container legal__inner">
+      <header class="legal__head">
+        <h1>{title}</h1>
+        {lead && <p class="lead">{lead}</p>}
+        {draft && <p class="legal__draft">{draft}</p>}
+      </header>
+      <slot />
+    </div>
+  </article>
+</BaseLayout>
+
+<style>
+  .legal {
+    padding-block: var(--space-8) var(--section-y);
+  }
+  .legal__inner {
+    max-width: calc(52rem + 2 * var(--gutter));
+  }
+  .legal__head {
+    margin-bottom: var(--space-7);
+  }
+  .legal__head .lead {
+    margin-top: var(--space-4);
+    color: var(--text-muted);
+  }
+  .legal :global(h2) {
+    margin-top: var(--space-7);
+    margin-bottom: var(--space-3);
+    font-size: clamp(1.375rem, 1.25rem + 0.6vw, 1.75rem);
+  }
+  .legal__draft {
+    margin-top: var(--space-5);
+    padding: var(--space-3) var(--space-4);
+    border-left: 3px solid var(--rule);
+    background-color: var(--surface-alt);
+    border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+    font-size: var(--fs-small);
+    font-weight: 700;
+  }
+  .legal :global(h2 + p),
+  .legal :global(p + p),
+  .legal :global(p + ul),
+  .legal :global(ul + p) {
+    margin-top: var(--space-3);
+  }
+  .legal :global(ul) {
+    padding-left: 1.25em;
+  }
+  .legal :global(li + li) {
+    margin-top: var(--space-2);
+  }
+  .legal :global(.todo) {
+    padding: var(--space-4);
+    border: 1px dashed var(--field-border);
+    border-radius: var(--radius-sm);
+    color: var(--text-muted);
+    font-weight: 600;
+  }
+</style>

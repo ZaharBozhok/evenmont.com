@@ -1,0 +1,70 @@
+---
+/** #10 Spirit level — the bubble slides in from the right and settles in the center. */
+---
+
+<figure class="level" data-animate>
+  <svg class="level__svg" viewBox="0 0 240 56" aria-hidden="true" focusable="false">
+    <rect class="level__body" x="1" y="1" width="238" height="54" rx="27" />
+    <rect class="level__vial" x="44" y="14" width="152" height="28" rx="14" />
+    <path class="level__tick" d="M104 12v32M136 12v32" />
+    <ellipse class="level__bubble" cx="120" cy="28" rx="13" ry="9" />
+  </svg>
+  <figcaption class="level__label">Balanced.</figcaption>
+</figure>
+
+<style is:global>
+  .level {
+    display: grid;
+    justify-items: center;
+    gap: var(--space-3);
+    margin: 0;
+  }
+  .level__svg {
+    width: min(240px, 100%);
+    height: auto;
+    overflow: visible;
+  }
+  .level__body {
+    fill: var(--surface);
+    stroke: var(--border);
+    stroke-width: 2;
+  }
+  .level__vial {
+    fill: var(--surface-alt);
+    stroke: var(--text-muted);
+    stroke-width: 1.5;
+  }
+  .level__tick {
+    stroke: var(--heading);
+    stroke-width: 1.5;
+    stroke-linecap: round;
+  }
+  .level__bubble {
+    fill: var(--rule);
+    stroke: var(--heading);
+    stroke-width: 1.5;
+  }
+  .level__label {
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 1.375rem;
+    color: var(--heading);
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .js .level:not(.is-in) .level__bubble {
+      transform: translateX(62px);
+      opacity: 0;
+    }
+    .js .level:not(.is-in) .level__label {
+      opacity: 0;
+    }
+    .js .level__bubble {
+      transition:
+        transform 700ms var(--ease-settle) 150ms,
+        opacity var(--dur-2) var(--ease-out) 150ms;
+    }
+    .js .level__label {
+      transition: opacity var(--dur-3) var(--ease-out) 800ms;
+    }
+  }
+</style>

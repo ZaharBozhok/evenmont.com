@@ -1,0 +1,162 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import HomeHero from '../components/sections/HomeHero.astro';
+import TrustStrip from '../components/sections/TrustStrip.astro';
+import ScenarioSwitcher from '../components/sections/ScenarioSwitcher.astro';
+import Section from '../components/Section.astro';
+import BeforeAfter from '../components/BeforeAfter.astro';
+import CompareSlider from '../components/illustrations/CompareSlider.astro';
+import CasesSection from '../components/sections/CasesSection.astro';
+import Calculator from '../components/sections/Calculator.astro';
+import ScenarioCards from '../components/sections/ScenarioCards.astro';
+import Comparison from '../components/sections/Comparison.astro';
+import Timeline from '../components/Timeline.astro';
+import WithAccountant from '../components/sections/WithAccountant.astro';
+import Pricing from '../components/sections/Pricing.astro';
+import Guarantees from '../components/sections/Guarantees.astro';
+import CheckUs from '../components/sections/CheckUs.astro';
+import NotAFit from '../components/sections/NotAFit.astro';
+import Founders from '../components/sections/Founders.astro';
+import Faq from '../components/sections/Faq.astro';
+import FinalCta from '../components/sections/FinalCta.astro';
+import { Picture } from 'astro:assets';
+import workshop from '../assets/placeholders/blueprint-workshop.jpg';
+import { getTerms } from '../lib/terms';
+import type { IconName } from '../icons/lucide';
+
+const terms = await getTerms();
+const stepIcons: Record<string, IconName> = { 'fit-call': 'video', blueprint: 'map', build: 'layers', 'go-live': 'calendar-check', keep: 'life-buoy' };
+const steps = terms.process.steps.map((s) => ({ name: s.name, get: terms.fmt(s.get), time: terms.fmt(s.time), price: terms.fmt(s.price), icon: stepIcons[s.id] }));
+
+const whatChanges = [
+  { today: 'Twelve tools, copy-paste between them', after: 'One system, every number entered once', icon: 'layers' },
+  { today: 'Profit per project or product is a guess', after: 'Live margin by project, product and customer', icon: 'percent' },
+  { today: 'Stock counts nobody trusts', after: 'Real-time inventory with barcode scanning', icon: 'scan-barcode' },
+  { today: 'Production planned on a whiteboard', after: 'Work orders, bills of materials and real unit costs', icon: 'factory' },
+  { today: 'Contractors paid from email', after: 'Rates, timesheets, invoices and payouts in one flow', icon: 'users' },
+  { today: 'Close drags on', after: 'Close without spreadsheet marathons, together with your accountant', icon: 'calendar-check' },
+];
+---
+
+<BaseLayout
+  title="Evenmont — Finance-first Odoo implementation"
+  description="We implement Odoo for growing US service firms, distributors and manufacturers. Fixed-price phases, your accountant in the loop, a founder on every project."
+>
+  <HomeHero />
+  <TrustStrip />
+  <ScenarioSwitcher />
+
+  <Section id="what-changes" title="What changes" intro="Drag the handle: twelve tools on the left, one system on the right." tone="alt">
+    <div class="changes">
+      <CompareSlider />
+      <BeforeAfter rows={whatChanges} caption="What changes: today compared with Evenmont" />
+    </div>
+  </Section>
+
+  <CasesSection />
+  <Calculator />
+  <ScenarioCards />
+  <Comparison />
+
+  <Section id="process" title="How we work" intro="Five steps, a fixed price for each, and a founder on every one." tone="alt">
+    <figure class="process__photo" data-reveal>
+      <Picture
+        src={workshop}
+        alt="A small team planning a process on a large sheet of paper spread across a table"
+        widths={[640, 960, 1280, 1600]}
+        sizes="(min-width: 1280px) 1200px, calc(100vw - 2 * clamp(20px, 4vw, 40px))"
+        formats={['avif', 'webp']}
+        loading="lazy"
+        decoding="async"
+        data-placeholder="true"
+      />
+      <figcaption class="process__card">
+        <span class="process__kicker">Where every project starts</span>
+        <strong>The Blueprint</strong>
+        <span>Your process on one page, today’s numbers measured, and a fixed price — before anything is built.</span>
+      </figcaption>
+    </figure>
+    <Timeline steps={steps} />
+    <p class="process__note">{terms.fmt(terms.process.note)}</p>
+  </Section>
+
+  <WithAccountant />
+  <Pricing />
+  <Guarantees />
+  <CheckUs />
+  <NotAFit
+    fit={[
+      'You’re a US company with 10–200 people.',
+      'You sell services, distribute products or make them in one plant.',
+      'You want your accountant in the loop, not around it.',
+      'You want to own your system, your code and your data.',
+    ]}
+  />
+  <Founders />
+  <Faq id="home" />
+  <FinalCta />
+</BaseLayout>
+
+<style>
+  .changes {
+    display: grid;
+    gap: var(--space-6);
+  }
+  .process__photo {
+    position: relative;
+    margin: 0 0 var(--space-7);
+  }
+  .process__photo :global(picture) {
+    display: block;
+    overflow: hidden;
+    border-radius: 20px;
+    aspect-ratio: 4 / 3;
+  }
+  .process__photo :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: 50% 50%;
+  }
+  /* Phones: the card overlaps the bottom of the photo; wider: it floats on the photo. */
+  .process__card {
+    position: relative;
+    display: grid;
+    gap: var(--space-1);
+    margin: calc(-1 * var(--space-7)) var(--space-3) 0;
+    padding: var(--space-4) var(--space-5);
+    border-radius: 16px;
+    background-color: var(--surface);
+    box-shadow: 0 12px 32px -12px rgba(20, 32, 28, 0.4);
+    font-size: var(--fs-small);
+    line-height: 1.45;
+  }
+  .process__card strong {
+    font-size: var(--fs-h3);
+    color: var(--heading);
+  }
+  .process__kicker {
+    color: var(--link);
+    font-size: var(--fs-xs);
+    font-weight: 800;
+  }
+  @media (min-width: 768px) {
+    .process__photo :global(picture) {
+      aspect-ratio: 21 / 8;
+    }
+    .process__card {
+      position: absolute;
+      left: var(--space-6);
+      bottom: var(--space-6);
+      max-width: 380px;
+      margin: 0;
+    }
+  }
+  .process__note {
+    max-width: none;
+    margin-top: var(--space-6);
+    padding-top: var(--space-5);
+    border-top: 1px solid var(--border);
+    font-weight: 700;
+  }
+</style>

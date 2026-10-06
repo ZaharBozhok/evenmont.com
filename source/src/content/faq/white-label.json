@@ -1,0 +1,12 @@
+{
+  "title": "Questions from agencies and Odoo partners",
+  "items": [
+    { "q": "Will your team talk to our client?", "a": "Only if you want us to. We work under your brand, from your email and channels, and contact your client directly only with your permission." },
+    { "q": "Who owns the code?", "a": "All code is assigned to you or your client." },
+    { "q": "How do you price white-label work?", "a": "A fixed price per scope, or a monthly capacity block, with payment by milestones. You get a fixed quote before you send your proposal." },
+    { "q": "How do you fit into our process?", "a": "We work in your tools and tracker, send daily async updates, go through your code review, write documentation and follow Odoo coding guidelines." },
+    { "q": "Can you take over a stuck project?", "a": "Yes — rescuing stuck projects is one of the reasons teams call us. Send us the scope and the current state, and we come back with a fixed quote." },
+    { "q": "Do you sign an NDA?", "a": "Yes, before we see any client details." },
+    { "q": "How many projects can you take on?", "a": "We take {whiteLabelProjects} white-label projects at a time — currently up to {whiteLabelPeople} per project." }
+  ]
+}

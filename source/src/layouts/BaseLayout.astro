@@ -1,0 +1,128 @@
+---
+/**
+ * Base layout: <html data-mood>, SEO + sharing tags, JSON-LD, fonts, header, footer,
+ * mobile sticky CTA and the single animation observer.
+ *
+ * Mood is set here per page:  client (default, no attribute) · partner · partner-dark.
+ * Components read only semantic tokens, so they re-skin automatically.
+ */
+import '../styles/tokens.css';
+import '../styles/theme.css';
+import '../styles/base.css';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import StickyCta from '../components/StickyCta.astro';
+import { clientNav, ctas, partnerNav, prerelease, settings, whiteLabelNav, type Cta, type Mood, type NavItem } from '../lib/site';
+
+interface Props {
+  title: string;
+  description: string;
+  mood?: Mood;
+  /** Tone of the band the header sits on: dark (hero) or light. */
+  headerTone?: 'dark' | 'light';
+  /** Partner-mood nav variant. */
+  navVariant?: 'client' | 'partner' | 'white-label';
+  /** Mobile sticky CTA after the hero; false to hide it. */
+  stickyCta?: Cta | false;
+  noindex?: boolean;
+  ogImageAlt?: string;
+}
+
+const {
+  title,
+  description,
+  mood = 'client',
+  headerTone = 'dark',
+  navVariant = mood === 'partner' ? 'partner' : mood === 'partner-dark' ? 'white-label' : 'client',
+  stickyCta,
+  noindex = false,
+  ogImageAlt,
+} = Astro.props;
+
+const site = Astro.site ?? new URL(settings.siteUrl);
+const path = Astro.url.pathname.replace(/\.html$/, '').replace(/\/index$/, '') || '/';
+const canonical = new URL(path === '/' ? '/' : path.replace(/\/$/, ''), site).href;
+const partner = mood !== 'client';
+const ogImage = new URL(partner ? '/og-image-partners.png' : '/og-image.png', site).href;
+const ogAlt = ogImageAlt ?? (partner ? 'Evenmont — Recommend Odoo with confidence.' : 'Evenmont — Everything adds up.');
+
+const nav: NavItem[] = navVariant === 'partner' ? partnerNav : navVariant === 'white-label' ? whiteLabelNav : clientNav;
+const cta: Cta = navVariant === 'partner' ? ctas.partner : navVariant === 'white-label' ? ctas.whiteLabel : ctas.client;
+const altLink = partner ? { label: 'For businesses', href: '/' } : undefined;
+const sticky = stickyCta === false ? null : (stickyCta ?? { ...cta, label: cta.label });
+const themeColor = mood === 'client' ? '#0F3D34' : mood === 'partner' ? '#0C2621' : '#071A16';
+
+const organization = {
+  '@context': 'https://schema.org',
+  '@type': 'Organization',
+  name: settings.siteName,
+  legalName: settings.legal.legalName,
+  url: new URL('/', site).href,
+  logo: new URL('/icon-512.png', site).href,
+  description: `${settings.descriptor} for growing US companies.`,
+  sameAs: settings.links.socialLinks,
+};
+---
+
+<!doctype html>
+<html lang="en-US" data-mood={mood === 'client' ? undefined : mood}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    {(noindex || prerelease) && <meta name="robots" content="noindex, nofollow" />}
+
+    <link rel="preload" href="/fonts/manrope-var-latin.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="/fonts/fraunces-600-latin.woff2" as="font" type="font/woff2" crossorigin />
+
+    <link rel="icon" href="/favicon.ico" sizes="48x48" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/site.webmanifest" />
+    <meta name="theme-color" content={themeColor} />
+    <meta name="color-scheme" content={mood === 'partner-dark' ? 'dark' : 'only light'} />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Evenmont" />
+    <meta property="og:locale" content="en_US" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={ogImage} />
+    <meta property="og:image:type" content="image/png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content={ogAlt} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogImage} />
+    <meta name="twitter:image:alt" content={ogAlt} />
+
+    <script type="application/ld+json" set:html={JSON.stringify(organization)} />
+
+    <!-- Progressive enhancement flag, set before first paint (no flash, no layout shift). -->
+    <script is:inline>document.documentElement.classList.add('js');</script>
+
+    {
+      /* Analytics slot for a cookieless tool — disabled until settings.analytics.enabled is true. */
+      settings.analytics.enabled && settings.analytics.src && (
+        <script is:inline defer data-domain={settings.analytics.domain} src={settings.analytics.src} />
+      )
+    }
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to content</a>
+    <Header mood={mood} tone={headerTone} nav={nav} cta={cta} altLink={altLink} currentPath={path} />
+    <main id="main" tabindex="-1">
+      <slot />
+    </main>
+    <Footer mood={mood} />
+    {sticky && <StickyCta label={sticky.label} href={sticky.href} />}
+    <script>
+      import '../scripts/animate';
+    </script>
+  </body>
+</html>

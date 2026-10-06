@@ -1,0 +1,85 @@
+---
+/** /security — security & data. */
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PageHero from '../components/PageHero.astro';
+import Section from '../components/Section.astro';
+import Icon from '../components/Icon.astro';
+import T from '../components/T.astro';
+import FinalCta from '../components/sections/FinalCta.astro';
+import { settings } from '../lib/site';
+import type { IconName } from '../icons/lucide';
+
+const items: { icon: IconName; title: string; text: string }[] = [
+  { icon: 'server', title: 'Where your data lives', text: 'On Odoo.sh or on your own server — your choice.' },
+  { icon: 'key-round', title: 'Who has access', text: 'Named accounts, least privilege and MFA. Access is removed after the project.' },
+  { icon: 'database-backup', title: 'Backups', text: 'Backups are in place, and we test a restore before go-live.' },
+  { icon: 'file-signature', title: 'NDA', text: 'We sign an NDA on request.' },
+  { icon: 'shield', title: 'GDPR', text: 'As an EU-based company, we process personal data in line with GDPR.' },
+];
+---
+
+<BaseLayout
+  title="Security & data | Evenmont"
+  description="Where your Odoo data lives, who can access it, backups and restore tests, NDA on request, and GDPR. Contact us with any security question."
+>
+  <PageHero eyebrow="Security & data" title="Your data, your choice." lead="Where your data lives, who can see it, and how it is protected during and after the project." />
+
+  <Section id="practices">
+    <ul class="grid grid--3 sec" role="list" data-reveal-children>
+      {
+        items.map((item) => (
+          <li class="sec__item card">
+            <span class="sec__icon" aria-hidden="true">
+              <Icon name={item.icon} size={24} />
+            </span>
+            <h2 class="sec__title">{item.title}</h2>
+            <p>{item.text}</p>
+          </li>
+        ))
+      }
+      <li class="sec__item card sec__item--contact">
+        <span class="sec__icon" aria-hidden="true">
+          <Icon name="mail" size={24} />
+        </span>
+        <h2 class="sec__title">Security questions</h2>
+        <p>Write to us at <a href={`mailto:${settings.contact.securityEmail}`}><T v={settings.contact.securityEmail} /></a>.</p>
+      </li>
+    </ul>
+  </Section>
+
+  <FinalCta />
+</BaseLayout>
+
+<style>
+  .sec__item {
+    display: grid;
+    gap: var(--space-3);
+    align-content: start;
+  }
+  .sec__item > * + * {
+    margin-top: 0;
+  }
+  .sec__icon {
+    display: grid;
+    place-items: center;
+    width: 52px;
+    height: 52px;
+    border-radius: 14px;
+    background-color: var(--surface-alt);
+    color: var(--heading);
+  }
+  .sec__title {
+    font-family: var(--font-sans);
+    font-size: var(--fs-h3);
+    font-weight: 700;
+    letter-spacing: 0;
+    line-height: var(--lh-snug);
+  }
+  .sec__item--contact {
+    background-color: var(--surface-alt);
+    box-shadow: none;
+  }
+  .sec__item--contact .sec__icon {
+    background-color: var(--surface);
+  }
+</style>

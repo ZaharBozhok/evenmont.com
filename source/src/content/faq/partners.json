@@ -1,0 +1,13 @@
+{
+  "title": "Questions from partners",
+  "items": [
+    { "q": "Do I need to know Odoo?", "a": "No. Technology, training and support are on us. You bring the accounting view — and if you want to learn Odoo, we train your team for free." },
+    { "q": "Will you do bookkeeping for my client?", "a": "No. We never do bookkeeping, tax or financial advisory. The books and the advice stay with you, and the agreement includes a non-solicit clause." },
+    { "q": "How is the fee paid and disclosed?", "a": "{feePercent} of the client’s fees in the first {feeMonths}, paid within {payoutDays} after the client pays, with a written disclosure for every fee. Prefer no fee? We pass the same amount to your client as a discount." },
+    { "q": "What if my client is an attest client?", "a": "Use the no-fee option: the amount goes to your client as a discount, and you receive nothing from us. State rules can be stricter — our agreement asks you to confirm yours." },
+    { "q": "What if the project goes wrong?", "a": "Each phase has a fixed price, a founder is on every project, and weekly demos surface problems early. You see the status in the partner portal. The client signs the implementation contract with us, not with you." },
+    { "q": "Can I refer clients who aren’t ready yet?", "a": "Yes. Register the introduction and it is protected for {dealRegistration}. If Odoo isn’t a fit yet, we tell your client so." },
+    { "q": "Do you work with QuickBooks Online clients?", "a": "Yes. Migration from QuickBooks is part of every Launch package: customers, vendors, items, opening balances and history, with a cutover date agreed with you." },
+    { "q": "I’m already in Odoo’s program for accounting firms — why you?", "a": "The two fit together: you advise, we implement. We do the configuration, migration, integrations, training and support for your client, while the books and the advice stay with you." }
+  ]
+}

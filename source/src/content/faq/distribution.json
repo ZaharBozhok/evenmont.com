@@ -1,0 +1,9 @@
+{
+  "title": "Questions from distributors",
+  "items": [
+    { "q": "Do we need to stop shipping during go-live?", "a": "We plan the cutover so shipping stops as little as possible — usually around a weekend or a quiet day — and your team trains on the real setup first. The dated plan is part of the Blueprint." },
+    { "q": "How do you handle the first stock count?", "a": "A full count just before go-live, scanned with barcodes straight into Odoo. Opening stock values are agreed with your accountant." },
+    { "q": "Which marketplaces can you connect?", "a": "In most cases, the storefronts and marketplaces you already sell on. We confirm the connectors and any custom work during the Blueprint." },
+    { "q": "How are landed costs calculated?", "a": "Freight, duties and other costs are added to the cost of the products they belong to, split by quantity, weight, volume or value. Your accountant chooses the method and valuation accounts with us in the Blueprint." }
+  ]
+}

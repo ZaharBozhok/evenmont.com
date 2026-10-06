@@ -1,0 +1,197 @@
+---
+/** "Sound familiar?" — scenario switcher (accessible tabs), 3 pain cards per scenario, each with a problem screen. */
+import ScenarioIcon from '../illustrations/ScenarioIcon.astro';
+import PainVisual from '../illustrations/PainVisual.astro';
+import LinkArrow from '../LinkArrow.astro';
+import { getCollection } from 'astro:content';
+
+const scenarios = (await getCollection('scenarios')).sort((a, b) => a.data.order - b.data.order);
+---
+
+<section class="section familiar" id="familiar" aria-labelledby="familiar-title">
+  <div class="container">
+    <div class="section-head">
+      <h2 id="familiar-title">Sound familiar?</h2>
+    </div>
+    <div class="switcher" data-tabs>
+      <div class="switcher__tabs" role="tablist" aria-label="Choose a scenario">
+        {
+          scenarios.map((s, i) => (
+            <button
+              class="switcher__tab"
+              type="button"
+              role="tab"
+              id={`tab-${s.id}`}
+              aria-controls={`familiar-${s.id}`}
+              aria-selected={i === 0 ? 'true' : 'false'}
+              tabindex={i === 0 ? 0 : -1}
+              data-scenario={s.id}
+              data-name={s.data.name}
+            >
+              <ScenarioIcon scenario={s.data.id} />
+              <span>{s.data.tab}</span>
+            </button>
+          ))
+        }
+      </div>
+      <div class="switcher__panels">
+        {
+          scenarios.map((s, i) => (
+            <div
+              class:list={['switcher__panel', i === 0 && 'is-active']}
+              role="tabpanel"
+              id={`familiar-${s.id}`}
+              aria-labelledby={`tab-${s.id}`}
+              tabindex="0"
+            >
+              <h3 class="switcher__panel-title">{s.data.name}</h3>
+              <ul class="switcher__pains" role="list">
+                {s.data.pains.map((pain, n) => (
+                  <li class="pain card">
+                    <PainVisual scenario={s.data.id} index={n} />
+                    <p>{pain}</p>
+                  </li>
+                ))}
+              </ul>
+              <LinkArrow href={`/${s.id}`}>How we fix this: {s.data.name.toLowerCase()}</LinkArrow>
+            </div>
+          ))
+        }
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  import '../../scripts/scenario';
+</script>
+
+<style is:global>
+  .switcher__tabs {
+    display: none;
+  }
+  .js .switcher__tabs {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--space-2);
+    margin-bottom: var(--space-6);
+    padding: var(--space-1);
+    border: 1px solid var(--border);
+    border-radius: calc(var(--radius-btn) + 4px);
+    background-color: var(--surface-alt);
+  }
+  .switcher__tab {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-1);
+    min-height: 64px;
+    padding: var(--space-2) var(--space-1);
+    border: 1px solid transparent;
+    border-radius: var(--radius-btn);
+    background: transparent;
+    color: var(--text);
+    font-size: var(--fs-small);
+    font-weight: 700;
+    line-height: 1.2;
+  }
+  .switcher__tab:hover {
+    background-color: color-mix(in srgb, var(--surface) 55%, transparent);
+  }
+  .switcher__tab[aria-selected='true'] {
+    border-color: var(--border);
+    background-color: var(--surface);
+    box-shadow: var(--shadow-card);
+    color: var(--heading);
+  }
+  .switcher__tab .scenario-icon {
+    color: var(--link);
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .switcher__tab[aria-selected='true'] .redraw {
+      animation: icon-redraw var(--dur-3) var(--ease-out) both;
+      animation-delay: calc(var(--i, 0) * 30ms);
+    }
+  }
+  @keyframes icon-redraw {
+    from {
+      stroke-dasharray: 1;
+      stroke-dashoffset: 1;
+    }
+    to {
+      stroke-dasharray: 1;
+      stroke-dashoffset: 0;
+    }
+  }
+  @media (min-width: 768px) {
+    .js .switcher__tabs {
+      display: inline-flex;
+      gap: var(--space-1);
+    }
+    .switcher__tab {
+      flex-direction: row;
+      gap: var(--space-3);
+      min-height: var(--btn-h);
+      padding: 0 var(--space-5);
+      font-size: 1rem;
+    }
+  }
+
+  .switcher__panel + .switcher__panel {
+    margin-top: var(--space-7);
+  }
+  .switcher__panel-title {
+    margin-bottom: var(--space-4);
+  }
+  .js .switcher__panels {
+    display: grid;
+  }
+  .js .switcher__panel {
+    grid-area: 1 / 1;
+    margin: 0;
+    visibility: hidden;
+    opacity: 0;
+  }
+  .js .switcher__panel.is-active {
+    visibility: visible;
+    opacity: 1;
+  }
+  .js .switcher__panel.is-leaving {
+    opacity: 0;
+    transition: opacity var(--dur-1) var(--ease-out);
+  }
+  .js .switcher__panel.is-entering {
+    animation: panel-in var(--dur-2) var(--ease-out);
+  }
+  .js .switcher__panel-title {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+  @keyframes panel-in {
+    from {
+      opacity: 0;
+      transform: translateY(8px);
+    }
+  }
+  .switcher__panel:focus-visible {
+    outline-offset: 6px;
+    border-radius: var(--radius-sm);
+  }
+
+  .switcher__pains {
+    display: grid;
+    gap: var(--space-4);
+    margin-bottom: var(--space-5);
+  }
+  @media (min-width: 768px) {
+    .switcher__pains {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: var(--space-5);
+    }
+  }
+</style>

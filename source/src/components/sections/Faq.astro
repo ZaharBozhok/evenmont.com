@@ -1,0 +1,123 @@
+---
+/**
+ * FAQ accordion (<details>), answers from src/content/faq/<id>.json. On wide screens a
+ * "talk to a founder" card sits beside the questions (client pages: the delivery founder;
+ * partner pages: the partnerships contact).
+ */
+import { getEntry } from 'astro:content';
+import Section from '../Section.astro';
+import Icon from '../Icon.astro';
+import T from '../T.astro';
+import Avatar from '../Avatar.astro';
+import Button from '../Button.astro';
+import { settings } from '../../lib/site';
+import { getTerms } from '../../lib/terms';
+
+interface Props {
+  id: string;
+  title?: string;
+  tone?: 'default' | 'alt';
+  /** Hide the contact card (e.g. when the page ends in a form right below). */
+  contact?: boolean;
+}
+const { id, title, tone = 'default', contact = true } = Astro.props;
+const entry = await getEntry('faq', id);
+if (!entry) throw new Error(`Missing FAQ file src/content/faq/${id}.json`);
+const terms = await getTerms();
+const partner = id === 'partners' || id === 'white-label';
+const person = partner ? settings.partnerContact : settings.founders[1];
+const cta = partner
+  ? { label: id === 'white-label' ? 'Send us a scope' : terms.fmt('Book a {partnerIntroShort} partner intro'), href: id === 'white-label' ? '#scope' : '#apply' }
+  : { label: terms.fmt('Book a {fitCallShort} fit call'), href: '/book' };
+---
+
+<Section id="faq" title={title ?? entry.data.title} tone={tone}>
+  <div class:list={['faqwrap', contact && 'faqwrap--aside']}>
+    <div class="faq">
+      {
+        entry.data.items.map((item) => (
+          <details>
+            <summary>
+              <span>{terms.fmt(item.q)}</span>
+              <Icon name="chevron-down" />
+            </summary>
+            <div class="faq__answer">
+              <p>
+                <T v={terms.fmt(item.a)} />
+              </p>
+            </div>
+          </details>
+        ))
+      }
+    </div>
+    {
+      contact && (
+        <aside class="faqask" aria-label="Ask us directly">
+          <Avatar name={person.name} size={64} tone={1} />
+          <p class="faqask__title">Didn’t find your question?</p>
+          <p class="faqask__text">
+            Ask {person.name} ({person.role.toLowerCase()}). We reply within {terms.vars.replyTime}.
+          </p>
+          <Button href={cta.href} block>
+            {cta.label}
+          </Button>
+          <a class="faqask__mail" href={`mailto:${settings.contact.email}`}>
+            <Icon name="mail" size={18} />
+            {settings.contact.email}
+          </a>
+        </aside>
+      )
+    }
+  </div>
+</Section>
+
+<style is:global>
+  .faqwrap {
+    display: grid;
+    gap: var(--space-7);
+    align-items: start;
+  }
+  .faqask {
+    /* Links on the soft surface use the mood's alt-surface link color (Cobalt fails on Mist). */
+    --link: var(--alt-link);
+    display: grid;
+    justify-items: start;
+    gap: var(--space-3);
+    padding: var(--space-6);
+    border-radius: 20px;
+    background-color: var(--surface-alt);
+  }
+  .faqask > * {
+    margin: 0;
+  }
+  .faqask__title {
+    margin-top: var(--space-2);
+    font-size: var(--fs-h3);
+    font-weight: 800;
+    color: var(--heading);
+  }
+  .faqask__text {
+    color: var(--text);
+  }
+  .faqask .btn {
+    margin-top: var(--space-2);
+  }
+  .faqask__mail {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    min-height: var(--tap);
+    color: var(--link);
+    font-weight: 700;
+  }
+  @media (min-width: 1024px) {
+    .faqwrap--aside {
+      grid-template-columns: minmax(0, 1fr) 340px;
+      gap: var(--space-8);
+    }
+    .faqask {
+      position: sticky;
+      top: var(--space-6);
+    }
+  }
+</style>

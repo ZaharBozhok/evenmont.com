@@ -1,0 +1,55 @@
+name: Build site
+
+# GitHub Pages publishes the root of `main` as-is. When the Astro project in source/
+# changes, rebuild it and commit the static output to the root; Pages then deploys it.
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'source/**'
+      - '.github/scripts/publish-build.sh'
+      - '.github/workflows/build-site.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: build-site
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: source/package-lock.json
+
+      - name: Install dependencies
+        working-directory: source
+        run: npm ci
+
+      - name: Build
+        working-directory: source
+        run: npm run build
+
+      - name: Copy the build to the repository root
+        run: .github/scripts/publish-build.sh
+
+      - name: Commit and push
+        run: |
+          git add -A
+          if git diff --cached --quiet; then
+            echo "Build output unchanged, nothing to publish."
+            exit 0
+          fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git commit -m "Build site from ${GITHUB_SHA::7}"
+          git push

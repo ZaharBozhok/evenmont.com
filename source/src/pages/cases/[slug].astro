@@ -1,0 +1,775 @@
+---
+/**
+ * Case study template — /cases/[slug]. One Markdown file per case in src/content/cases/.
+ * Sections: hero (result, headline, client wordmark, cover photo with before → after) ·
+ * snapshot + story (body: Before / Why they chose us / What we did, one ### per phase,
+ * drawn as a timeline) · results as tiles with before/after bars · quotes · screens ·
+ * what's next · final CTA ("Talk to this client" only with referenceCall).
+ */
+import '../../styles/tone-light.css';
+import { getCollection, render, type CollectionEntry } from 'astro:content';
+import { Picture } from 'astro:assets';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import SumLine from '../../components/SumLine.astro';
+import Section from '../../components/Section.astro';
+import Avatar from '../../components/Avatar.astro';
+import Icon from '../../components/Icon.astro';
+import Stars from '../../components/Stars.astro';
+import LinkArrow from '../../components/LinkArrow.astro';
+import T from '../../components/T.astro';
+import ScreenMock from '../../components/illustrations/ScreenMock.astro';
+import ClientLogo from '../../components/illustrations/ClientLogo.astro';
+import FinalCta from '../../components/sections/FinalCta.astro';
+import { getTerms } from '../../lib/terms';
+import { noBreakHyphens } from '../../lib/text';
+import type { IconName } from '../../icons/lucide';
+
+export async function getStaticPaths() {
+  const cases = await getCollection('cases');
+  return cases.map((entry) => ({ params: { slug: entry.id }, props: { entry } }));
+}
+
+interface Props {
+  entry: CollectionEntry<'cases'>;
+}
+const { entry } = Astro.props;
+const c = entry.data;
+const { Content } = await render(entry);
+const scenario = (await getCollection('scenarios')).find((s) => s.id === c.scenario)!;
+const terms = await getTerms();
+const snapshot: { label: string; value: string; icon: IconName }[] = [
+  { label: 'Industry', value: c.profile.industry, icon: 'building-2' },
+  { label: 'Size', value: c.profile.size, icon: 'users' },
+  { label: 'State', value: c.profile.state, icon: 'map-pin' },
+  { label: 'Apps', value: c.apps.join(', '), icon: 'layers' },
+  { label: 'Integrations', value: c.integrations.length ? c.integrations.join(', ') : '—', icon: 'plug' },
+  { label: 'Timeline', value: c.timeline, icon: 'clock' },
+  { label: 'Pricing model', value: c.pricingModel, icon: 'receipt-text' },
+];
+const facts: { icon: IconName; text: string }[] = [
+  { icon: 'clock', text: c.timeline },
+  { icon: 'users', text: c.profile.size },
+  { icon: 'map-pin', text: c.profile.state },
+];
+// Results: a numeric before/after pair in the same unit (11 → 3, 71% → 96%, $412k → $284k)
+// gets two bars; anything else is shown as words.
+const parse = (v: string) => {
+  const m = v.replace(/,/g, '').match(/^([^\d−-]*)([−-]?\d+(?:\.\d+)?)\s*(.*)$/);
+  return m ? { n: Number(m[2].replace('−', '-')), unit: `${m[1]}|${m[3]}` } : null;
+};
+const results = c.results.map((r) => {
+  const b = parse(r.before);
+  const a = parse(r.after);
+  const bars = b && a && b.unit === a.unit && Math.max(b.n, a.n) > 0 ? { b: b.n / Math.max(b.n, a.n), a: a.n / Math.max(b.n, a.n) } : null;
+  return { ...r, bars, short: r.after.length <= 9 };
+});
+---
+
+<BaseLayout title={`${c.title} | Evenmont`} description={c.description}>
+  <section class="chero tone-dark ledger" data-hero data-animate>
+    <div class="container chero__grid">
+      <div class="chero__copy">
+        <p class="chero__eyebrow">
+          <a href="/cases">Case study</a> <span aria-hidden="true">·</span> <span set:html={noBreakHyphens(scenario.data.name)} />
+          {c.placeholder && <span class="sample-label chero__sample">Sample</span>}
+        </p>
+        <p class="chero__result">
+          <span class="display chero__number"><SumLine text={c.result.number} delay={200} /></span>
+          <span class="chero__label" set:html={noBreakHyphens(c.result.label)} />
+        </p>
+        <h1 class="hero-title chero__title">{c.headline}</h1>
+        <div class="chero__client">
+          <span class="chero__logo tone-light">
+            <ClientLogo name={c.company} />
+            <span class="visually-hidden">{c.company}</span>
+          </span>
+          <ul class="chero__facts" role="list">
+            {
+              facts.map((f) => (
+                <li>
+                  <Icon name={f.icon} size={16} />
+                  <T v={f.text} />
+                </li>
+              ))
+            }
+          </ul>
+        </div>
+      </div>
+      <figure class="chero__media">
+        <Picture
+          src={c.cover}
+          alt={c.coverAlt}
+          width={960}
+          height={720}
+          widths={[480, 720, 960, 1200]}
+          sizes="(min-width: 1200px) 540px, (min-width: 1024px) 44vw, calc(100vw - 2 * clamp(20px, 4vw, 40px))"
+          formats={['avif', 'webp']}
+          loading="eager"
+          fetchpriority="high"
+          decoding="async"
+          data-placeholder={c.placeholder || c.demo ? 'true' : undefined}
+        />
+        <figcaption class="chero__ba tone-light">
+          <span class="chero__ba-row">
+            <span class="chero__ba-tag">Before</span>
+            <span class="chero__ba-before">{c.beforeAfter.before}</span>
+          </span>
+          <span class="chero__ba-row">
+            <span class="chero__ba-tag chero__ba-tag--after">After</span>
+            <strong>{c.beforeAfter.after}</strong>
+          </span>
+        </figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <section class="section case-body">
+    <div class="container case-layout">
+      <aside class="snapshot card card--flat" aria-labelledby="snapshot-title">
+        <span class="snapshot__logo">
+          <ClientLogo name={c.company} />
+        </span>
+        <h2 id="snapshot-title" class="snapshot__title">Snapshot</h2>
+        <dl class="snapshot__list">
+          {
+            snapshot.map((row) => (
+              <div>
+                <dt>
+                  <Icon name={row.icon} size={16} />
+                  {row.label}
+                </dt>
+                <dd>
+                  <T v={row.value} />
+                </dd>
+              </div>
+            ))
+          }
+        </dl>
+      </aside>
+      <div class="prose">
+        <Content />
+      </div>
+    </div>
+  </section>
+
+  {
+    results.length > 0 && (
+      <Section id="results" title="Results" tone="alt">
+        <ul class="rtiles" role="list" data-reveal-children>
+          {results.map((r) => (
+            <li class="rtile card">
+              <h3 class="rtile__metric">{r.metric}</h3>
+              <p class:list={['rtile__after', r.short ? 'num' : 'rtile__after--words']}>
+                <span class="visually-hidden">After: </span>
+                <T v={r.after} />
+              </p>
+              {r.bars ? (
+                <span class="rtile__bars" aria-hidden="true">
+                  <span class="rtile__bar" style={`--w:${r.bars.b.toFixed(3)}`}>
+                    <span class="rtile__fill" />
+                    <span class="rtile__val">{r.before} before</span>
+                  </span>
+                  <span class="rtile__bar rtile__bar--after" style={`--w:${r.bars.a.toFixed(3)}`}>
+                    <span class="rtile__fill" />
+                    <span class="rtile__val">{r.after} after</span>
+                  </span>
+                </span>
+              ) : null}
+              <p class:list={['rtile__before', r.bars && 'visually-hidden']}>
+                Before: <T v={r.before} />
+              </p>
+              <p class="rtile__measured">
+                <Icon name="calendar-check" size={16} />
+                Measured <T v={r.measured} />
+              </p>
+            </li>
+          ))}
+        </ul>
+        <p class="results__note">{terms.fmt('Measured against the Blueprint baseline, {resultsCheck} after go-live.')}</p>
+      </Section>
+    )
+  }
+
+  <Section id="quote">
+    <div class:list={['quotes', c.accountantQuote && 'quotes--two']}>
+      <figure class="pull" data-reveal>
+        <Stars size={18} />
+        <blockquote>
+          <p>“<T v={c.quote.text} />”</p>
+        </blockquote>
+        <figcaption>
+          <Avatar name={c.quote.name} photo={c.quote.photo} size={56} />
+          <span><strong><T v={c.quote.name} /></strong><br /><T v={`${c.quote.role}, ${c.company}`} /></span>
+        </figcaption>
+      </figure>
+      {
+        c.accountantQuote && (
+          <figure class="pull pull--second" data-reveal>
+            <p class="pull__eyebrow">
+              <Icon name="calculator" size={18} />
+              The accountant’s view
+            </p>
+            <blockquote>
+              <p>
+                “<T v={c.accountantQuote.text} />”
+              </p>
+            </blockquote>
+            <figcaption>
+              <Avatar name={c.accountantQuote.name} size={48} />
+              <span>
+                <strong>
+                  <T v={c.accountantQuote.name} />
+                </strong>
+                <br />
+                <T v={c.accountantQuote.firm} />
+              </span>
+            </figcaption>
+          </figure>
+        )
+      }
+    </div>
+  </Section>
+
+  {
+    c.screenshots.length > 0 && (
+      <Section id="screens" title="Screens" intro="Screens from the project. Client data is anonymized." tone="alt">
+        <div class="screens">
+          {c.screenshots.map((shot) => (
+            <div class="screens__item tone-light">
+              {shot.image ? (
+                <Picture src={shot.image} alt={shot.caption} widths={[480, 800, 1200]} sizes="(min-width: 900px) 560px, 100vw" formats={['avif', 'webp']} loading="lazy" decoding="async" class="screens__img" />
+              ) : (
+                <ScreenMock kind={shot.kind} label={shot.caption} />
+              )}
+              <p class="screens__caption">{shot.caption}</p>
+            </div>
+          ))}
+        </div>
+      </Section>
+    )
+  }
+
+  {
+    c.whatsNext && (
+      <Section id="next">
+        <div class="next card">
+          <span class="next__icon" aria-hidden="true">
+            <Icon name="trending-up" size={24} />
+          </span>
+          <div>
+            <h2 class="next__title">What’s next</h2>
+            <p class="next__text">
+              <T v={c.whatsNext} />
+            </p>
+            <LinkArrow href={`/${c.scenario}`}>How we work with {scenario.data.name.toLowerCase()}</LinkArrow>
+          </div>
+        </div>
+      </Section>
+    )
+  }
+
+  <FinalCta secondary={c.referenceCall ? { label: 'Talk to this client', href: `/book?reference=${entry.id}` } : undefined} checklist={false} />
+</BaseLayout>
+
+<style>
+  /* ---- Hero ---- */
+  .chero {
+    padding-top: var(--space-6);
+    padding-bottom: var(--space-8);
+    overflow: hidden;
+  }
+  .chero__grid {
+    display: grid;
+    gap: var(--space-7);
+  }
+  .chero__eyebrow {
+    margin-bottom: var(--space-4);
+    color: var(--text-muted);
+    font-size: var(--fs-small);
+    font-weight: 700;
+    line-height: 1.8;
+  }
+  .chero__eyebrow a {
+    color: inherit;
+  }
+  .chero__sample {
+    margin-left: var(--space-2);
+  }
+  .chero__result {
+    display: grid;
+    gap: var(--space-1);
+    color: var(--heading);
+  }
+  .chero__number {
+    line-height: 1.05;
+  }
+  .chero__label {
+    font-size: var(--fs-h3);
+    font-weight: 700;
+  }
+  .chero__title {
+    max-width: 16em;
+    margin-top: var(--space-6);
+  }
+  .chero__client {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-4) var(--space-5);
+    margin-top: var(--space-6);
+  }
+  .chero__logo {
+    display: inline-flex;
+    align-items: center;
+    height: 52px;
+    padding: 0 var(--space-4);
+    border-radius: 12px;
+    background-color: var(--surface);
+    color: var(--heading);
+  }
+  .chero__logo :global(.client-logo) {
+    width: 140px;
+    height: 30px;
+  }
+  .chero__facts {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2) var(--space-4);
+    color: var(--text-muted);
+    font-size: var(--fs-small);
+    font-weight: 700;
+  }
+  .chero__facts li {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .chero__facts :global(.icon) {
+    color: var(--rule);
+  }
+  .chero__media {
+    position: relative;
+    margin: 0 0 var(--space-7);
+  }
+  .chero__media :global(picture) {
+    display: block;
+  }
+  .chero__media :global(img) {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 4 / 3;
+    object-fit: cover;
+    border-radius: 20px;
+  }
+  @media (min-width: 600px) and (max-width: 1023.98px) {
+    /* One column on tablets: a wider crop keeps the photo from filling the screen. */
+    .chero__media :global(img) {
+      aspect-ratio: 16 / 9;
+    }
+  }
+  .chero__ba {
+    position: absolute;
+    left: var(--space-4);
+    right: var(--space-4);
+    bottom: calc(-1 * var(--space-7));
+    display: grid;
+    gap: var(--space-2);
+    padding: var(--space-4);
+    border-radius: 16px;
+    background-color: var(--surface);
+    color: var(--text);
+    box-shadow: 0 24px 48px -24px rgba(0, 0, 0, 0.5);
+    font-size: var(--fs-small);
+    line-height: 1.35;
+  }
+  .chero__ba-row {
+    display: grid;
+    grid-template-columns: 64px minmax(0, 1fr);
+    gap: var(--space-3);
+    align-items: baseline;
+  }
+  .chero__ba-tag {
+    justify-self: start;
+    padding: 2px 8px;
+    border-radius: var(--radius-pill);
+    background-color: var(--surface-alt);
+    color: var(--text-muted);
+    font-size: var(--fs-xs);
+    font-weight: 800;
+  }
+  .chero__ba-tag--after {
+    background-color: var(--heading);
+    color: var(--em-sand);
+  }
+  .chero__ba-before {
+    color: var(--text-muted);
+    text-decoration: line-through;
+    text-decoration-color: color-mix(in srgb, var(--error) 70%, transparent);
+  }
+  .chero__ba strong {
+    color: var(--heading);
+    font-weight: 800;
+  }
+  @media (min-width: 1024px) {
+    .chero {
+      padding-top: var(--space-8);
+      padding-bottom: var(--space-9);
+    }
+    .chero__grid {
+      grid-template-columns: minmax(0, 6fr) minmax(0, 5fr);
+      align-items: center;
+      gap: var(--space-8);
+    }
+    .chero__media {
+      margin-bottom: 0;
+    }
+    .chero__ba {
+      left: calc(-1 * var(--space-7));
+      right: auto;
+      bottom: var(--space-6);
+      width: min(360px, 90%);
+    }
+  }
+
+  /* ---- Snapshot + story ---- */
+  .case-layout {
+    display: grid;
+    gap: var(--space-7);
+  }
+  .snapshot {
+    align-self: start;
+  }
+  .snapshot__logo {
+    display: flex;
+    padding-bottom: var(--space-4);
+    margin-bottom: var(--space-4);
+    border-bottom: 1px solid var(--border);
+    color: var(--heading);
+  }
+  .snapshot__logo :global(.client-logo) {
+    width: 150px;
+    height: 32px;
+  }
+  .snapshot__title {
+    font-family: var(--font-sans);
+    font-size: var(--fs-h3);
+    font-weight: 700;
+    letter-spacing: 0;
+  }
+  .snapshot__list {
+    display: grid;
+    gap: var(--space-3);
+    margin-top: var(--space-4);
+  }
+  .snapshot__list div {
+    display: grid;
+    gap: 2px;
+    padding-bottom: var(--space-3);
+    border-bottom: 1px solid var(--border);
+  }
+  .snapshot__list div:last-child {
+    border-bottom: 0;
+    padding-bottom: 0;
+  }
+  .snapshot__list dt {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--text-muted);
+    font-size: var(--fs-small);
+    font-weight: 700;
+  }
+  .snapshot__list dt :global(.icon) {
+    color: var(--link);
+  }
+  .snapshot__list dd {
+    margin: 0;
+    padding-left: 22px;
+    font-weight: 600;
+  }
+  @media (min-width: 1024px) {
+    .case-layout {
+      grid-template-columns: minmax(0, 4fr) minmax(0, 8fr);
+      gap: var(--space-8);
+    }
+    .snapshot {
+      position: sticky;
+      top: var(--space-5);
+    }
+  }
+
+  .prose {
+    counter-reset: phase;
+  }
+  .prose :global(h2) {
+    margin-top: var(--space-7);
+    margin-bottom: var(--space-4);
+  }
+  .prose :global(h2:first-child) {
+    margin-top: 0;
+  }
+  .prose :global(p + p) {
+    margin-top: var(--space-4);
+  }
+  .prose :global(p) {
+    font-size: var(--fs-body);
+  }
+  .prose :global(strong) {
+    color: var(--heading);
+  }
+  /* "What we did": one ### per phase, drawn as a numbered timeline. */
+  .prose :global(h3) {
+    position: relative;
+    display: flex;
+    align-items: center;
+    min-height: 36px;
+    margin-top: var(--space-5);
+    padding-left: 52px;
+    font-size: 1.1875rem;
+    counter-increment: phase;
+  }
+  .prose :global(h3)::before {
+    content: counter(phase);
+    position: absolute;
+    left: 0;
+    top: 0;
+    display: grid;
+    place-items: center;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background-color: var(--heading);
+    color: var(--em-sand);
+    font-size: var(--fs-small);
+    font-weight: 800;
+  }
+  .prose :global(h3 + p) {
+    position: relative;
+    margin-top: var(--space-2);
+    padding-left: 52px;
+  }
+  .prose :global(h3 + p)::before {
+    content: "";
+    position: absolute;
+    left: 17px;
+    top: -2px;
+    bottom: calc(-1 * var(--space-5) - 2px);
+    border-left: 2px dashed color-mix(in srgb, var(--heading) 30%, transparent);
+  }
+  .prose :global(h3 + p:last-child)::before {
+    bottom: 0;
+    border-left-color: transparent;
+  }
+
+  /* ---- Results ---- */
+  .rtiles {
+    display: grid;
+    gap: var(--space-4);
+  }
+  .rtile {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+    padding: var(--space-5);
+  }
+  .rtile > :global(*) {
+    margin: 0;
+  }
+  .rtile__metric {
+    font-family: var(--font-sans);
+    font-size: 1rem;
+    font-weight: 700;
+    letter-spacing: 0;
+    color: var(--text-muted);
+    line-height: 1.4;
+  }
+  .rtile__after {
+    color: var(--heading);
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: clamp(2.5rem, 2rem + 1.6vw, 3.25rem);
+    line-height: 1;
+  }
+  .rtile__after--words {
+    font-size: clamp(1.5rem, 1.3rem + 0.6vw, 1.75rem);
+    line-height: 1.2;
+  }
+  .rtile__bars {
+    display: grid;
+    gap: 6px;
+  }
+  .rtile__bar {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    height: 24px;
+    font-size: var(--fs-xs);
+    font-weight: 700;
+    color: var(--text-muted);
+  }
+  .rtile__fill {
+    flex: none;
+    width: max(6px, calc(var(--w) * 70%));
+    height: 100%;
+    border-radius: 6px;
+    background-color: color-mix(in srgb, var(--text-muted) 28%, transparent);
+  }
+  .rtile__bar--after {
+    color: var(--heading);
+  }
+  .rtile__bar--after .rtile__fill {
+    background-color: var(--heading);
+  }
+  .rtile__val {
+    white-space: nowrap;
+  }
+  .rtile__before {
+    color: var(--text-muted);
+    font-weight: 600;
+  }
+  .rtile__measured {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: auto !important;
+    padding-top: var(--space-3);
+    border-top: 1px solid var(--border);
+    color: var(--text-muted);
+    font-size: var(--fs-xs);
+    font-weight: 700;
+  }
+  .rtile__measured :global(.icon) {
+    color: var(--link);
+  }
+  .results__note {
+    margin-top: var(--space-4);
+    color: var(--text-muted);
+  }
+  @media (min-width: 768px) {
+    .rtiles {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+
+  /* ---- Quotes ---- */
+  .quotes {
+    display: grid;
+    gap: var(--space-7);
+  }
+  .pull {
+    display: grid;
+    gap: var(--space-4);
+    margin: 0;
+    max-width: 52rem;
+  }
+  .pull blockquote {
+    margin: 0;
+  }
+  .pull blockquote p {
+    max-width: none;
+    font-family: var(--font-display);
+    font-size: clamp(1.5rem, 1.2rem + 1.2vw, 2.125rem);
+    font-weight: 600;
+    line-height: 1.3;
+    color: var(--heading);
+  }
+  .pull figcaption {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+    color: var(--text-muted);
+    line-height: 1.45;
+  }
+  .pull figcaption strong {
+    color: var(--text);
+  }
+  .pull--second {
+    align-self: start;
+    padding: var(--space-6) var(--space-5);
+    border-radius: 20px;
+    background-color: var(--surface-alt);
+  }
+  .pull--second blockquote p {
+    font-family: var(--font-sans);
+    font-size: 1.125rem;
+    font-weight: 600;
+    line-height: 1.55;
+  }
+  .pull__eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    color: var(--heading);
+    font-size: var(--fs-small);
+    font-weight: 800;
+  }
+  .pull__eyebrow :global(.icon) {
+    color: var(--link);
+  }
+  @media (min-width: 1024px) {
+    .quotes--two {
+      grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+      align-items: center;
+      gap: var(--space-8);
+    }
+  }
+
+  /* ---- Screens ---- */
+  .screens {
+    display: grid;
+    gap: var(--space-8);
+  }
+  .screens__item :global(.screens__img) {
+    width: 100%;
+    height: auto;
+    border-radius: 14px;
+    box-shadow: var(--shadow-card);
+  }
+  .screens__caption {
+    margin-top: var(--space-6);
+    color: var(--text-muted);
+    font-size: var(--fs-small);
+  }
+  @media (min-width: 900px) {
+    .screens {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: var(--space-6);
+    }
+  }
+
+  /* ---- What's next ---- */
+  .next {
+    display: grid;
+    gap: var(--space-4);
+    align-items: start;
+    padding: var(--space-6) var(--space-5);
+  }
+  .next__icon {
+    display: grid;
+    place-items: center;
+    width: 52px;
+    height: 52px;
+    border-radius: 14px;
+    background-color: var(--heading);
+    color: var(--em-sand);
+  }
+  .next__title {
+    font-family: var(--font-sans);
+    font-size: var(--fs-h3);
+    font-weight: 800;
+    letter-spacing: 0;
+  }
+  .next__text {
+    margin: var(--space-2) 0 var(--space-4);
+    font-size: var(--fs-lead);
+    line-height: 1.5;
+  }
+  @media (min-width: 768px) {
+    .next {
+      grid-template-columns: auto minmax(0, 1fr);
+      gap: var(--space-5);
+      padding: var(--space-7);
+    }
+  }
+</style>

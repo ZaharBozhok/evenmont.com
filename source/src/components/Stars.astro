@@ -1,0 +1,46 @@
+---
+/** Five-star rating (accent color). The label carries the value for screen readers. */
+import { icons } from '../icons/lucide';
+
+interface Props {
+  value?: number;
+  size?: number;
+  class?: string;
+}
+const { value = 5, size = 18, class: className } = Astro.props;
+const full = Math.round(value * 2) / 2;
+---
+
+<span class:list={['stars', className]} role="img" aria-label={`Rated ${value} out of 5`} style={`--star:${size}px`}>
+  {
+    [1, 2, 3, 4, 5].map((n) => (
+      <svg
+        class:list={['stars__star', n > full + 0.25 && 'is-empty']}
+        viewBox="0 0 24 24"
+        aria-hidden="true"
+        focusable="false"
+        set:html={icons.star}
+      />
+    ))
+  }
+</span>
+
+<style is:global>
+  .stars {
+    display: inline-flex;
+    gap: 2px;
+    color: var(--rule);
+    vertical-align: middle;
+  }
+  .stars__star {
+    width: var(--star);
+    height: var(--star);
+    fill: currentColor;
+    stroke: currentColor;
+    stroke-width: 1;
+    stroke-linejoin: round;
+  }
+  .stars__star.is-empty {
+    fill: none;
+  }
+</style>

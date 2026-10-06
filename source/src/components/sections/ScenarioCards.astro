@@ -1,0 +1,142 @@
+---
+/** "Built for how you make money." — three cards linking to the scenario pages. */
+import { Picture } from 'astro:assets';
+import { getCollection } from 'astro:content';
+import Section from '../Section.astro';
+import Icon from '../Icon.astro';
+import Included from '../Included.astro';
+import { appIcon, appLabel } from '../../lib/apps';
+import { noBreakHyphens } from '../../lib/text';
+import services from '../../assets/placeholders/scenario-services.jpg';
+import distribution from '../../assets/placeholders/scenario-distribution.jpg';
+import manufacturing from '../../assets/placeholders/scenario-manufacturing.jpg';
+
+const images = { 'scenario-services': services, 'scenario-distribution': distribution, 'scenario-manufacturing': manufacturing };
+const scenarios = (await getCollection('scenarios')).sort((a, b) => a.data.order - b.data.order);
+---
+
+<Section id="scenarios" title="Built for how you make money.">
+  <ul class="grid grid--3 scenario-cards" role="list" data-reveal-children>
+    {
+      scenarios.map((s) => (
+        <li class="scenario-card card">
+          <div class="scenario-card__media">
+            <Picture
+              src={images[s.data.image as keyof typeof images]}
+              alt={s.data.imageAlt}
+              width={960}
+              height={720}
+              widths={[400, 720, 960]}
+              sizes="(min-width: 1200px) 370px, (min-width: 1024px) 30vw, (min-width: 768px) 45vw, calc(100vw - 2 * clamp(20px, 4vw, 40px))"
+              formats={['avif', 'webp']}
+              loading="lazy"
+              decoding="async"
+              data-placeholder="true"
+            />
+          </div>
+          <div class="scenario-card__body">
+            <h3>
+              <a class="card-link" href={`/${s.id}`} set:html={noBreakHyphens(s.data.name)} />
+            </h3>
+            <ul class="scenario-card__apps" role="list" aria-label="Typical Odoo apps">
+              {s.data.apps.slice(0, 6).map((app) => (
+                <li>
+                  <Icon name={appIcon(app)} size={16} />
+                  {appLabel(app)}
+                </li>
+              ))}
+            </ul>
+            <p class="scenario-card__outcome">
+              <Icon name="trending-up" size={20} />
+              <span>{s.data.card.outcome}</span>
+            </p>
+            <span class="link-arrow scenario-card__more" aria-hidden="true">
+              <span class="link-arrow__label">See {s.data.tab.toLowerCase()}</span>
+              <Icon name="arrow-right" size={18} class="arrow-nudge" />
+            </span>
+          </div>
+        </li>
+      ))
+    }
+  </ul>
+  <Included />
+</Section>
+
+<style is:global>
+  .scenario-card {
+    display: flex;
+    flex-direction: column;
+    padding: 0;
+    overflow: hidden;
+    transition: transform var(--dur-2) var(--ease-out);
+  }
+  .scenario-card > * + * {
+    margin-top: 0;
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .scenario-card:hover {
+      transform: translateY(-2px);
+    }
+    .scenario-card:hover .scenario-card__more .arrow-nudge {
+      transform: translateX(3px);
+    }
+  }
+  .scenario-card__media {
+    aspect-ratio: 4 / 3;
+    background-color: var(--surface-alt);
+  }
+  .scenario-card__media img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .scenario-card__body {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+    flex: 1;
+    padding: var(--space-5);
+  }
+  .scenario-card__body h3 {
+    font-size: var(--fs-h3);
+  }
+  .scenario-card__apps {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+  }
+  .scenario-card__apps li {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 10px;
+    border-radius: var(--radius-pill);
+    background-color: var(--surface-alt);
+    color: var(--heading);
+    font-size: var(--fs-xs);
+    font-weight: 700;
+  }
+  .scenario-card__apps .icon {
+    color: var(--link);
+  }
+  .scenario-card__outcome {
+    display: flex;
+    gap: var(--space-2);
+    color: var(--heading);
+    font-weight: 700;
+    line-height: 1.4;
+  }
+  .scenario-card__outcome .icon {
+    flex: none;
+    color: var(--link);
+    margin-top: 1px;
+  }
+  .scenario-card__more {
+    margin-top: auto;
+  }
+  @media (min-width: 768px) {
+    .scenario-card__body {
+      padding: var(--space-6);
+    }
+  }
+</style>

@@ -1,0 +1,392 @@
+---
+/** /partners/white-label — white-label Odoo delivery for agencies and Odoo partners (partner-dark mood). */
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import '../../styles/moods-partner.css';
+import SumLine from '../../components/SumLine.astro';
+import Button from '../../components/Button.astro';
+import Section from '../../components/Section.astro';
+import Icon from '../../components/Icon.astro';
+import T from '../../components/T.astro';
+import LinkArrow from '../../components/LinkArrow.astro';
+import RiskTable from '../../components/RiskTable.astro';
+import Faq from '../../components/sections/Faq.astro';
+import ScopeForm from '../../components/forms/ScopeForm.astro';
+import BlueprintLayers from '../../components/illustrations/BlueprintLayers.astro';
+import { settings } from '../../lib/site';
+import { getTerms } from '../../lib/terms';
+import type { IconName } from '../../icons/lucide';
+
+const terms = await getTerms();
+const fmt = terms.fmt;
+
+const when: { icon: IconName; text: string }[] = [
+  { icon: 'users', text: 'Your delivery team is overloaded' },
+  { icon: 'puzzle', text: 'Custom modules' },
+  { icon: 'plug', text: 'Integrations' },
+  { icon: 'database', text: 'Migrations' },
+  { icon: 'landmark', text: 'US accounting and sales tax setup' },
+  { icon: 'life-buoy', text: 'Rescuing stuck projects' },
+];
+
+const process: { icon: IconName; text: string }[] = [
+  { icon: 'kanban', text: 'Your tools and tracker' },
+  { icon: 'message-square', text: 'Daily async updates' },
+  { icon: 'git-pull-request', text: 'Code review' },
+  { icon: 'book-open', text: 'Documentation' },
+  { icon: 'code-xml', text: 'Odoo coding guidelines' },
+];
+
+const risks = [
+  { concern: 'We’ll be exposed to your client.', answer: 'We work under your brand, from your email and channels; NDA.' },
+  { concern: 'You’ll poach the client.', answer: 'Non-solicit; direct contact only with your permission.' },
+  { concern: 'Code quality.', answer: 'Code review, tests, documentation.' },
+  { concern: 'IP.', answer: 'All code is assigned to you or your client.' },
+  { concern: 'Deadlines.', answer: 'Fixed price and dates before start, daily updates.' },
+  { concern: 'Hiring for peaks.', answer: 'No headcount, capacity per project.' },
+];
+
+const proof: { icon: IconName; title: string; href: string; text: string }[] = [
+  { icon: 'layers', title: 'Modules in the Odoo Apps Store', href: settings.links.odooAppsStoreUrl, text: 'Published modules you can inspect.' },
+  { icon: 'code-xml', title: 'Code samples', href: settings.links.codeSamplesUrl, text: 'How we structure, test and document.' },
+  { icon: 'badge-check', title: 'Certifications', href: settings.links.certLinks, text: 'Our Odoo certifications, on Odoo’s site.' },
+];
+---
+
+<BaseLayout
+  mood="partner-dark"
+  title="White-label Odoo delivery for agencies | Evenmont"
+  description="Custom modules, integrations, migrations and US accounting setup — delivered under your name, inside your process. Fixed quote before your proposal."
+>
+  <section class="wl-hero tone-dark" data-hero>
+    <div class="container wl-hero__grid">
+      <div class="wl-hero__copy">
+        <p class="eyebrow">White-label Odoo delivery for agencies and Odoo partners</p>
+        <h1 class="hero-title">
+          Your brand.<br />
+          <SumLine text="Our certified Odoo team." delay={200} />
+        </h1>
+        <p class="hero-sub wl-hero__sub">
+          <span class="wl-hero__phrase">Custom modules, integrations, migrations and US accounting setup —</span>
+          <span class="wl-hero__phrase">delivered under your name, inside your process.</span>
+        </p>
+        <div class="wl-hero__actions">
+          <Button href="#scope" arrow>Send us a scope</Button>
+          <p class="wl-hero__micro">Fixed quote before you send your proposal.</p>
+        </div>
+      </div>
+      <div class="wl-hero__art">
+        <BlueprintLayers />
+      </div>
+    </div>
+  </section>
+
+  <Section id="when" title="When teams call us">
+    <ul class="grid grid--3 tiles" role="list" data-reveal-children>
+      {
+        when.map((item) => (
+          <li class="tile card">
+            <Icon name={item.icon} size={28} />
+            <p>{item.text}</p>
+          </li>
+        ))
+      }
+    </ul>
+  </Section>
+
+  <Section id="process" title="Inside your process" tone="alt">
+    <ul class="inproc" role="list" data-reveal-children>
+      {
+        process.map((item) => (
+          <li>
+            <Icon name={item.icon} />
+            <span>{item.text}</span>
+          </li>
+        ))
+      }
+    </ul>
+  </Section>
+
+  <Section id="risks" title="Risks you don’t carry">
+    <RiskTable rows={risks} caption="Agency concerns and how we handle them" />
+  </Section>
+
+  <Section id="commercials" title="Commercials" tone="alt">
+    <div class="grid grid--2 commercials">
+      {
+        terms.whiteLabel.commercials.map((c) => (
+          <article class="card commercial">
+            <h3>{c.title}</h3>
+            <p>{fmt(c.text)}</p>
+          </article>
+        ))
+      }
+    </div>
+    <p class="commercials__pay">{terms.whiteLabel.payment}</p>
+    <div class="capacity card">
+      <p class="capacity__eyebrow">Honest capacity</p>
+      <p class="capacity__text"><T v={fmt(terms.whiteLabel.capacity)} /></p>
+    </div>
+  </Section>
+
+  <Section id="proof" title="Proof">
+    <div class="wl-proof">
+      <ul class="proof-list" role="list">
+        {
+          proof.map((item) => (
+            <li>
+              <a class="proof-list__link" href={item.href}>
+                <Icon name={item.icon} />
+                <span>
+                  <span class="proof-list__title">{item.title}</span>
+                  <span class="proof-list__text">{item.text}</span>
+                </span>
+                <Icon name="arrow-right" size={18} class="arrow-nudge" />
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+      <div class="wl-cases">
+        <p class="wl-case__kicker">White-label cases · shared with the agency’s permission, names withheld</p>
+        {
+          settings.whiteLabelCases.map((c) => (
+            <article class="card wl-case">
+              <p class="wl-case__who">{c.who}</p>
+              <h3 class="wl-case__what">{c.what}</h3>
+              <ul class="checks" role="list">
+                {c.facts.map((f) => (
+                  <li>
+                    <Icon name="check" />
+                    {f}
+                  </li>
+                ))}
+              </ul>
+            </article>
+          ))
+        }
+      </div>
+    </div>
+  </Section>
+
+  <Faq id="white-label" />
+
+  <section class="scope tone-dark" id="scope" data-sticky-hide>
+    <div class="container scope__grid">
+      <div class="scope__copy">
+        <h2>Send us a scope</h2>
+        <p class="lead">Fixed quote before you send your proposal. We come back with questions or a price.</p>
+        <ul class="checks" role="list">
+          <li><Icon name="check" />NDA before any client details, on request</li>
+          <li><Icon name="check" />Delivered under your brand, inside your process</li>
+          <li><Icon name="check" />All code assigned to you or your client</li>
+        </ul>
+        <p><LinkArrow href="/partners">Accountant or CPA? See the partner program</LinkArrow></p>
+      </div>
+      <div class="scope__form card">
+        <ScopeForm />
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .wl-hero {
+    padding-top: var(--space-6);
+    padding-bottom: var(--space-9);
+    overflow: hidden;
+  }
+  .wl-hero__grid {
+    display: grid;
+    gap: var(--space-8);
+    align-items: center;
+  }
+  .wl-hero h1 {
+    max-width: 14em;
+  }
+  .wl-hero__sub {
+    margin-top: var(--space-5);
+    max-width: 34em;
+  }
+  .wl-hero__phrase {
+    display: block;
+  }
+  .wl-hero__actions {
+    display: grid;
+    justify-items: start;
+    gap: var(--space-3);
+    margin-top: var(--space-6);
+  }
+  .wl-hero__micro {
+    color: var(--text-muted);
+    font-weight: 600;
+  }
+  @media (max-width: 479.98px) {
+    .wl-hero__actions :global(.btn) {
+      width: 100%;
+    }
+  }
+  @media (min-width: 1024px) {
+    .wl-hero {
+      padding-top: var(--space-8);
+    }
+    .wl-hero__grid {
+      grid-template-columns: minmax(0, 6fr) minmax(0, 6fr);
+    }
+  }
+
+  .tile {
+    display: grid;
+    gap: var(--space-4);
+    align-content: start;
+  }
+  .tile > * + * {
+    margin-top: 0;
+  }
+  .tile :global(.icon) {
+    color: var(--rule);
+  }
+  .tile p {
+    font-size: var(--fs-h3);
+    font-weight: 700;
+    line-height: var(--lh-snug);
+    color: var(--heading);
+  }
+
+  .inproc {
+    display: grid;
+    gap: var(--space-3);
+  }
+  .inproc li {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+    min-height: 64px;
+    padding: var(--space-3) var(--space-5);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-card);
+    background-color: var(--surface);
+    font-weight: 700;
+  }
+  .inproc :global(.icon) {
+    color: var(--rule);
+  }
+  @media (min-width: 768px) {
+    .inproc {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+  @media (min-width: 1024px) {
+    .inproc {
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+    }
+    .inproc li {
+      flex-direction: column;
+      align-items: flex-start;
+      padding: var(--space-5);
+      min-height: 140px;
+    }
+  }
+
+  .commercial p {
+    color: var(--text-muted);
+  }
+  .commercials__pay {
+    margin-top: var(--space-5);
+    font-weight: 700;
+  }
+  .capacity {
+    margin-top: var(--space-6);
+    border-left: 4px solid var(--rule);
+  }
+  .capacity__eyebrow {
+    color: var(--text-muted);
+    font-size: var(--fs-small);
+    font-weight: 700;
+  }
+  .capacity__text {
+    font-size: var(--fs-h3);
+    font-weight: 700;
+    color: var(--heading);
+  }
+
+  .wl-proof {
+    display: grid;
+    gap: var(--space-6);
+  }
+  .proof-list li {
+    border-bottom: 1px solid var(--border);
+  }
+  .proof-list li:first-child {
+    border-top: 1px solid var(--border);
+  }
+  .proof-list__link {
+    display: grid;
+    grid-template-columns: 24px minmax(0, 1fr) 18px;
+    align-items: center;
+    gap: var(--space-4);
+    min-height: 72px;
+    padding: var(--space-3) 0;
+    color: var(--text);
+    text-decoration: none;
+  }
+  .proof-list__link > :global(.icon:first-child) {
+    color: var(--rule);
+  }
+  .proof-list__title {
+    display: block;
+    font-weight: 700;
+  }
+  .proof-list__text {
+    display: block;
+    color: var(--text-muted);
+    font-size: var(--fs-small);
+  }
+  .proof-list__link:hover .proof-list__title {
+    text-decoration: underline;
+    text-underline-offset: 0.2em;
+  }
+  .wl-cases {
+    display: grid;
+    gap: var(--space-4);
+  }
+  .wl-case__kicker {
+    color: var(--text-muted);
+    font-size: var(--fs-small);
+    font-weight: 700;
+  }
+  .wl-case__who {
+    color: var(--text-muted);
+    font-size: var(--fs-small);
+    font-weight: 700;
+  }
+  .wl-case__what {
+    margin-top: var(--space-2);
+    margin-bottom: var(--space-4);
+  }
+  @media (min-width: 1024px) {
+    .wl-proof {
+      grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+      gap: var(--space-8);
+      align-items: start;
+    }
+  }
+
+  .scope {
+    padding-block: var(--section-y);
+  }
+  .scope__grid {
+    display: grid;
+    gap: var(--space-7);
+    align-items: start;
+  }
+  .scope__copy {
+    display: grid;
+    gap: var(--space-5);
+  }
+  @media (min-width: 1024px) {
+    .scope__grid {
+      grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+      gap: var(--space-8);
+    }
+  }
+</style>

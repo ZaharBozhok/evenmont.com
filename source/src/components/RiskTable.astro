@@ -1,0 +1,118 @@
+---
+/** "Your concern → How we handle it" (#14 shield checks draw as each row enters, 60ms stagger). */
+interface Props {
+  rows: { concern: string; answer: string }[];
+  caption: string;
+}
+const { rows, caption } = Astro.props;
+---
+
+<div class="risks card card--flat">
+  <table class="rtable risks__table" role="table">
+    <caption class="visually-hidden">{caption}</caption>
+    <thead role="rowgroup">
+      <tr role="row">
+        <th role="columnheader" scope="col">Your concern</th>
+        <th role="columnheader" scope="col">How we handle it</th>
+      </tr>
+    </thead>
+    <tbody role="rowgroup">
+      {
+        rows.map((row, i) => (
+          <tr class="risks__row" role="row" data-animate style={`--i:${i % 3}`}>
+            <td class="risks__concern" role="cell">
+              <span class="rtable__label" aria-hidden="true">
+                Your concern
+              </span>
+              “{row.concern}”
+            </td>
+            <td class="risks__answer" role="cell">
+              <svg class="risks__shield" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                <path
+                  class="draw"
+                  pathLength="1"
+                  d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"
+                />
+                <path class="draw risks__tick" pathLength="1" d="m9 12 2 2 4-4" />
+              </svg>
+              <span>
+                <span class="rtable__label" aria-hidden="true">
+                  How we handle it
+                </span>
+                {row.answer}
+              </span>
+            </td>
+          </tr>
+        ))
+      }
+    </tbody>
+  </table>
+</div>
+
+<style is:global>
+  .risks {
+    padding: var(--space-2) var(--space-5);
+  }
+  .risks__table thead th {
+    padding: var(--space-4) 0 var(--space-3);
+    color: var(--text-muted);
+    font-size: var(--fs-small);
+  }
+  .risks__row td {
+    padding: var(--space-4) 0;
+  }
+  .risks__row + .risks__row {
+    border-top: 1px solid var(--border);
+  }
+  .risks__concern {
+    color: var(--heading);
+    font-weight: 700;
+  }
+  .risks__answer {
+    display: flex;
+    gap: var(--space-3);
+    align-items: flex-start;
+  }
+  .risks__shield {
+    flex: none;
+    width: 24px;
+    height: 24px;
+    fill: none;
+    stroke: var(--success);
+    stroke-width: 1.5;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+  @media (max-width: 767.98px) {
+    .risks__row {
+      padding: var(--space-4) 0;
+    }
+    .risks__row td {
+      padding: 0;
+    }
+    .risks__concern {
+      margin-bottom: var(--space-3);
+    }
+  }
+  @media (min-width: 768px) {
+    .risks {
+      padding: var(--space-2) var(--space-6);
+    }
+    .risks__table thead tr {
+      border-bottom: 1px solid var(--border);
+    }
+    .risks__concern {
+      width: 42%;
+      padding-right: var(--space-6) !important;
+    }
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .js .risks__row .draw {
+      transition-duration: var(--dur-3);
+      transition-delay: calc(var(--i) * 60ms);
+    }
+    .js .risks__row .risks__tick {
+      transition-delay: calc(var(--i) * 60ms + 250ms);
+    }
+  }
+</style>

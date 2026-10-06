@@ -1,0 +1,73 @@
+---
+/** Partner intro form: name, firm, role, number of clients, email, how you'd like to work. */
+import Form from './Form.astro';
+import Field from './Field.astro';
+import { getTerms } from '../../lib/terms';
+
+const terms = await getTerms();
+const f = 'partner-intro';
+---
+
+<Form name={f} submitLabel="Book a partner intro" successTitle="Thank you." successText={terms.fmt('We reply within {replyTime}.')}>
+  <div class="form__row form__row--2">
+    <Field form={f} name="name" label="Name" required autocomplete="name" />
+    <Field form={f} name="firm" label="Firm" required autocomplete="organization" error="Please enter your firm’s name." />
+  </div>
+  <div class="form__row form__row--2">
+    <Field form={f} name="role" label="Role" type="select" required options={['CPA', 'Bookkeeper', 'Fractional CFO', 'Other']} error="Please choose your role." />
+    <Field form={f} name="clients" label="Number of clients" type="select" required options={['1–10', '11–50', '51–200', '200+']} error="Please choose a range." />
+  </div>
+  <Field form={f} name="email" label="Email" type="email" required autocomplete="email" inputmode="email" />
+  <fieldset class="choice">
+    <legend class="field__label">How you’d like to work</legend>
+    <div class="choice__options">
+      {
+        ['Referral', 'Co-delivery', 'Not sure'].map((option, i) => (
+          <label class="choice__option">
+            <input type="radio" name="model" value={option} checked={i === 2} />
+            <span>{option}</span>
+          </label>
+        ))
+      }
+    </div>
+  </fieldset>
+</Form>
+
+<style is:global>
+  .choice {
+    margin: 0;
+    padding: 0;
+    border: 0;
+  }
+  .choice__options {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+    margin-top: var(--space-2);
+  }
+  .choice__option {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    min-height: var(--tap);
+    padding: 0 var(--space-4);
+    border: 1px solid var(--field-border);
+    border-radius: var(--radius-pill);
+    font-weight: 600;
+    cursor: pointer;
+  }
+  .choice__option:has(input:checked) {
+    border-color: var(--heading);
+    box-shadow: inset 0 0 0 1px var(--heading);
+  }
+  .choice__option:has(input:focus-visible) {
+    outline: 2px solid var(--focus);
+    outline-offset: 2px;
+  }
+  .choice__option input {
+    width: 18px;
+    height: 18px;
+    margin: 0;
+    accent-color: var(--accent);
+  }
+</style>

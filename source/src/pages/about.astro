@@ -1,0 +1,393 @@
+---
+/** /about — who we are: the story in three steps, numbers, the founders, how we work, values. */
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PageHero from '../components/PageHero.astro';
+import Section from '../components/Section.astro';
+import Icon from '../components/Icon.astro';
+import T from '../components/T.astro';
+import Founders from '../components/sections/Founders.astro';
+import FinalCta from '../components/sections/FinalCta.astro';
+import { legalLine, settings } from '../lib/site';
+import type { IconName } from '../icons/lucide';
+
+const story: { icon: IconName; title: string; text: string }[] = [
+  { icon: 'code-xml', title: 'We built a software company', text: 'And ran it on the same patchwork of tools our clients have today.' },
+  { icon: 'database-backup', title: 'We moved it onto Odoo', text: 'Our own sales, projects and books — one system, every number entered once.' },
+  { icon: 'calculator', title: 'Now we do it for US companies', text: 'Finance-first, and together with their accountant.' },
+];
+const how: { icon: IconName; title: string; text: string }[] = [
+  { icon: 'receipt-text', title: 'Fixed phases', text: 'A fixed price per phase, agreed before the work starts.' },
+  { icon: 'calendar', title: 'Weekly demos', text: 'A demo every week, so you see the system take shape.' },
+  { icon: 'file-text', title: 'Written updates', text: 'You get a written update every week.' },
+  { icon: 'clock', title: 'US-hours overlap', text: 'Europe-based, with daily overlap with US business hours.' },
+];
+const values: { icon: IconName; name: string; text: string }[] = [
+  { icon: 'scale', name: 'Precision', text: 'Numbers instead of adjectives: a baseline in the Blueprint, results measured after go-live.' },
+  { icon: 'message-circle', name: 'Candor', text: 'If Odoo isn’t right for you, we’ll say so — before you pay for a project.' },
+  { icon: 'key-round', name: 'Ownership', text: 'A founder on every project. Your code, your data, full documentation.' },
+  { icon: 'calendar-check', name: 'Calm', text: 'Fixed phases, weekly demos, written updates — a calm path to go-live.' },
+];
+const stats = settings.proof.stats;
+---
+
+<BaseLayout
+  title="About Evenmont — two founders, one system"
+  description="Two founders who moved their own software company to Odoo, now implementing it for growing US companies — finance-first, with your accountant."
+>
+  <PageHero eyebrow="About" title="Two founders. One system. Every number adds up." sum="Every number adds up." breakBeforeSum />
+
+  <Section id="story">
+    <h2 class="visually-hidden">Our story</h2>
+    <div class="story">
+      <div class="story__copy">
+        <p class="lead story__text">
+          We built and ran a software company, moved it onto Odoo ourselves, and now do the same for US companies —
+          finance-first and together with their accountant.
+        </p>
+        <ol class="path" role="list" data-reveal-children>
+          {
+            story.map((step) => (
+              <li class="path__step">
+                <span class="path__icon">
+                  <Icon name={step.icon} size={22} />
+                </span>
+                <h3>{step.title}</h3>
+                <p>{step.text}</p>
+              </li>
+            ))
+          }
+        </ol>
+      </div>
+      <figure class="name card">
+        <svg class="name__mark" viewBox="0 0 120 47" aria-hidden="true" focusable="false">
+          <rect x="0" y="0" width="120" height="7" rx="3.5"></rect>
+          <polygon points="6,47 34,7 62,47"></polygon>
+          <polygon points="58,47 86,7 114,47"></polygon>
+        </svg>
+        <dl class="name__list">
+          <div>
+            <dt>Even</dt>
+            <dd>books that balance.</dd>
+          </div>
+          <div>
+            <dt>Mont</dt>
+            <dd>ground that holds.</dd>
+          </div>
+        </dl>
+      </figure>
+    </div>
+  </Section>
+
+  <section class="stats tone-dark" aria-label="Evenmont in numbers">
+    <div class="container">
+      <ul class="stats__list" role="list" data-reveal-children>
+        {
+          stats.map((st) => (
+            <li>
+              <span class="stats__value">
+                <T v={st.value} />
+              </span>
+              <span class="stats__label">{st.label}</span>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+
+  <Founders more={false} />
+
+  <Section id="how" title="How we work" tone="alt">
+    <ul class="grid grid--4 how" role="list" data-reveal-children>
+      {
+        how.map((item) => (
+          <li class="how__item card">
+            <span class="how__icon">
+              <Icon name={item.icon} size={24} />
+            </span>
+            <h3>{item.title}</h3>
+            <p>{item.text}</p>
+          </li>
+        ))
+      }
+    </ul>
+  </Section>
+
+  <Section id="values" title="What we value">
+    <dl class="values" data-reveal-children>
+      {
+        values.map((v) => (
+          <div class="values__item">
+            <span class="values__icon" aria-hidden="true">
+              <Icon name={v.icon} size={24} />
+            </span>
+            <dt>{v.name}</dt>
+            <dd>{v.text}</dd>
+          </div>
+        ))
+      }
+    </dl>
+  </Section>
+
+  <Section id="company" tight>
+    <div class="entity">
+      <Icon name="building-2" size={20} />
+      <p><T v={legalLine()} /></p>
+    </div>
+  </Section>
+
+  <FinalCta />
+</BaseLayout>
+
+<style>
+  .story {
+    display: grid;
+    gap: var(--space-7);
+    align-items: start;
+  }
+  .story__copy {
+    display: grid;
+    gap: var(--space-7);
+  }
+  .story__text {
+    font-size: var(--fs-lead);
+    line-height: 1.5;
+  }
+  @media (min-width: 768px) {
+    .story__text {
+      font-size: clamp(1.25rem, 1.1rem + 0.8vw, 1.625rem);
+      line-height: 1.45;
+    }
+  }
+  .path {
+    display: grid;
+    gap: var(--space-5);
+  }
+  .path__step {
+    position: relative;
+    display: grid;
+    grid-template-columns: 48px minmax(0, 1fr);
+    column-gap: var(--space-4);
+    row-gap: var(--space-1);
+  }
+  .path__step h3 {
+    align-self: center;
+    font-size: 1.125rem;
+  }
+  .path__step p {
+    grid-column: 2;
+    color: var(--text-muted);
+  }
+  .path__icon {
+    grid-row: span 2;
+    display: grid;
+    place-items: center;
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background-color: var(--heading);
+    color: var(--em-sand);
+  }
+  .path__step:not(:last-child)::after {
+    content: "";
+    position: absolute;
+    left: 23px;
+    top: 56px;
+    bottom: calc(-1 * var(--space-5) + 8px);
+    border-left: 2px dashed color-mix(in srgb, var(--heading) 30%, transparent);
+  }
+  .path__step:last-child .path__icon {
+    background-color: var(--rule);
+    color: var(--on-accent);
+  }
+  @media (min-width: 900px) {
+    .path {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: var(--space-5);
+    }
+    .path__step {
+      grid-template-columns: minmax(0, 1fr);
+      row-gap: var(--space-2);
+    }
+    .path__icon {
+      grid-row: auto;
+      margin-bottom: var(--space-2);
+    }
+    .path__step p {
+      grid-column: 1;
+    }
+    .path__step:not(:last-child)::after {
+      left: 60px;
+      right: 12px;
+      top: 23px;
+      bottom: auto;
+      border-left: 0;
+      border-top: 2px dashed color-mix(in srgb, var(--heading) 30%, transparent);
+    }
+  }
+  .name {
+    display: grid;
+    gap: var(--space-5);
+  }
+  .name__mark {
+    width: 96px;
+    height: auto;
+  }
+  .name__mark rect {
+    fill: var(--rule);
+  }
+  .name__mark polygon {
+    fill: var(--heading);
+  }
+  .name__list {
+    display: grid;
+    gap: var(--space-3);
+  }
+  .name__list div {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: var(--space-3);
+  }
+  .name__list dt {
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 2rem;
+    color: var(--heading);
+  }
+  .name__list dd {
+    margin: 0;
+    font-size: var(--fs-lead);
+  }
+  @media (min-width: 1024px) {
+    .story {
+      grid-template-columns: minmax(0, 8fr) minmax(0, 4fr);
+      gap: var(--space-8);
+    }
+  }
+
+  .stats {
+    padding-block: var(--space-7);
+  }
+  .stats__list {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--space-6) var(--space-5);
+  }
+  .stats__list li {
+    display: grid;
+    gap: var(--space-1);
+    align-content: start;
+  }
+  .stats__value {
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: clamp(2.25rem, 1.8rem + 2vw, 3.5rem);
+    line-height: 1;
+    color: var(--heading);
+  }
+  .stats__label {
+    color: var(--text-muted);
+    font-size: var(--fs-small);
+    font-weight: 600;
+    line-height: 1.4;
+  }
+  @media (min-width: 900px) {
+    .stats {
+      padding-block: var(--space-8);
+    }
+    .stats__list {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+    .stats__list li + li {
+      padding-left: var(--space-5);
+      border-left: 1px solid var(--border);
+    }
+  }
+
+  .how__item {
+    display: grid;
+    grid-template-columns: 48px minmax(0, 1fr);
+    column-gap: var(--space-4);
+    row-gap: var(--space-1);
+    align-content: start;
+  }
+  .how__item h3 {
+    align-self: center;
+  }
+  .how__item p {
+    grid-column: 2;
+  }
+  .how__icon {
+    grid-row: span 2;
+    display: grid;
+    place-items: center;
+    width: 48px;
+    height: 48px;
+    border-radius: 14px;
+    background-color: var(--surface-alt);
+    color: var(--heading);
+  }
+  @media (min-width: 768px) {
+    .how__item {
+      grid-template-columns: minmax(0, 1fr);
+      row-gap: var(--space-3);
+    }
+    .how__icon {
+      grid-row: auto;
+    }
+    .how__item p {
+      grid-column: 1;
+    }
+  }
+  .values {
+    display: grid;
+    gap: var(--space-6);
+  }
+  .values__item {
+    display: grid;
+    grid-template-columns: 52px minmax(0, 1fr);
+    column-gap: var(--space-4);
+    row-gap: var(--space-1);
+    align-items: start;
+  }
+  .values__icon {
+    grid-row: span 2;
+    display: grid;
+    place-items: center;
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    border: 2px solid var(--rule);
+    color: var(--heading);
+  }
+  .values__item dt {
+    font-family: var(--font-sans);
+    font-weight: 800;
+    font-size: var(--fs-h3);
+    color: var(--heading);
+  }
+  .values__item dd {
+    margin: 0;
+  }
+  @media (min-width: 768px) {
+    .values {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: var(--space-7) var(--space-8);
+    }
+  }
+  .entity {
+    display: flex;
+    gap: var(--space-3);
+    align-items: flex-start;
+    padding: var(--space-5);
+    border-radius: 16px;
+    border: 1px solid var(--border);
+    color: var(--text-muted);
+    font-size: var(--fs-small);
+  }
+  .entity :global(.icon) {
+    flex: none;
+    color: var(--link);
+  }
+</style>

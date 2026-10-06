@@ -1,0 +1,17 @@
+{
+  "title": "Frequently asked questions",
+  "items": [
+    { "q": "How much does Odoo cost in total?", "a": "Two parts: Odoo licenses, billed by Odoo per user, and our fixed implementation fee. You get both numbers after the Blueprint, before you commit to the build." },
+    { "q": "How long does implementation take?", "a": "Typically {buildServices} for service companies and {buildProducts} with inventory or manufacturing. The Blueprint gives you a dated plan." },
+    { "q": "Will we lose our QuickBooks history?", "a": "We migrate what your accountant needs — customers, vendors, items, opening balances and history — and agree the cutover date with them." },
+    { "q": "Does it handle US sales tax?", "a": "Yes. Odoo calculates sales tax, and we can connect Avalara for multi-state rules. We have set this up for US companies before." },
+    { "q": "Can our accountant keep working the way they do?", "a": "Yes. They own the chart of accounts and sign off on the setup. We can train their team too." },
+    { "q": "How do you set up inventory valuation and COGS?", "a": "Together with your accountant: costing method, landed costs and valuation accounts are agreed in the Blueprint." },
+    { "q": "Can you connect our storefront and marketplaces?", "a": "In most cases, yes. We confirm the connectors and any custom work during the Blueprint." },
+    { "q": "What barcode scanners do we need?", "a": "Standard USB or Bluetooth scanners and mobile devices work. We recommend hardware in the Blueprint." },
+    { "q": "What if the project goes over budget?", "a": "Each phase has a fixed price. If we underestimate, that’s on us. Scope changes are quoted before any work starts." },
+    { "q": "You’re in Europe — how do meetings work?", "a": "Calls and demos happen during US business hours, and you get a written update every week." },
+    { "q": "Who owns the code and the data?", "a": "You do. Full documentation, no lock-in." },
+    { "q": "What happens after go-live?", "a": "{hypercare} of hypercare, then optional managed Odoo (Keep) for support, updates and improvements." }
+  ]
+}

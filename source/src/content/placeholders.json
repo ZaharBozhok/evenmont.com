@@ -1,0 +1,235 @@
+{
+  "$comment": "Every placeholder image, mock and file on the site. Each one carries data-placeholder=\"true\" in the HTML. Replace the file (or component), then set status to \"replaced\" — the build warning lists everything that is still open.",
+  "items": [
+    {
+      "slot": "Scenario card — Services & projects",
+      "page": "/",
+      "file": "src/assets/placeholders/scenario-services.jpg",
+      "ratio": "4:3",
+      "source": "https://www.pexels.com/photo/a-group-of-people-having-a-meeting-in-the-office-7651804/",
+      "license": "Pexels License",
+      "replaceWith": "A real client team (agency or consultancy) at work, natural light",
+      "status": "placeholder"
+    },
+    {
+      "slot": "Scenario card — Distribution & e-commerce",
+      "page": "/",
+      "file": "src/assets/placeholders/scenario-distribution.jpg",
+      "ratio": "4:3",
+      "source": "https://www.pexels.com/photo/photo-of-a-man-scanning-products-in-a-warehouse-4483942/",
+      "license": "Pexels License",
+      "replaceWith": "A client warehouse: shelves and barcode scanning",
+      "status": "placeholder"
+    },
+    {
+      "slot": "Scenario card — Light manufacturing",
+      "page": "/",
+      "file": "src/assets/placeholders/scenario-manufacturing.jpg",
+      "ratio": "4:3",
+      "source": "https://www.pexels.com/photo/workers-handling-detail-by-pneumatic-tool-in-workshop-3846262/",
+      "license": "Pexels License",
+      "replaceWith": "A client workshop or small assembly line",
+      "status": "placeholder"
+    },
+    {
+      "slot": "Case cover — Fieldwork Collective (demo case)",
+      "page": "/, /services, /cases, /cases/fieldwork-collective",
+      "file": "src/assets/placeholders/case-services.jpg",
+      "ratio": "16:9",
+      "source": "https://www.pexels.com/photo/team-having-a-meeting-6476254/",
+      "license": "Pexels License",
+      "replaceWith": "Photo from the real case (office team)",
+      "status": "placeholder"
+    },
+    {
+      "slot": "Case cover — Copperline Home Goods (demo case)",
+      "page": "/, /distribution, /cases, /cases/copperline-home-goods",
+      "file": "src/assets/placeholders/case-distribution.jpg",
+      "ratio": "16:9",
+      "source": "https://www.pexels.com/photo/warehouse-with-stock-on-metal-shelves-4483773/",
+      "license": "Pexels License",
+      "replaceWith": "Photo from the real case (distribution warehouse)",
+      "status": "placeholder"
+    },
+    {
+      "slot": "Case cover — Tallis Woodworks (demo case)",
+      "page": "/, /manufacturing, /cases, /cases/tallis-woodworks",
+      "file": "src/assets/placeholders/case-manufacturing.jpg",
+      "ratio": "16:9",
+      "source": "https://www.pexels.com/photo/close-up-of-hands-assembling-wooden-furniture-31755424/",
+      "license": "Pexels License",
+      "replaceWith": "Photo from the real case (small assembly line)",
+      "status": "placeholder"
+    },
+    {
+      "slot": "Case cover — Ridgeway Engineering (demo case)",
+      "page": "/services, /cases, /cases/ridgeway-engineering",
+      "file": "src/assets/placeholders/case-services-2.jpg",
+      "ratio": "16:9",
+      "source": "https://www.pexels.com/photo/7876755/",
+      "license": "Pexels License",
+      "replaceWith": "A real client team reviewing a project",
+      "status": "placeholder"
+    },
+    {
+      "slot": "Case cover — Harbor Supply Co. (demo case)",
+      "page": "/distribution, /cases, /cases/harbor-supply",
+      "file": "src/assets/placeholders/case-distribution-2.jpg",
+      "ratio": "16:9",
+      "source": "https://www.pexels.com/photo/4484151/",
+      "license": "Pexels License",
+      "replaceWith": "A real client warehouse, scanning stock",
+      "status": "placeholder"
+    },
+    {
+      "slot": "Case cover — Kestrel Signworks (demo case)",
+      "page": "/manufacturing, /cases, /cases/kestrel-signworks",
+      "file": "src/assets/placeholders/case-manufacturing-2.jpg",
+      "ratio": "16:9",
+      "source": "https://www.pexels.com/photo/7254428/",
+      "license": "Pexels License",
+      "replaceWith": "A real client shop floor",
+      "status": "placeholder"
+    },
+    {
+      "slot": "Partner page visual",
+      "page": "/partners",
+      "file": "src/assets/placeholders/partner-desk.jpg",
+      "ratio": "4:3",
+      "source": "https://www.pexels.com/photo/a-laptop-near-the-plant-and-documents-on-the-table-5520296/",
+      "license": "Pexels License",
+      "replaceWith": "Accountant desk with laptop and documents (ideally a partner firm, with permission)",
+      "status": "placeholder"
+    },
+    {
+      "slot": "Home “How we work” — the Blueprint workshop",
+      "page": "/",
+      "file": "src/assets/placeholders/blueprint-workshop.jpg",
+      "ratio": "21:8 (4:3 on phones)",
+      "source": "https://www.pexels.com/photo/10499058/",
+      "license": "Pexels License",
+      "replaceWith": "A real Blueprint session: a founder and a client team around a table with the process map",
+      "status": "placeholder"
+    },
+    {
+      "slot": "Home “Built with your accountant” — accountant card",
+      "page": "/",
+      "file": "src/assets/placeholders/accountant-desk.jpg",
+      "ratio": "16:9",
+      "source": "https://www.pexels.com/photo/7654448/",
+      "license": "Pexels License",
+      "replaceWith": "A partner accountant at work (with permission), or a neutral desk shot",
+      "status": "placeholder"
+    },
+    {
+      "slot": "Home “Built with your accountant” — Evenmont card",
+      "page": "/",
+      "file": "src/assets/placeholders/team-building.jpg",
+      "ratio": "16:9",
+      "source": "https://www.pexels.com/photo/5940721/",
+      "license": "Pexels License",
+      "replaceWith": "The Evenmont team configuring a real system",
+      "status": "placeholder"
+    },
+    {
+      "slot": "Founders photo (home “Who we are” and /about)",
+      "page": "/, /about",
+      "file": "src/assets/placeholders/founders-at-work.jpg",
+      "ratio": "4:5",
+      "source": "https://www.pexels.com/photo/12899155/",
+      "license": "Pexels License",
+      "replaceWith": "Both founders at work, natural light — the most important photo on the site",
+      "status": "placeholder"
+    },
+    {
+      "slot": "Rating, certification seals and review count (trust card, hero, reviews, cases index)",
+      "page": "/, /cases",
+      "file": "src/content/settings.json → proof + src/components/illustrations/Seal.astro",
+      "ratio": "—",
+      "source": "Invented for the preview",
+      "license": "—",
+      "replaceWith": "The real review score and count (with a link to the source), real certification counts; the official Odoo partner badge file",
+      "status": "placeholder"
+    },
+    {
+      "slot": "Founders’ signatures on the guarantees certificate",
+      "page": "/",
+      "file": "src/components/sections/Guarantees.astro (two drawn SVG paths)",
+      "ratio": "—",
+      "source": "Drawn placeholders",
+      "license": "—",
+      "replaceWith": "Real signatures (SVG traced from a scan), or remove the signature row",
+      "status": "placeholder"
+    },
+    {
+      "slot": "Hero product screens (SVG mocks with demo data: projects, inventory, production)",
+      "page": "/services, /distribution, /manufacturing",
+      "file": "src/components/illustrations/ScreenMock.astro",
+      "ratio": "16:10",
+      "source": "On-brand SVG mock (no data)",
+      "license": "Own work",
+      "replaceWith": "Real Odoo screenshots in a neutral frame with accent annotations",
+      "status": "placeholder"
+    },
+    {
+      "slot": "Case study screenshots (SVG mocks with demo data)",
+      "page": "/cases/*",
+      "file": "src/components/illustrations/ScreenMock.astro (screenshots in each case's frontmatter)",
+      "ratio": "16:10",
+      "source": "On-brand SVG mock (no data)",
+      "license": "Own work",
+      "replaceWith": "Real screenshots with client data blurred — add `image:` to each screenshot in the case file",
+      "status": "placeholder"
+    },
+    {
+      "slot": "Client logos (invented wordmarks for the six demo clients)",
+      "page": "/ (trust strip)",
+      "file": "src/components/illustrations/ClientLogo.astro",
+      "ratio": "120×28",
+      "source": "Neutral SVG wordmarks",
+      "license": "Own work",
+      "replaceWith": "Real client logos (one-color SVG), only for clients who approved being listed",
+      "status": "placeholder"
+    },
+    {
+      "slot": "Founder portraits (initials avatars; demo names)",
+      "page": "/, /about",
+      "file": "src/components/Avatar.astro (names in src/content/settings.json)",
+      "ratio": "1:1",
+      "source": "Sage/Evergreen avatar; shows initials once names are filled in",
+      "license": "Own work",
+      "replaceWith": "Founder photos, or keep the initials avatars",
+      "status": "placeholder"
+    },
+    {
+      "slot": "Founder video (stock poster + script dialog, no video yet)",
+      "page": "/ (Check us before you call)",
+      "file": "src/assets/placeholders/video-poster.jpg + src/components/sections/CheckUs.astro",
+      "ratio": "16:9",
+      "source": "https://www.pexels.com/photo/8062362/",
+      "license": "Own work",
+      "replaceWith": "60–90 s founder video + poster still; set links.founderVideoUrl in settings.json",
+      "status": "placeholder"
+    },
+    {
+      "slot": "Odoo partner badge (text badge “Odoo Ready Partner” — demo level)",
+      "page": "/ (trust strip, check us), footer on every page",
+      "file": "settings.json → odooPartnerBadge",
+      "ratio": "—",
+      "source": "Dashed placeholder box",
+      "license": "—",
+      "replaceWith": "The official badge file from Odoo, placed separately from the Evenmont logo",
+      "status": "placeholder"
+    },
+    {
+      "slot": "Downloadable PDFs (9, generated by scripts/pdfs/build.mjs; samples use demo clients)",
+      "page": "/, /partners, /partners/white-label",
+      "file": "public/downloads/*.pdf",
+      "ratio": "Letter",
+      "source": "Placeholder PDFs",
+      "license": "Own work",
+      "replaceWith": "Client one-pager, partner one-pager, sample SOW, sample weekly report, sample partner agreement, sample payout statement",
+      "status": "placeholder"
+    }
+  ]
+}

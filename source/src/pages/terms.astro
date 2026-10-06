@@ -1,0 +1,64 @@
+---
+/**
+ * /terms — DRAFT written for the pre-release preview. Must be reviewed and approved by
+ * counsel before launch; the draft notice stays until then.
+ */
+import LegalPage from '../components/LegalPage.astro';
+import { settings } from '../lib/site';
+
+const l = settings.legal;
+const email = settings.contact.email;
+---
+
+<LegalPage
+  title="Terms"
+  metaTitle="Terms | Evenmont"
+  description="Terms of use for evenmont.com, operated by JITO LTD under the business name Evenmont."
+  lead="Last updated: September 2026"
+  draft="Draft for legal review — not yet approved."
+>
+  <section>
+    <h2>Scope</h2>
+    <p>
+      These terms apply to your use of evenmont.com, operated by {l.legalName} under the business name Evenmont. Our services are
+      provided under a separate written agreement, such as a statement of work; if that agreement and these terms differ, the
+      agreement applies.
+    </p>
+  </section>
+  <section>
+    <h2>Use of this website</h2>
+    <p>
+      You may use this site to learn about our services and to contact us. Don’t misuse it: no attempts to break its security,
+      overload it or collect data from it automatically.
+    </p>
+  </section>
+  <section>
+    <h2>Services and proposals</h2>
+    <p>
+      Prices, timelines and examples on this site are general information. A binding offer is the written proposal we send after a
+      Blueprint, with its own scope, price and terms. Odoo licenses are billed separately by Odoo S.A.
+    </p>
+  </section>
+  <section>
+    <h2>Intellectual property</h2>
+    <p>
+      The content and design of this site belong to us. Code we write for clients is assigned under the terms of each client
+      agreement. Odoo is a trademark of Odoo S.A.; we are an independent company and not part of Odoo S.A.
+    </p>
+  </section>
+  <section>
+    <h2>Liability</h2>
+    <p>
+      We work to keep this site accurate, but it is provided as is. To the extent the law allows, we are not liable for losses
+      that come from relying on its general information. Nothing in these terms limits liability that cannot be limited by law.
+    </p>
+  </section>
+  <section>
+    <h2>Governing law</h2>
+    <p>These terms are governed by the laws of the Republic of Cyprus, and its courts have jurisdiction.</p>
+  </section>
+  <section>
+    <h2>Contact</h2>
+    <p>Questions about these terms: <a href={`mailto:${email}`}>{email}</a>.</p>
+  </section>
+</LegalPage>

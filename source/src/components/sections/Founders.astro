@@ -1,0 +1,297 @@
+---
+/**
+ * "Who we are" — a photo of the founders at work, the two founders, the working-hours
+ * overlap with the US drawn as a timeline, and the quarterly capacity ⚑ as four slots.
+ * Photo and hours are demo placeholders (see placeholders.json / DEMO-CONTENT.md).
+ */
+import { Picture } from 'astro:assets';
+import Section from '../Section.astro';
+import LinkArrow from '../LinkArrow.astro';
+import Avatar from '../Avatar.astro';
+import Icon from '../Icon.astro';
+import T from '../T.astro';
+import photo from '../../assets/placeholders/founders-at-work.jpg';
+import { settings } from '../../lib/site';
+import { getTerms } from '../../lib/terms';
+
+interface Props {
+  /** Show the "More about us" link (not on /about itself). */
+  more?: boolean;
+  tone?: 'default' | 'alt';
+}
+const { more = true, tone = 'default' } = Astro.props;
+const terms = await getTerms();
+const slots = Number(terms.vars.projectsPerQuarter) || 0;
+// Hours on a 24h US Eastern axis (demo): Evenmont 3:00–13:00 ET (10:00–20:00 in Limassol), US East 9:00–17:00.
+const pct = (h: number) => `${(h / 24) * 100}%`;
+const us = [9, 17];
+const em = [3, 13];
+const ov = [Math.max(us[0], em[0]), Math.min(us[1], em[1])];
+---
+
+<Section id="who-we-are" tone={tone}>
+  <div class="founders">
+    <figure class="founders__photo" data-reveal>
+      <Picture
+        src={photo}
+        alt="Two colleagues working side by side at a laptop in a bright office"
+        widths={[480, 720, 960]}
+        sizes="(min-width: 1024px) 460px, calc(100vw - 2 * clamp(20px, 4vw, 40px))"
+        formats={['avif', 'webp']}
+        loading="lazy"
+        decoding="async"
+        data-placeholder="true"
+      />
+      <figcaption class="founders__badge">
+        <Icon name="user-check" size={18} />
+        A founder on every project
+      </figcaption>
+    </figure>
+
+    <div class="founders__copy">
+      <p class="eyebrow">Who we are</p>
+      <h2>Two founders, both on your project.</h2>
+      <p class="lead">We moved our own company to Odoo first. Europe-based, with daily overlap with US business hours.</p>
+
+      <ul class="founders__people" role="list">
+        {
+          settings.founders.map((f, i) => (
+            <li class="fperson">
+              <Avatar name={f.name} size={56} tone={i === 0 ? 2 : 1} />
+              <div>
+                <h3 class="fperson__name">
+                  <T v={f.name} />
+                </h3>
+                <p class="fperson__role">{f.role}</p>
+                <p class="fperson__bio">
+                  <T v={f.bio} />
+                </p>
+              </div>
+            </li>
+          ))
+        }
+      </ul>
+
+      <div class="hours" data-reveal>
+        <p class="hours__title">
+          <Icon name="clock" size={18} />
+          {ov[1] - ov[0]} hours of overlap with the US East Coast, every weekday
+        </p>
+        <div class="hours__chart" aria-hidden="true">
+          <span class="hours__row">
+            <span class="hours__label">Evenmont</span>
+            <span class="hours__track">
+              <span class="hours__bar hours__bar--em" style={`left:${pct(em[0])};width:${pct(em[1] - em[0])}`} />
+            </span>
+          </span>
+          <span class="hours__row">
+            <span class="hours__label">New York</span>
+            <span class="hours__track">
+              <span class="hours__bar" style={`left:${pct(us[0])};width:${pct(us[1] - us[0])}`} />
+            </span>
+          </span>
+          <span class="hours__overlap" style={`--lf:${ov[0] / 24};--wf:${(ov[1] - ov[0]) / 24}`} />
+          <span class="hours__axis">
+            <span>12 am</span>
+            <span>6 am</span>
+            <span>12 pm</span>
+            <span>6 pm</span>
+            <span>ET</span>
+          </span>
+        </div>
+        <p class="hours__note">Calls between 9 am and 1 pm Eastern. Fit calls run during US business hours.</p>
+      </div>
+
+      <div class="capacity-row">
+        <span class="capacity-row__slots" aria-hidden="true">
+          {Array.from({ length: slots }, () => <span />)}
+        </span>
+        <p><T v={terms.fmt('We take on {projectsPerQuarter} new projects per quarter.')} /></p>
+      </div>
+      {more && <LinkArrow href="/about">More about us</LinkArrow>}
+    </div>
+  </div>
+</Section>
+
+<style is:global>
+  .founders {
+    display: grid;
+    gap: var(--space-7);
+    align-items: start;
+  }
+  .founders__photo {
+    position: relative;
+    margin: 0;
+    overflow: hidden;
+    border-radius: 24px;
+    aspect-ratio: 4 / 5;
+    max-height: 640px;
+  }
+  .founders__photo picture {
+    display: block;
+    height: 100%;
+  }
+  .founders__photo img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .founders__badge {
+    position: absolute;
+    left: var(--space-4);
+    bottom: var(--space-4);
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    padding: 10px 16px;
+    border-radius: var(--radius-pill);
+    background-color: var(--surface);
+    color: var(--heading);
+    font-weight: 800;
+    font-size: var(--fs-small);
+    box-shadow: 0 10px 24px -10px rgba(20, 32, 28, 0.45);
+  }
+  .founders__badge .icon {
+    color: var(--link);
+  }
+  .founders__copy {
+    display: grid;
+    gap: var(--space-5);
+    justify-items: start;
+  }
+  .founders__copy > .eyebrow {
+    margin-bottom: calc(-1 * var(--space-3));
+    color: var(--text-muted);
+  }
+  .founders__people {
+    display: grid;
+    gap: var(--space-4);
+    width: 100%;
+  }
+  .fperson {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    gap: var(--space-4);
+    padding: var(--space-4);
+    border-radius: 16px;
+    background-color: var(--surface);
+    border: 1px solid var(--border);
+  }
+  .fperson__name {
+    font-size: 1.125rem;
+  }
+  .fperson__role {
+    color: var(--link);
+    font-size: var(--fs-small);
+    font-weight: 700;
+  }
+  .fperson__bio {
+    margin-top: var(--space-2);
+    font-size: var(--fs-small);
+    line-height: 1.55;
+  }
+  .hours {
+    width: 100%;
+    padding: var(--space-5);
+    border-radius: 16px;
+    background-color: var(--surface-alt);
+  }
+  .hours__title {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    font-weight: 800;
+    color: var(--heading);
+  }
+  .hours__title .icon {
+    color: var(--link);
+    flex: none;
+  }
+  .hours__chart {
+    position: relative;
+    display: grid;
+    gap: var(--space-2);
+    margin-top: var(--space-4);
+    padding-left: 84px;
+  }
+  .hours__row {
+    position: relative;
+    display: block;
+    height: 22px;
+  }
+  .hours__label {
+    position: absolute;
+    left: -84px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-muted);
+    font-size: var(--fs-xs);
+    font-weight: 700;
+  }
+  .hours__track {
+    position: absolute;
+    inset: 7px 0;
+    border-radius: 4px;
+    background-color: color-mix(in srgb, var(--text-muted) 16%, transparent);
+  }
+  .hours__bar {
+    position: absolute;
+    top: -3px;
+    bottom: -3px;
+    border-radius: 6px;
+    background-color: var(--link);
+  }
+  .hours__bar--em {
+    background-color: var(--heading);
+  }
+  .hours__overlap {
+    position: absolute;
+    top: -6px;
+    height: calc(22px * 2 + var(--space-2) + 12px);
+    left: calc(84px + (100% - 84px) * var(--lf));
+    width: calc((100% - 84px) * var(--wf));
+    border: 2px dashed var(--rule);
+    border-radius: 8px;
+    background-color: color-mix(in srgb, var(--rule) 22%, transparent);
+    pointer-events: none;
+  }
+  .hours__axis {
+    display: flex;
+    justify-content: space-between;
+    margin-top: var(--space-1);
+    color: var(--text-muted);
+    font-size: 11px;
+    font-weight: 700;
+  }
+  .hours__note {
+    margin-top: var(--space-3);
+    color: var(--text-muted);
+    font-size: var(--fs-small);
+  }
+  .capacity-row {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+    font-weight: 700;
+  }
+  .capacity-row__slots {
+    display: inline-flex;
+    gap: 6px;
+  }
+  .capacity-row__slots span {
+    width: 14px;
+    height: 28px;
+    border-radius: 4px;
+    background-color: var(--rule);
+  }
+  @media (min-width: 1024px) {
+    .founders {
+      grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+      gap: var(--space-8);
+    }
+    .founders__photo {
+      position: sticky;
+      top: var(--space-6);
+    }
+  }
+</style>

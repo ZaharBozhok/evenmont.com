@@ -1,0 +1,47 @@
+---
+/**
+ * Evenmont logo as a cached image file (the kit's SVGs, used as provided).
+ * Picks the right file for the page mood and the tone of the band it sits on.
+ */
+import logo from '../assets/brand/evenmont-logo.svg?url';
+import logoReverse from '../assets/brand/evenmont-logo-reverse.svg?url';
+import logoPartner from '../assets/brand/evenmont-logo-partner.svg?url';
+import logoPartnerReverse from '../assets/brand/evenmont-logo-partner-reverse.svg?url';
+import descriptor from '../assets/brand/evenmont-logo-descriptor.svg?url';
+import descriptorReverse from '../assets/brand/evenmont-logo-descriptor-reverse.svg?url';
+import type { Mood } from '../lib/site';
+
+interface Props {
+  mood: Mood;
+  tone: 'dark' | 'light';
+  variant?: 'default' | 'descriptor';
+  alt?: string;
+  class?: string;
+  lazy?: boolean;
+  priority?: boolean;
+}
+const { mood, tone, variant = 'default', alt = 'Evenmont', class: className, lazy = false, priority = false } = Astro.props;
+
+const partner = mood !== 'client';
+const dark = tone === 'dark' || mood === 'partner-dark';
+// The descriptor lock-up exists only with the Amber accent, so partner pages use the
+// partner logo (Cobalt/Sky accent) with the descriptor set as text next to it.
+const useDescriptor = variant === 'descriptor' && !partner;
+const src = useDescriptor
+  ? dark ? descriptorReverse : descriptor
+  : partner
+    ? dark ? logoPartnerReverse : logoPartner
+    : dark ? logoReverse : logo;
+const [w, h] = useDescriptor ? [444, 78] : [444, 46];
+---
+
+<img
+  src={src}
+  width={w}
+  height={h}
+  alt={alt}
+  class:list={['logo', useDescriptor && 'logo--descriptor', className]}
+  loading={lazy ? 'lazy' : undefined}
+  decoding={lazy ? 'async' : undefined}
+  fetchpriority={priority ? 'high' : undefined}
+/>

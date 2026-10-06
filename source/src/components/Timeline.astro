@@ -1,0 +1,299 @@
+---
+import { noBreakHyphens } from '../lib/text';
+import Icon from './Icon.astro';
+import type { IconName } from '../icons/lucide';
+/**
+ * How we work — 5 steps (#9 timeline draw): one line connects the steps (horizontal
+ * ≥1024px, vertical below). Each segment draws as its step enters the viewport, and the
+ * step dot fills with the accent color.
+ */
+interface Step {
+  name: string;
+  get?: string;
+  time?: string;
+  price?: string;
+  /** With icons, each step gets an icon badge instead of a dot and a card body. */
+  icon?: IconName;
+}
+interface Props {
+  steps: Step[];
+  compact?: boolean;
+  headingLevel?: 'h3' | 'h4';
+}
+const { steps, compact = false, headingLevel = 'h3' } = Astro.props;
+const Heading = headingLevel;
+const withIcons = !compact && steps.every((st) => st.icon);
+---
+
+<ol class:list={['timeline', compact && 'timeline--compact', withIcons && 'timeline--icons']} role="list" data-reveal-children>
+  {
+    steps.map((step, i) => (
+      <li class="timeline__step" data-animate style={`--i:${i}`}>
+        <span class="timeline__rail" aria-hidden="true">
+          <span class="timeline__dot">{withIcons && step.icon && <Icon name={step.icon} size={22} />}</span>
+          {i < steps.length - 1 && <span class="timeline__seg" />}
+        </span>
+        <div class="timeline__body">
+          <Heading class="timeline__name">
+            <span class="timeline__num">{i + 1}.</span> <Fragment set:html={noBreakHyphens(step.name)} />
+          </Heading>
+          {step.get && <p class="timeline__get">{step.get}</p>}
+          {(step.time || step.price) && (
+            <dl class="timeline__meta">
+              {step.time && (
+                <div>
+                  <dt>
+                    <Icon name="clock" size={14} />
+                    <span class="timeline__dt">Time</span>
+                  </dt>
+                  <dd>{step.time}</dd>
+                </div>
+              )}
+              {step.price && (
+                <div>
+                  <dt>
+                    <Icon name="receipt-text" size={14} />
+                    <span class="timeline__dt">Price</span>
+                  </dt>
+                  <dd>{step.price}</dd>
+                </div>
+              )}
+            </dl>
+          )}
+        </div>
+      </li>
+    ))
+  }
+</ol>
+
+<style is:global>
+  .timeline {
+    --dot: 18px;
+    --line: 2px;
+    display: grid;
+    gap: 0;
+  }
+  .timeline__step {
+    position: relative;
+    display: grid;
+    grid-template-columns: var(--dot) minmax(0, 1fr);
+    gap: var(--space-4);
+    padding-bottom: var(--space-6);
+  }
+  .timeline__step:last-child {
+    padding-bottom: 0;
+  }
+  .timeline__rail {
+    position: relative;
+  }
+  .timeline__dot {
+    position: absolute;
+    top: 3px;
+    left: 0;
+    width: var(--dot);
+    height: var(--dot);
+    border: var(--line) solid var(--heading);
+    border-radius: 50%;
+    background-color: var(--surface);
+  }
+  .timeline__dot::after {
+    content: '';
+    position: absolute;
+    inset: 2px;
+    border-radius: 50%;
+    background-color: var(--rule);
+  }
+  .timeline__seg {
+    position: absolute;
+    top: calc(3px + var(--dot));
+    bottom: calc(-1 * var(--space-6) - 3px);
+    left: calc(var(--dot) / 2 - var(--line) / 2);
+    width: var(--line);
+    background-color: var(--heading);
+    transform-origin: top center;
+  }
+  .timeline__name {
+    font-size: var(--fs-h3);
+  }
+  .timeline__num {
+    color: var(--text-muted);
+    font-variant-numeric: tabular-nums;
+  }
+  .timeline__get {
+    margin-top: var(--space-2);
+  }
+  .timeline__meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2) var(--space-5);
+    margin-top: var(--space-3);
+    font-size: var(--fs-small);
+    font-variant-numeric: tabular-nums;
+  }
+  .timeline__meta div {
+    display: flex;
+    gap: var(--space-2);
+  }
+  .timeline__meta dt {
+    color: var(--text-muted);
+    font-weight: 700;
+  }
+  .timeline__meta dd {
+    margin: 0;
+    font-weight: 600;
+  }
+
+  .timeline--compact .timeline__step {
+    padding-bottom: var(--space-5);
+  }
+  .timeline--compact .timeline__seg {
+    bottom: calc(-1 * var(--space-5) - 3px);
+  }
+  .timeline--compact .timeline__name {
+    font-size: 1.0625rem;
+  }
+
+  @media (min-width: 1024px) {
+    .timeline {
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: var(--space-5);
+    }
+    .timeline__step {
+      grid-template-columns: minmax(0, 1fr);
+      grid-template-rows: auto 1fr;
+      gap: var(--space-5);
+      padding-bottom: 0;
+    }
+    .timeline__rail {
+      height: calc(var(--dot) + 6px);
+    }
+    .timeline__seg {
+      top: calc(3px + var(--dot) / 2 - var(--line) / 2);
+      bottom: auto;
+      left: var(--dot);
+      right: calc(-1 * var(--space-5));
+      width: auto;
+      height: var(--line);
+      transform-origin: left center;
+    }
+    .timeline--compact .timeline__seg {
+      bottom: auto;
+    }
+    .timeline__meta {
+      flex-direction: column;
+    }
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .js .timeline__step:not(.is-in) .timeline__seg {
+      transform: scaleY(0);
+    }
+    .js .timeline__step:not(.is-in) .timeline__dot::after {
+      transform: scale(0);
+    }
+    .js .timeline__seg {
+      transition: transform var(--dur-draw) var(--ease-out) 200ms;
+    }
+    .js .timeline__dot::after {
+      transition: transform var(--dur-3) var(--ease-settle);
+    }
+  }
+  @media (prefers-reduced-motion: no-preference) and (min-width: 1024px) {
+    .js .timeline__step:not(.is-in) .timeline__seg {
+      transform: scaleX(0);
+    }
+    .js .timeline__seg,
+    .js .timeline__dot::after {
+      transition-delay: calc(var(--i) * 160ms);
+    }
+    .js .timeline__seg {
+      transition-delay: calc(var(--i) * 160ms + 200ms);
+    }
+  }
+
+  /* Icon variant (home "How we work"): icon badges on the line, each step in a card. */
+  .timeline--icons {
+    --dot: 48px;
+  }
+  .timeline--icons .timeline__dot {
+    top: 0;
+    display: grid;
+    place-items: center;
+    border: 0;
+    background-color: var(--heading);
+    color: var(--em-sand);
+  }
+  .timeline--icons .timeline__dot::after {
+    display: none;
+  }
+  .timeline--icons .timeline__seg {
+    top: var(--dot);
+    background-image: linear-gradient(to bottom, var(--heading) 60%, transparent 0);
+    background-size: 2px 8px;
+    background-color: transparent;
+  }
+  .timeline--icons .timeline__body {
+    padding: var(--space-5);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-card);
+    background-color: var(--surface);
+  }
+  .timeline--icons .timeline__meta {
+    flex-direction: row;
+    gap: var(--space-2);
+  }
+  .timeline--icons .timeline__meta div {
+    align-items: flex-start;
+    gap: 6px;
+    padding: 4px 10px;
+    border-radius: 10px;
+    background-color: var(--surface-alt);
+    line-height: 1.45;
+  }
+  .timeline--icons .timeline__meta dt {
+    padding-top: 3px;
+  }
+  .timeline__meta dt {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .timeline--icons .timeline__dt {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+  }
+  .timeline--icons .timeline__meta dt .icon {
+    color: var(--link);
+  }
+  .timeline:not(.timeline--icons) .timeline__meta dt .icon {
+    display: none;
+  }
+  @media (min-width: 1024px) {
+    .timeline--icons .timeline__seg {
+      top: calc(var(--dot) / 2 - 1px);
+      left: calc(var(--dot) + 8px);
+      right: calc(-1 * var(--space-5) + 8px);
+      background-image: linear-gradient(to right, var(--heading) 60%, transparent 0);
+      background-size: 8px 2px;
+    }
+    .timeline--icons .timeline__rail {
+      height: var(--dot);
+    }
+    .timeline--icons .timeline__body {
+      height: 100%;
+    }
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .js .timeline--icons .timeline__step:not(.is-in) .timeline__dot {
+      transform: scale(0.6);
+      opacity: 0;
+    }
+    .js .timeline--icons .timeline__dot {
+      transition: transform var(--dur-3) var(--ease-settle), opacity var(--dur-2) var(--ease-out);
+      transition-delay: calc(var(--i) * 160ms);
+    }
+  }
+</style>

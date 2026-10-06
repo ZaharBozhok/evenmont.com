@@ -1,0 +1,45 @@
+---
+/** Custom 404 (client mood). */
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PageHero from '../components/PageHero.astro';
+import Button from '../components/Button.astro';
+import LinkArrow from '../components/LinkArrow.astro';
+---
+
+<BaseLayout title="Page not found | Evenmont" description="This page doesn’t exist or has moved." stickyCta={false}>
+  <PageHero eyebrow="404" title="This page doesn’t add up." sum="add up." lead="The link may be broken, or the page may have moved.">
+    <div class="nf__actions btn-row btn-row--stack">
+      <Button href="/" arrow>Back home</Button>
+      <Button href="/book" variant="secondary">Book a fit call</Button>
+    </div>
+  </PageHero>
+  <section class="section section--tight">
+    <div class="container">
+      <h2 class="nf__title">Popular pages</h2>
+      <ul class="nf__links" role="list">
+        <li><LinkArrow href="/services">Services & projects</LinkArrow></li>
+        <li><LinkArrow href="/distribution">Distribution & e-commerce</LinkArrow></li>
+        <li><LinkArrow href="/manufacturing">Light manufacturing</LinkArrow></li>
+        <li><LinkArrow href="/cases">Case studies</LinkArrow></li>
+        <li><LinkArrow href="/partners">Partner program</LinkArrow></li>
+      </ul>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .nf__actions {
+    margin-top: var(--space-6);
+  }
+  .nf__title {
+    font-size: var(--fs-h3);
+    font-family: var(--font-sans);
+    font-weight: 700;
+    letter-spacing: 0;
+    margin-bottom: var(--space-3);
+  }
+  .nf__links {
+    display: grid;
+    gap: var(--space-1);
+  }
+</style>

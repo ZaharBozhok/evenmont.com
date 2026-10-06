@@ -1,0 +1,84 @@
+/* ==========================================================================
+   Evenmont theme extensions
+   Builds on tokens.css (the kit's source of truth, left untouched).
+   No new colors: everything maps to existing primitives, or to translucent
+   versions of them for hairlines.
+
+   Components read only semantic tokens (--bg, --text, --accent, --rule …).
+   Tone classes remap those tokens for a band of the page, so every component
+   re-skins automatically inside it:
+     .tone-dark   hero / final CTA bands (Evergreen in client mood, Night in partner)
+     .tone-light  a light card placed inside a dark band (tone-light.css, loaded where used)
+     .tone-alt    soft surface band (Sage / Mist)
+   ========================================================================== */
+
+/* ---- Metric-matched fallbacks: text keeps its size while the WOFF2 files load ---- */
+@font-face {
+  font-family: "Fraunces Fallback";
+  src: local("Georgia");
+  size-adjust: 106.55%;
+  ascent-override: 91.79%;
+  descent-override: 23.93%;
+  line-gap-override: 0%;
+}
+@font-face {
+  font-family: "Fraunces Fallback Serif";
+  src: local("Noto Serif"), local("NotoSerif-Regular");
+  size-adjust: 98.75%;
+  ascent-override: 99.04%;
+  descent-override: 25.82%;
+  line-gap-override: 0%;
+}
+@font-face {
+  font-family: "Manrope Fallback";
+  src: local("Arial"), local("ArialMT");
+  size-adjust: 103.19%;
+  ascent-override: 103.31%;
+  descent-override: 29.07%;
+  line-gap-override: 0%;
+}
+@font-face {
+  font-family: "Manrope Fallback Sans";
+  src: local("Roboto"), local("Roboto-Regular");
+  size-adjust: 103.41%;
+  ascent-override: 103.08%;
+  descent-override: 29.01%;
+  line-gap-override: 0%;
+}
+
+:root {
+  --font-display: "Fraunces", "Fraunces Fallback", "Fraunces Fallback Serif", Georgia, "Times New Roman", serif;
+  --font-sans: "Manrope", "Manrope Fallback", "Manrope Fallback Sans", system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+
+  /* Dark bands inside light pages (client mood: Evergreen) */
+  --on-dark-border: rgba(246, 242, 234, 0.2);   /* Sand hairline */
+  --on-dark-surface: rgba(246, 242, 234, 0.07); /* Sand wash on Evergreen */
+  --on-dark-accent-edge: transparent;           /* Amber on Evergreen is 6.1:1, no edge needed */
+  --on-dark-success: var(--em-sage);            /* checks on Evergreen: 9.5:1 */
+  --alt-link: var(--em-pine);                   /* links on Sage: 5.9:1 */
+  --field-border: var(--text-muted);            /* form fields need 3:1 against the surface */
+  --header-h: 72px;
+}
+
+.tone-dark {
+  --bg: var(--dark-bg);
+  --surface: var(--on-dark-surface);
+  --surface-alt: var(--on-dark-surface);
+  --text: var(--on-dark);
+  --text-muted: var(--on-dark-muted);
+  --heading: var(--on-dark);
+  --link: var(--on-dark-link);
+  --focus: var(--on-dark-focus);
+  --rule: var(--on-dark-link);          /* sum line on dark: Amber (client) / Sky (partner) */
+  --border: var(--on-dark-border);
+  --accent-edge: var(--on-dark-accent-edge);
+  --success: var(--on-dark-success);
+  --field-border: var(--on-dark-muted);
+  background-color: var(--bg);
+  color: var(--text);
+}
+
+.tone-alt {
+  --link: var(--alt-link);
+  background-color: var(--surface-alt);
+}

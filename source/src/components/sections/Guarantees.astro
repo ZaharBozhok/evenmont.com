@@ -1,0 +1,187 @@
+---
+/**
+ * "Our promises, in writing." — ⚑ guarantees laid out as a signed certificate: a seal,
+ * the promises with check icons that draw in (#11), and both founders' signatures that
+ * write themselves once in view. Signatures are drawn placeholders (demo names).
+ */
+import Section from '../Section.astro';
+import Seal from '../illustrations/Seal.astro';
+import { getTerms } from '../../lib/terms';
+import { settings } from '../../lib/site';
+
+const terms = await getTerms();
+const [f1, f2] = settings.founders;
+const signatures = [
+  {
+    name: f1.name,
+    d: 'M6 44c5-12 12-27 18-30 5-2 3 19-1 28 8-9 16-12 19-8 2 3-3 8-8 9 7 0 12-3 16-8s6-12 9-11c3 1-2 15-3 19 4-8 9-14 13-13 4 1 0 10-2 12 6-4 11-7 15-4 3 2-1 6 1 7 6 2 17-11 25-9',
+    flourish: 'M4 54c34-4 74-7 124-9',
+  },
+  {
+    name: f2.name,
+    d: 'M8 38c2-12 15-25 23-21 6 3-3 12-11 14 8 2 9 10 17 8 8-3 8-15 12-15 3 0-2 13 2 14 5 1 10-11 14-10 4 1 0 10 4 10 6 0 8-11 14-9 4 2 0 9 5 9 6 0 12-9 20-7',
+    flourish: 'M10 50c36 2 74-2 108-9',
+  },
+];
+---
+
+<Section id="guarantees" title="Our promises, in writing." tone="alt">
+  <div class="cert" data-reveal>
+    <div class="cert__seal">
+      <Seal id="promise" ring="Evenmont · In writing · Fixed price" center="Signed" icon="stamp" size={132} />
+    </div>
+    <ul class="cert__list" role="list" data-animate>
+      {
+        terms.guarantees.map((text, i) => (
+          <li class="cert__item" style={`--i:${i}`}>
+            <svg class="cert__check" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+              <circle cx="12" cy="12" r="11" />
+              <path class="draw" pathLength="1" d="M7 12.5l3.2 3.2L17 9" />
+            </svg>
+            <p>{terms.fmt(text)}</p>
+          </li>
+        ))
+      }
+    </ul>
+    <div class="cert__signs scene" data-animate>
+      {
+        signatures.map((s, i) => (
+          <figure class="cert__sign">
+            <svg viewBox="0 0 132 60" aria-hidden="true" focusable="false">
+              <path class="k" pathLength="1" style={`--k:k-draw;--t:1400ms;--d:${300 + i * 900}ms;--e:cubic-bezier(.45,0,.3,1)`} d={s.d} />
+              <path class="k" pathLength="1" style={`--k:k-draw;--t:500ms;--d:${1600 + i * 900}ms`} d={s.flourish} />
+            </svg>
+            <figcaption>
+              {s.name}
+              <span>Co-founder</span>
+            </figcaption>
+          </figure>
+        ))
+      }
+    </div>
+  </div>
+</Section>
+
+<style is:global>
+  .cert {
+    position: relative;
+    display: grid;
+    gap: var(--space-6);
+    padding: var(--space-7) var(--space-5) var(--space-6);
+    border-radius: 20px;
+    background-color: var(--surface);
+    box-shadow: 0 2px 4px rgba(20, 32, 28, 0.04), 0 24px 48px -20px rgba(20, 32, 28, 0.25);
+  }
+  .cert::before {
+    content: "";
+    position: absolute;
+    inset: 10px;
+    border: 1px solid color-mix(in srgb, var(--heading) 22%, transparent);
+    border-radius: 14px;
+    pointer-events: none;
+  }
+  .cert__seal {
+    display: flex;
+    justify-content: center;
+  }
+  .cert__seal .seal {
+    --seal: 120px;
+  }
+  .cert__list {
+    display: grid;
+    gap: var(--space-4) var(--space-7);
+  }
+  .cert__item {
+    display: grid;
+    grid-template-columns: 30px minmax(0, 1fr);
+    gap: var(--space-3);
+    align-items: start;
+    padding-bottom: var(--space-4);
+    border-bottom: 1px dashed color-mix(in srgb, var(--heading) 18%, transparent);
+  }
+  .cert__item p {
+    font-weight: 700;
+    font-size: 1.0625rem;
+    line-height: 1.45;
+    color: var(--heading);
+  }
+  .cert__check {
+    width: 30px;
+    height: 30px;
+  }
+  .cert__check circle {
+    fill: var(--surface-alt);
+  }
+  .cert__check path {
+    fill: none;
+    stroke: var(--success);
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+  .cert__signs {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: var(--space-6) var(--space-8);
+  }
+  .cert__sign {
+    display: grid;
+    justify-items: center;
+    margin: 0;
+  }
+  .cert__sign svg {
+    width: 150px;
+    height: auto;
+    overflow: visible;
+  }
+  .cert__sign path {
+    fill: none;
+    stroke: var(--heading);
+    stroke-width: 1.8;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-dasharray: 1;
+  }
+  .cert__sign figcaption {
+    display: grid;
+    justify-items: center;
+    margin-top: var(--space-1);
+    padding-top: var(--space-2);
+    min-width: 170px;
+    border-top: 1px solid var(--border);
+    font-weight: 700;
+    font-size: var(--fs-small);
+    color: var(--text);
+  }
+  .cert__sign figcaption span {
+    color: var(--text-muted);
+    font-weight: 600;
+    font-size: var(--fs-xs);
+  }
+  @media (min-width: 900px) {
+    .cert {
+      grid-template-columns: 180px minmax(0, 1fr);
+      padding: var(--space-8) var(--space-8) var(--space-7);
+      column-gap: var(--space-7);
+    }
+    .cert__seal {
+      align-items: flex-start;
+    }
+    .cert__seal .seal {
+      --seal: 156px;
+    }
+    .cert__list {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+    .cert__signs {
+      grid-column: 2;
+      justify-content: flex-start;
+    }
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .js .cert__list .draw {
+      transition-duration: 300ms;
+    }
+  }
+</style>

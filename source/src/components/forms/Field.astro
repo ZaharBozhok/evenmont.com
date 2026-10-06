@@ -1,0 +1,85 @@
+---
+/**
+ * Form field: label above, 48px control, hint, inline error (text + color).
+ * Types: text inputs, select, textarea. Errors are filled in by src/scripts/forms.ts.
+ */
+interface Props {
+  form: string;
+  name: string;
+  label: string;
+  type?: 'text' | 'email' | 'tel' | 'url' | 'number' | 'select' | 'textarea';
+  required?: boolean;
+  optional?: boolean;
+  autocomplete?: string;
+  inputmode?: 'text' | 'email' | 'tel' | 'url' | 'numeric' | 'decimal' | 'search' | 'none';
+  options?: string[];
+  placeholder?: string;
+  hint?: string;
+  rows?: number;
+  maxlength?: number;
+  error?: string;
+}
+const {
+  form,
+  name,
+  label,
+  type = 'text',
+  required = false,
+  optional = false,
+  autocomplete,
+  inputmode,
+  options = [],
+  placeholder,
+  hint,
+  rows = 5,
+  maxlength,
+  error,
+} = Astro.props;
+const id = `${form}-${name}`;
+const describedBy = [hint && `${id}-hint`, `${id}-error`].filter(Boolean).join(' ');
+---
+
+<div class="field">
+  <label class="field__label" for={id}>
+    {label}
+    {optional && <span class="field__hint"> (optional)</span>}
+  </label>
+  {hint && <p class="field__hint" id={`${id}-hint`}>{hint}</p>}
+  {
+    type === 'select' ? (
+      <select class="field__input" id={id} name={name} required={required} autocomplete={autocomplete} aria-describedby={describedBy} data-error={error}>
+        <option value="">Choose…</option>
+        {options.map((o) => (
+          <option value={o}>{o}</option>
+        ))}
+      </select>
+    ) : type === 'textarea' ? (
+      <textarea
+        class="field__input"
+        id={id}
+        name={name}
+        rows={rows}
+        required={required}
+        maxlength={maxlength}
+        placeholder={placeholder}
+        aria-describedby={describedBy}
+        data-error={error}
+      />
+    ) : (
+      <input
+        class="field__input"
+        id={id}
+        name={name}
+        type={type}
+        required={required}
+        autocomplete={autocomplete}
+        inputmode={inputmode}
+        placeholder={placeholder}
+        maxlength={maxlength}
+        aria-describedby={describedBy}
+        data-error={error}
+      />
+    )
+  }
+  <p class="field__error" id={`${id}-error`}></p>
+</div>

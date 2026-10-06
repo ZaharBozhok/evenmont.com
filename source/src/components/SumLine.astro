@@ -1,0 +1,40 @@
+---
+/**
+ * Sum line — the double underline under a key phrase or number ("it all adds up").
+ * Each word gets its own bars, so the line follows the text when it wraps.
+ * trigger="view": draws when scrolled into view (#3) · "hover": draws on card hover (#7, desktop)
+ * · "static": always drawn. A no-break space keeps words together: "adds up.".
+ */
+import { escapeHtml, isPlaceholder } from '../lib/text';
+
+interface Props {
+  text: string;
+  trigger?: 'view' | 'hover' | 'static';
+  /** Extra delay before the first bar, e.g. after a heading has settled. */
+  delay?: number;
+  class?: string;
+}
+const { text, trigger = 'view', delay, class: className } = Astro.props;
+const style = delay !== undefined ? `--sum-delay:${delay}ms` : undefined;
+// One continuous sweep: each word's bars start when the previous word's finish, and
+// take a share of the total time proportional to its length (spaces included), mapped
+// through an ease-out curve so the whole line decelerates once, not per word.
+const words = text.trim().split(/ +/);
+const lengths = words.map((w, i) => w.length + (i < words.length - 1 ? 1 : 0));
+const total = lengths.reduce((a, b) => a + b, 0) || 1;
+const sweep = trigger === 'hover' ? 420 : Math.min(1100, 380 + total * 22);
+const easeOutInv = (p: number) => 1 - Math.cbrt(1 - p); // inverse of 1 - (1 - t)^3
+let done = 0;
+// Built as one string: whitespace inside the inline word spans would render as extra gaps.
+const html = words
+  .map((word, i) => {
+    const t0 = Math.round(sweep * easeOutInv(done / total));
+    done += lengths[i];
+    const t1 = Math.round(sweep * easeOutInv(Math.min(1, done / total)));
+    const inner = isPlaceholder(word) ? `<span class="ph">${escapeHtml(word)}</span>` : escapeHtml(word);
+    return `<span class="sum__w" style="--sd:${t0}ms;--sdur:${Math.max(40, t1 - t0)}ms">${inner}<span class="sum__bars" aria-hidden="true"></span></span>`;
+  })
+  .join(' ');
+---
+
+<span class:list={['sum', `sum--${trigger}`, className]} data-animate={trigger === 'view' ? '' : undefined} style={style} set:html={html} />

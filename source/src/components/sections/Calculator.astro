@@ -1,0 +1,293 @@
+---
+/**
+ * Cost of chaos calculator (#8): people × hours × weeks × rate. On input the result fades
+ * (150ms) and a bar scales to the new value (250ms). Numbers change instantly.
+ */
+import Section from '../Section.astro';
+import Button from '../Button.astro';
+import { getTerms } from '../../lib/terms';
+import { usd } from '../../lib/text';
+import Icon from '../Icon.astro';
+import type { IconName } from '../../icons/lucide';
+
+const terms = await getTerms();
+const { people, hours, rate, weeks } = terms.calculator;
+const hoursYear = people * hours * weeks;
+const dollarsYear = hoursYear * rate;
+const BAR_MAX = 150000;
+const scale = Math.max(0.02, Math.min(1, dollarsYear / BAR_MAX));
+// The same hours as months of one full-time person (160 h a month).
+const months = hoursYear / 160;
+const monthLetters = ['J', 'F', 'M', 'A', 'M', 'J', 'J', 'A', 'S', 'O', 'N', 'D'];
+// Typical manual work, to help people estimate their hours.
+const tasks: { icon: IconName; text: string }[] = [
+  { icon: 'repeat', text: 'Re-typing orders and invoices' },
+  { icon: 'landmark', text: 'Matching bank lines by hand' },
+  { icon: 'package', text: 'Counting and fixing stock' },
+  { icon: 'sheet', text: 'Building month-end reports' },
+  { icon: 'mail', text: 'Chasing approvals by email' },
+  { icon: 'search', text: 'Finding the latest file' },
+];
+const monthsText = (m: number) =>
+  m > 12 ? `≈ ${(m / 12).toFixed(1)} full-time people, all year` : `≈ ${m.toFixed(m % 1 ? 1 : 0)} months of one full-time person, every year`;
+---
+
+<Section id="calculator" title="What the spreadsheets really cost." tone="alt">
+  <div class="calc card" data-calc data-weeks={weeks} data-bar-max={BAR_MAX}>
+    <div class="calc__side">
+      <form class="calc__inputs form" aria-label="Your numbers" novalidate>
+        <div class="field">
+          <label class="field__label" for="calc-people"><Icon name="users" size={16} />People doing manual work</label>
+          <input class="field__input" id="calc-people" name="people" type="number" inputmode="numeric" min="0" max="500" step="1" value={people} />
+        </div>
+        <div class="field">
+          <label class="field__label" for="calc-hours"><Icon name="clock" size={16} />Hours per person per week</label>
+          <input class="field__input" id="calc-hours" name="hours" type="number" inputmode="decimal" min="0" max="60" step="0.5" value={hours} />
+        </div>
+        <div class="field">
+          <label class="field__label" for="calc-rate"><Icon name="coins" size={16} />Loaded hourly cost ($)</label>
+          <input class="field__input" id="calc-rate" name="rate" type="number" inputmode="decimal" min="0" max="1000" step="1" value={rate} />
+        </div>
+        <p class="calc__formula">People × hours × {weeks} weeks × hourly cost</p>
+      </form>
+      <div class="calc__where">
+        <p class="calc__label">Where those hours usually go</p>
+        <ul class="calc__tasks" role="list">
+          {
+            tasks.map((t) => (
+              <li>
+                <Icon name={t.icon} size={16} />
+                {t.text}
+              </li>
+            ))
+          }
+        </ul>
+      </div>
+    </div>
+
+    <div class="calc__result">
+      <div class="calc__row">
+        <p class="calc__label" id="calc-hours-label">Hours per year</p>
+        <p class="calc__value num">
+          <output data-calc-hours for="calc-people calc-hours" aria-live="off" aria-labelledby="calc-hours-label">{hoursYear.toLocaleString('en-US')}</output>
+        </p>
+      </div>
+      <div class="calc__row">
+        <p class="calc__label" id="calc-cost-label">Cost per year</p>
+        <p class="calc__value calc__value--total num">
+          <span class="sum sum--view" data-animate><span class="sum__w"><output data-calc-dollars for="calc-people calc-hours calc-rate" aria-live="off" aria-labelledby="calc-cost-label">{usd(dollarsYear)}</output><span class="sum__bars" aria-hidden="true"></span></span></span>
+        </p>
+        <div class="calc__bar" aria-hidden="true"><span data-calc-bar style={`transform:scaleX(${scale.toFixed(3)})`}></span></div>
+      </div>
+      <div class="calc__months">
+        <p class="calc__label">In people time</p>
+        <span class="calc__cal" aria-hidden="true">
+          {monthLetters.map((m, i) => (
+            <span class:list={['calc__m', i < Math.round(Math.min(12, months)) && 'is-on']} data-calc-month>
+              {m}
+            </span>
+          ))}
+        </span>
+        <p class="calc__months-text" data-calc-months>{monthsText(months)}</p>
+      </div>
+      <p class="visually-hidden" aria-live="polite" data-calc-live></p>
+      <p class="calc__note">A rough estimate. We measure the real number in your Blueprint.</p>
+      <Button href="/book" arrow>Book a fit call</Button>
+    </div>
+  </div>
+</Section>
+
+<script>
+  const root = document.querySelector<HTMLElement>('[data-calc]');
+  if (root) {
+    const weeks = Number(root.dataset.weeks) || 48;
+    const barMax = Number(root.dataset.barMax) || 150000;
+    const form = root.querySelector('form')!;
+    const hoursOut = root.querySelector<HTMLOutputElement>('[data-calc-hours]')!;
+    const dollarsOut = root.querySelector<HTMLOutputElement>('[data-calc-dollars]')!;
+    const bar = root.querySelector<HTMLElement>('[data-calc-bar]')!;
+    const live = root.querySelector<HTMLElement>('[data-calc-live]')!;
+    const result = root.querySelector<HTMLElement>('.calc__result')!;
+    const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const num = (name: string) => {
+      const input = form.elements.namedItem(name) as HTMLInputElement;
+      const value = Math.min(Number(input.max) || Infinity, Math.max(0, Number(input.value) || 0));
+      return value;
+    };
+    let timer = 0;
+    const update = () => {
+      const hours = Math.round(num('people') * num('hours') * weeks);
+      const dollars = Math.round(hours * num('rate'));
+      hoursOut.value = hours.toLocaleString('en-US');
+      dollarsOut.value = '$' + dollars.toLocaleString('en-US');
+      bar.style.transform = `scaleX(${Math.max(0.02, Math.min(1, dollars / barMax)).toFixed(3)})`;
+      const months = hours / 160;
+      root.querySelectorAll('[data-calc-month]').forEach((m, i) => m.classList.toggle('is-on', i < Math.round(Math.min(12, months))));
+      const monthsOut = root.querySelector('[data-calc-months]');
+      if (monthsOut)
+        monthsOut.textContent =
+          months > 12 ? `≈ ${(months / 12).toFixed(1)} full-time people, all year` : `≈ ${months.toFixed(months % 1 ? 1 : 0)} months of one full-time person, every year`;
+      if (!reduced) result.animate([{ opacity: 0.4 }, { opacity: 1 }], { duration: 150, easing: 'ease-out' });
+      window.clearTimeout(timer);
+      timer = window.setTimeout(() => {
+        live.textContent = `About ${hoursOut.value} hours and ${dollarsOut.value} per year.`;
+      }, 600);
+    };
+    form.addEventListener('input', update);
+    form.addEventListener('submit', (e) => e.preventDefault());
+  }
+</script>
+
+<style is:global>
+  .calc {
+    display: grid;
+    gap: var(--space-6);
+    padding: var(--space-5);
+  }
+  .calc__side {
+    display: grid;
+    gap: var(--space-6);
+    align-content: start;
+  }
+  .calc__inputs {
+    gap: var(--space-4);
+    align-content: start;
+  }
+  .calc__where {
+    display: grid;
+    gap: var(--space-3);
+    padding-top: var(--space-5);
+    border-top: 1px dashed var(--border);
+  }
+  .calc__tasks {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+  }
+  .calc__tasks li {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    border-radius: var(--radius-pill);
+    background-color: var(--surface-alt);
+    color: var(--heading);
+    font-size: var(--fs-xs);
+    font-weight: 700;
+  }
+  .calc__tasks .icon {
+    flex: none;
+    color: var(--link);
+  }
+  .calc__formula {
+    color: var(--text-muted);
+    font-size: var(--fs-small);
+    font-variant-numeric: tabular-nums;
+  }
+  .calc__result {
+    display: grid;
+    gap: var(--space-4);
+    align-content: start;
+    padding-top: var(--space-5);
+    border-top: 1px solid var(--border);
+  }
+  .calc__label {
+    color: var(--text-muted);
+    font-size: var(--fs-small);
+    font-weight: 700;
+  }
+  .calc__value {
+    margin-top: var(--space-1);
+    font-size: clamp(2rem, 1.5rem + 2vw, 2.75rem);
+    line-height: 1.1;
+    color: var(--heading);
+    font-variant-numeric: tabular-nums;
+  }
+  .calc__value--total {
+    font-size: clamp(2.5rem, 1.9rem + 2.6vw, 3.5rem);
+  }
+  .calc__bar {
+    height: 8px;
+    margin-top: var(--space-4);
+    border-radius: 999px;
+    background-color: var(--surface-alt);
+    overflow: hidden;
+  }
+  .calc__bar span {
+    display: block;
+    height: 100%;
+    border-radius: inherit;
+    background-color: var(--chart-1);
+    transform-origin: left center;
+    transition: transform var(--dur-2) var(--ease-out);
+  }
+  .calc__note {
+    color: var(--text-muted);
+  }
+  .calc .field__label {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+  }
+  .calc .field__label .icon {
+    color: var(--link);
+  }
+  .calc__months {
+    display: grid;
+    gap: var(--space-2);
+  }
+  .calc__cal {
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    gap: 4px;
+    max-width: 420px;
+  }
+  .calc__m {
+    display: grid;
+    place-items: center;
+    height: 34px;
+    border-radius: 6px;
+    background-color: var(--surface-alt);
+    color: var(--text-muted);
+    font-size: var(--fs-xs);
+    font-weight: 800;
+    transition: background-color var(--dur-2) var(--ease-out), color var(--dur-2) var(--ease-out);
+  }
+  .calc__m.is-on {
+    background-color: var(--rule);
+    color: var(--on-accent);
+  }
+  .calc__months-text {
+    color: var(--heading);
+    font-weight: 700;
+  }
+  .calc__result .btn {
+    justify-self: start;
+  }
+  @media (max-width: 1023.98px) {
+    /* One column: the result follows the inputs; the examples come last. */
+    .calc__side {
+      display: contents;
+    }
+    .calc__where {
+      order: 1;
+    }
+  }
+  @media (min-width: 768px) {
+    .calc {
+      padding: var(--space-7);
+    }
+  }
+  @media (min-width: 1024px) {
+    .calc {
+      grid-template-columns: minmax(0, 5fr) minmax(0, 6fr);
+      gap: var(--space-8);
+    }
+    .calc__result {
+      padding-top: 0;
+      padding-left: var(--space-8);
+      border-top: 0;
+      border-left: 1px solid var(--border);
+    }
+  }
+</style>

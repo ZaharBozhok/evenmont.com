@@ -1,0 +1,46 @@
+---
+/**
+ * Odoo partner status badge. The text comes from settings.odooPartnerBadge; swap in the
+ * official badge artwork from Odoo once the partnership level is confirmed.
+ * While the value is still a {{PLACEHOLDER}} it renders as a dashed slot.
+ */
+import Icon from './Icon.astro';
+import T from './T.astro';
+import { settings } from '../lib/site';
+import { isPlaceholder } from '../lib/text';
+
+const label = settings.odooPartnerBadge;
+---
+
+{
+  isPlaceholder(label) ? (
+    <span class="badge-slot" data-placeholder="true" aria-label="Official Odoo partner badge — placeholder">
+      <T v={label} />
+    </span>
+  ) : (
+    <span class="partner-badge">
+      <Icon name="shield-check" size={20} />
+      <span>{label}</span>
+    </span>
+  )
+}
+
+<style is:global>
+  .partner-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    min-height: 40px;
+    padding: 0 var(--space-4) 0 var(--space-3);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-pill);
+    background-color: var(--surface);
+    color: var(--heading);
+    font-size: var(--fs-small);
+    font-weight: 700;
+    line-height: 1.3;
+  }
+  .partner-badge .icon {
+    color: var(--link);
+  }
+</style>

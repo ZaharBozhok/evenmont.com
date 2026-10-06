@@ -1,0 +1,132 @@
+---
+/** Package card (⚑ prices from terms.json). `wide` = compact horizontal layout. */
+import Icon from './Icon.astro';
+import T from './T.astro';
+import type { IconName } from '../icons/lucide';
+
+interface Props {
+  name: string;
+  audience: string;
+  includes: string[];
+  price: string;
+  from: boolean;
+  wide?: boolean;
+  featured?: boolean;
+  headingLevel?: 'h3' | 'h4';
+  icon?: IconName;
+}
+const { name, audience, includes, price, from, wide = false, featured = false, headingLevel = 'h3', icon } = Astro.props;
+const Heading = headingLevel;
+---
+
+<article class:list={['pkg card', wide && 'pkg--wide', featured && 'pkg--featured']}>
+  <div class="pkg__head">
+    {icon && <span class="pkg__icon" aria-hidden="true"><Icon name={icon} size={22} /></span>}
+    <Heading class="pkg__name">{name}</Heading>
+    <p class="pkg__for">{audience}</p>
+  </div>
+  <p class="pkg__price">
+    {from && <span class="pkg__from">From</span>}
+    <span class="num price"><T v={price} /></span>
+  </p>
+  {
+    wide ? (
+      <p class="pkg__includes-inline">{includes.join(' · ')}</p>
+    ) : (
+      <ul class="checks pkg__includes" role="list">
+        {includes.map((item) => (
+          <li>
+            <Icon name="check" size={20} />
+            {item}
+          </li>
+        ))}
+      </ul>
+    )
+  }
+</article>
+
+<style is:global>
+  .pkg {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+  }
+  .pkg > * + * {
+    margin-top: 0;
+  }
+  .pkg__name {
+    font-size: var(--fs-h3);
+  }
+  .pkg__icon {
+    display: grid;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    margin-bottom: var(--space-3);
+    border-radius: 12px;
+    background-color: var(--surface-alt);
+    color: var(--heading);
+  }
+  .pkg--featured .pkg__icon {
+    background-color: var(--heading);
+    color: var(--em-sand);
+  }
+  .pkg__for {
+    margin-top: var(--space-1);
+    color: var(--text-muted);
+    font-weight: 600;
+    font-size: var(--fs-small);
+  }
+  .pkg__price {
+    display: flex;
+    align-items: baseline;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+    color: var(--heading);
+  }
+  .pkg__from {
+    color: var(--text-muted);
+    font-size: var(--fs-small);
+    font-weight: 700;
+  }
+  .pkg__price .num {
+    font-size: clamp(1.75rem, 1.5rem + 1vw, 2.25rem);
+    line-height: 1.1;
+  }
+  .pkg--featured .pkg__price .num {
+    font-size: clamp(2.25rem, 1.8rem + 1.8vw, 3rem);
+  }
+  .pkg--featured {
+    border-top: 4px solid var(--rule);
+  }
+  .pkg__includes {
+    padding-top: var(--space-4);
+    border-top: 1px solid var(--border);
+  }
+  .pkg__includes-inline {
+    color: var(--text-muted);
+    font-size: var(--fs-small);
+  }
+  @media (min-width: 768px) {
+    .pkg--wide {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      grid-template-areas: 'head price' 'inc inc';
+      align-items: center;
+      align-content: start;
+      column-gap: var(--space-5);
+      row-gap: var(--space-2);
+    }
+    .pkg--wide .pkg__head {
+      grid-area: head;
+    }
+    .pkg--wide .pkg__price {
+      grid-area: price;
+      justify-content: flex-end;
+      text-align: right;
+    }
+    .pkg--wide .pkg__includes-inline {
+      grid-area: inc;
+    }
+  }
+</style>

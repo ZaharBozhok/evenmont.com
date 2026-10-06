@@ -1,0 +1,350 @@
+---
+/**
+ * On-brand product "screen" mock — stands in for real Odoo screenshots. DEMO data:
+ * the names and figures are invented for the pre-release preview and match the demo
+ * case studies. Replace with real screenshots (client data blurred) when available.
+ */
+type Kind = 'projects' | 'timesheets' | 'inventory' | 'orders' | 'production' | 'costing';
+interface Props {
+  kind: Kind;
+  label?: string;
+  class?: string;
+}
+const annotations: Record<Kind, string> = {
+  projects: 'Live project margin',
+  timesheets: 'Approved hours → invoice',
+  inventory: 'Real-time stock',
+  orders: 'Every channel, one list',
+  production: 'Work orders by work center',
+  costing: 'Unit cost roll-up',
+};
+const screens: Record<Kind, { app: string; title: string; sub: string }> = {
+  projects: { app: 'Projects', title: 'Project margin', sub: 'Q3 · active projects' },
+  timesheets: { app: 'Timesheets', title: 'Timesheets to approve', sub: 'Week of March 9' },
+  inventory: { app: 'Inventory', title: 'Stock on hand', sub: 'All warehouses · units' },
+  orders: { app: 'Sales', title: 'Orders', sub: 'Today · all channels' },
+  production: { app: 'Manufacturing', title: 'Work orders', sub: 'This week · by work center' },
+  costing: { app: 'Manufacturing', title: 'Unit cost · Oak dining table', sub: 'Average of the last 10 work orders' },
+};
+const { kind, label, class: className } = Astro.props;
+const note = annotations[kind];
+const sc = screens[kind];
+const uid = `sm-${kind}`;
+const nav = ['Dashboard', 'Sales', sc.app === 'Sales' ? 'Invoicing' : sc.app, 'Accounting', 'Reports'];
+const active = sc.app === 'Sales' ? 1 : 2;
+
+const projects = [
+  { name: 'Riverside survey', used: 0.72, margin: '41%' },
+  { name: 'Hwy 36 assessment', used: 0.94, margin: '18%', hi: true },
+  { name: 'Clearwater permits', used: 0.54, margin: '37%' },
+  { name: 'Lakeview remediation', used: 0.35, margin: '44%' },
+  { name: 'North Fork study', used: 0.63, margin: '32%' },
+];
+const hours = [
+  { who: 'J. Alvarez', what: 'Riverside survey', h: '38.5 h', ok: true },
+  { who: 'K. Chen', what: 'Hwy 36 assessment', h: '40.0 h', ok: true },
+  { who: 'M. Patel', what: 'Clearwater permits', h: '36.0 h', ok: true },
+  { who: 'S. Novak', what: 'North Fork study', h: '12.5 h', ok: false },
+  { who: 'T. Brooks', what: 'Lakeview remediation', h: '24.0 h', ok: false },
+];
+const stock = [
+  { sku: 'Mugs', v: 150 }, { sku: 'Kettles', v: 210 }, { sku: 'Pans', v: 120 }, { sku: 'Knives', v: 180 },
+  { sku: 'Boards', v: 70, hi: true }, { sku: 'Linens', v: 230 }, { sku: 'Jars', v: 160 },
+];
+const orders = [
+  { ch: 'Shopify', no: 'SO-10482', who: 'Online order', amt: '$184.00', st: 'Ready', c: 'screen__c1' },
+  { ch: 'Amazon', no: 'SO-10483', who: 'Marketplace', amt: '$62.50', st: 'Picked', c: 'screen__c2' },
+  { ch: 'Retail', no: 'SO-10484', who: 'Hearth & Co.', amt: '$2,410.00', st: 'Ready', c: 'screen__hi' },
+  { ch: 'Shopify', no: 'SO-10485', who: 'Online order', amt: '$96.00', st: 'Shipped', c: 'screen__c1' },
+  { ch: 'Retail', no: 'SO-10486', who: 'Pantry Goods', amt: '$1,180.00', st: 'Waiting', c: 'screen__c2' },
+];
+const centers = ['Cutting', 'Assembly', 'Finishing', 'Quality'];
+const jobs = [
+  { r: 0, x: 248, w: 150, t: 'WO-221 · Oak table ×6', c: 'screen__c1' },
+  { r: 0, x: 410, w: 130, t: 'WO-224 · Bench ×4', c: 'screen__c2' },
+  { r: 1, x: 300, w: 190, t: 'WO-219 · Sideboard ×2', c: 'screen__hi' },
+  { r: 2, x: 252, w: 120, t: 'WO-216 · Chairs ×12', c: 'screen__c2' },
+  { r: 2, x: 384, w: 170, t: 'WO-218 · Oak table ×4', c: 'screen__c1' },
+  { r: 3, x: 330, w: 150, t: 'WO-215 · Desk ×3', c: 'screen__c1' },
+];
+const cost = [
+  { k: 'Materials', v: '$412', w: 230, c: 'screen__c1' },
+  { k: 'Labor', v: '$236', w: 120, c: 'screen__c2' },
+  { k: 'Overhead', v: '$98', w: 96, c: 'screen__hi' },
+];
+---
+
+<figure class:list={['screen', className]} data-placeholder="true">
+  <svg viewBox="0 0 640 400" role="img" aria-label={label ?? `${sc.title} screen`} focusable="false">
+    <defs>
+      <clipPath id={`${uid}-clip`}><rect width="640" height="400" rx="14"></rect></clipPath>
+    </defs>
+    <g clip-path={`url(#${uid}-clip)`}>
+      <rect class="screen__bg" width="640" height="400"></rect>
+      <rect class="screen__bar" width="640" height="36"></rect>
+      <circle class="screen__dot" cx="20" cy="18" r="4"></circle>
+      <circle class="screen__dot" cx="34" cy="18" r="4"></circle>
+      <circle class="screen__dot" cx="48" cy="18" r="4"></circle>
+      <text class="screen__l" x="320" y="22" text-anchor="middle">evenmont-demo.odoo.com</text>
+      <rect class="screen__side" y="36" width="128" height="364"></rect>
+      <rect class="screen__nav-on" x="10" y={52 + active * 30} width="108" height="26" rx="6"></rect>
+      {nav.map((n, i) => <text class:list={['screen__nav', i === active && 'is-on']} x="22" y={69 + i * 30}>{n}</text>)}
+
+      <text class="screen__t" x="152" y="70">{sc.title}</text>
+      <text class="screen__l" x="152" y="90">{sc.sub}</text>
+
+      {
+        kind === 'projects' && (
+          <g>
+            <text class="screen__h" x="152" y="118">PROJECT</text>
+            <text class="screen__h" x="300" y="118">BUDGET USED</text>
+            <text class="screen__h" x="608" y="118" text-anchor="end">MARGIN</text>
+            {projects.map((p, i) => (
+              <g>
+                <text class="screen__v" x="152" y={150 + i * 46}>{p.name}</text>
+                <rect class="screen__track" x="300" y={140 + i * 46} width="220" height="12" rx="6" />
+                <rect class={p.hi ? 'screen__hi' : i % 2 ? 'screen__c2' : 'screen__c1'} x="300" y={140 + i * 46} width={220 * p.used} height="12" rx="6" />
+                <text class:list={['screen__v', p.hi && 'screen__warn']} x="608" y={150 + i * 46} text-anchor="end">{p.margin}</text>
+              </g>
+            ))}
+          </g>
+        )
+      }
+
+      {
+        kind === 'timesheets' && (
+          <g>
+            {hours.map((r, i) => (
+              <g>
+                <rect class="screen__row" x="152" y={106 + i * 46} width="456" height="38" rx="8" />
+                <text class="screen__v" x="168" y={130 + i * 46}>{r.who}</text>
+                <text class="screen__l" x="268" y={130 + i * 46}>{r.what}</text>
+                <text class="screen__v" x="540" y={130 + i * 46} text-anchor="end">{r.h}</text>
+                <circle class={r.ok ? 'screen__ok' : 'screen__todo'} cx="584" cy={125 + i * 46} r="9" />
+                {r.ok && <path class="screen__tick" d={`M579 ${125 + i * 46}l3.5 3.5 6.5-7`} />}
+              </g>
+            ))}
+            <text class="screen__v" x="152" y="370">114.5 h approved</text>
+            <text class="screen__v screen__warn" x="608" y="370" text-anchor="end">Invoice $16,030 →</text>
+          </g>
+        )
+      }
+
+      {
+        kind === 'inventory' && (
+          <g>
+            <path class="screen__axis" d="M152 344H608" />
+            {stock.map((b, i) => (
+              <g>
+                <rect class={b.hi ? 'screen__hi' : i % 2 ? 'screen__c2' : 'screen__c1'} x={166 + i * 62} y={344 - b.v} width="36" height={b.v} rx="6" />
+                <text class="screen__l" x={184 + i * 62} y="366" text-anchor="middle">{b.sku}</text>
+              </g>
+            ))}
+            <path class="screen__dash" d="M152 256H608" />
+            <text class="screen__l screen__warn" x="608" y="248" text-anchor="end">Reorder point</text>
+          </g>
+        )
+      }
+
+      {
+        kind === 'orders' && (
+          <g>
+            {orders.map((o, i) => (
+              <g>
+                <rect class="screen__row" x="152" y={106 + i * 50} width="456" height="40" rx="8" />
+                <rect class={o.c} x="164" y={116 + i * 50} width="62" height="20" rx="10" />
+                <text class="screen__pill" x="195" y={130 + i * 50} text-anchor="middle">{o.ch}</text>
+                <text class="screen__v" x="240" y={130 + i * 50}>{o.no}</text>
+                <text class="screen__l" x="318" y={130 + i * 50}>{o.who}</text>
+                <text class="screen__v" x="520" y={130 + i * 50} text-anchor="end">{o.amt}</text>
+                <text class="screen__l" x="596" y={130 + i * 50} text-anchor="end">{o.st}</text>
+              </g>
+            ))}
+          </g>
+        )
+      }
+
+      {
+        kind === 'production' && (
+          <g>
+            {centers.map((c, i) => (
+              <g>
+                <text class="screen__l" x="152" y={132 + i * 62}>{c}</text>
+                <path class="screen__axis" d={`M240 ${150 + i * 62}H608`} />
+              </g>
+            ))}
+            {jobs.map((j) => (
+              <g>
+                <rect class={j.c} x={j.x} y={112 + j.r * 62} width={j.w} height="28" rx="6" />
+                <text class="screen__pill" x={j.x + 10} y={130 + j.r * 62}>{j.t}</text>
+              </g>
+            ))}
+            <path class="screen__rule" d="M436 100V340" />
+            <text class="screen__l screen__warn" x="442" y="356">Today</text>
+          </g>
+        )
+      }
+
+      {
+        kind === 'costing' && (
+          <g>
+            {cost.map((c, i) => (
+              <rect class={c.c} x={152 + cost.slice(0, i).reduce((a, b) => a + b.w + 4, 0)} y="118" width={c.w} height="40" rx="8" />
+            ))}
+            {cost.map((c, i) => (
+              <g>
+                <rect class={c.c} x="152" y={192 + i * 36} width="14" height="14" rx="4" />
+                <text class="screen__v" x="178" y={204 + i * 36}>{c.k}</text>
+                <text class="screen__v" x="608" y={204 + i * 36} text-anchor="end">{c.v}</text>
+              </g>
+            ))}
+            <path class="screen__axis" d="M152 312H608" />
+            <text class="screen__t" x="152" y="346">$746 per unit</text>
+            <text class="screen__v" x="608" y="338" text-anchor="end">Price $1,210</text>
+            <text class="screen__v screen__warn" x="608" y="358" text-anchor="end">Margin 38%</text>
+          </g>
+        )
+      }
+    </g>
+    <rect class="screen__frame" x="0.75" y="0.75" width="638.5" height="398.5" rx="13.25"></rect>
+  </svg>
+  <figcaption class="screen__note"><span aria-hidden="true" class="screen__note-dot"></span>{note}</figcaption>
+</figure>
+
+<style is:global>
+  .screen {
+    position: relative;
+    margin: 0;
+  }
+  .screen svg {
+    width: 100%;
+    height: auto;
+    border-radius: 14px;
+    box-shadow: var(--shadow-card);
+  }
+  .screen__bg {
+    fill: var(--surface);
+  }
+  .screen__bar,
+  .screen__side {
+    fill: var(--surface-alt);
+  }
+  .screen__side {
+    opacity: 0.55;
+  }
+  .screen__dot {
+    fill: var(--text-muted);
+    opacity: 0.35;
+  }
+  .screen svg text {
+    font-family: var(--font-sans);
+    font-size: 12px;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+  }
+  .screen__nav-on {
+    fill: var(--surface);
+  }
+  .screen__nav,
+  .screen__l {
+    fill: var(--text-muted);
+  }
+  .screen svg .screen__nav.is-on,
+  .screen svg .screen__v {
+    fill: var(--text);
+    font-weight: 700;
+  }
+  .screen svg .screen__t {
+    fill: var(--heading);
+    font-size: 18px;
+    font-weight: 700;
+  }
+  .screen svg .screen__h {
+    fill: var(--text-muted);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+  }
+  .screen svg .screen__pill {
+    fill: var(--surface);
+    font-size: 10.5px;
+    font-weight: 700;
+  }
+  .screen svg .screen__hi + .screen__pill {
+    fill: var(--on-accent);
+  }
+  .screen svg .screen__warn {
+    fill: var(--link);
+  }
+  .screen__track,
+  .screen__row {
+    fill: var(--surface-alt);
+    opacity: 0.6;
+  }
+  .screen__c1 {
+    fill: var(--chart-1);
+  }
+  .screen__c2 {
+    fill: var(--chart-2);
+    opacity: 0.75;
+  }
+  .screen__hi {
+    fill: var(--chart-highlight);
+  }
+  .screen__ok {
+    fill: var(--chart-2);
+  }
+  .screen__todo {
+    fill: none;
+    stroke: var(--text-muted);
+    stroke-width: 1.5;
+    opacity: 0.5;
+  }
+  .screen__tick {
+    fill: none;
+    stroke: var(--surface);
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+  .screen__axis {
+    stroke: var(--border);
+    stroke-width: 1.5;
+  }
+  .screen__rule,
+  .screen__dash {
+    fill: none;
+    stroke: var(--chart-highlight);
+    stroke-width: 2;
+    stroke-dasharray: 6 6;
+  }
+  .screen__frame {
+    fill: none;
+    stroke: var(--border);
+    stroke-width: 1.5;
+  }
+  .screen__note {
+    position: absolute;
+    left: 50%;
+    bottom: -18px;
+    transform: translateX(-50%);
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    padding: 8px 14px;
+    border-radius: var(--radius-pill);
+    background-color: var(--accent);
+    color: var(--on-accent);
+    border: 1px solid var(--accent-edge);
+    font-size: var(--fs-small);
+    font-weight: 700;
+    white-space: nowrap;
+    box-shadow: var(--shadow-card);
+  }
+  .screen__note-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background-color: currentColor;
+  }
+</style>

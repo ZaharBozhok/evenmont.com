@@ -1,0 +1,34 @@
+---
+/** White-label scope form: name, company, email, Odoo version, what you need, timeline, NDA. */
+import Form from './Form.astro';
+import Field from './Field.astro';
+
+const f = 'white-label-scope';
+---
+
+<Form name={f} submitLabel="Send us a scope" successTitle="Thank you." successText="We’ll come back with questions or a fixed quote.">
+  <div class="form__row form__row--2">
+    <Field form={f} name="name" label="Name" required autocomplete="name" />
+    <Field form={f} name="company" label="Company" required autocomplete="organization" />
+  </div>
+  <div class="form__row form__row--2">
+    <Field form={f} name="email" label="Email" type="email" required autocomplete="email" inputmode="email" />
+    <Field form={f} name="odoo_version" label="Odoo version" type="select" required options={['Odoo 19', 'Odoo 18', 'Odoo 17', 'Odoo 16 or older', 'Not sure yet']} error="Please choose a version." />
+  </div>
+  <Field
+    form={f}
+    name="scope"
+    label="What you need"
+    type="textarea"
+    required
+    rows={6}
+    maxlength={4000}
+    hint="Modules, integrations, migration or setup — and where the project stands today."
+    error="Please describe what you need."
+  />
+  <Field form={f} name="timeline" label="Timeline" type="select" required options={['As soon as possible', 'Within a month', 'In 1–3 months', 'Later or not sure']} error="Please choose a timeline." />
+  <div class="field field--check">
+    <input type="checkbox" id={`${f}-nda`} name="nda" value="yes" />
+    <label for={`${f}-nda`}>We need an NDA before sharing details</label>
+  </div>
+</Form>

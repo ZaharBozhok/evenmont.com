@@ -1,0 +1,49 @@
+---
+/**
+ * #12 Quiet peaks — the large mark behind the final CTA. The peaks rise into place
+ * at 6% opacity, then the level line draws across them once in view.
+ */
+const k = (name: string, t: number, d: number, e?: string) => `--k:k-${name};--t:${t}ms;--d:${d}ms${e ? `;--e:${e}` : ''}`;
+---
+
+<svg class="quiet-peaks scene" viewBox="0 0 120 50" aria-hidden="true" focusable="false" data-animate>
+  <polygon class="quiet-peaks__peak k" style={k('rise', 900, 0)} points="6,50 34,10 62,50"></polygon>
+  <polygon class="quiet-peaks__peak k" style={k('rise', 900, 140)} points="58,50 86,10 114,50"></polygon>
+  <path class="quiet-peaks__line k" style={k('draw', 1100, 500, 'cubic-bezier(.45,0,.2,1)')} pathLength="1" d="M3.5 3.5H116.5"></path>
+</svg>
+
+<style is:global>
+  .quiet-peaks {
+    position: absolute;
+    z-index: -1;
+    right: -12%;
+    bottom: 0;
+    width: 100%;
+    height: auto;
+    pointer-events: none;
+  }
+  .quiet-peaks__peak {
+    fill: var(--text);
+    opacity: 0.07;
+  }
+  .quiet-peaks__line {
+    fill: none;
+    stroke: var(--rule);
+    stroke-width: 3;
+    stroke-linecap: round;
+    stroke-dasharray: 1;
+    opacity: 0.9;
+  }
+  @media (min-width: 768px) {
+    .quiet-peaks {
+      right: 4%;
+      width: 52%;
+    }
+  }
+  @media (min-width: 1024px) {
+    .quiet-peaks {
+      right: max(4%, calc((100vw - 1200px) / 2));
+      width: min(40%, 520px);
+    }
+  }
+</style>

@@ -1,0 +1,94 @@
+---
+/**
+ * Before → after as change cards: an icon, today's way (struck through, muted) and what
+ * it becomes with Evenmont (bold). Cards rise in as they scroll into view.
+ */
+import Icon from './Icon.astro';
+import type { IconName } from '../icons/lucide';
+
+interface Props {
+  rows: { today: string; after: string; icon?: string }[];
+  caption?: string;
+  class?: string;
+}
+const { rows, caption = 'Today compared with Evenmont', class: className } = Astro.props;
+---
+
+<ul class:list={['changes-grid', className]} role="list" aria-label={caption} data-reveal-children>
+  {
+    rows.map((row) => (
+      <li class="change">
+        <span class="change__icon" aria-hidden="true">
+          <Icon name={(row.icon ?? 'check') as IconName} size={22} />
+        </span>
+        <p class="change__today">
+          <span class="visually-hidden">Today: </span>
+          <s>{row.today}</s>
+        </p>
+        <p class="change__after">
+          <span class="visually-hidden">With Evenmont: </span>
+          {row.after}
+        </p>
+      </li>
+    ))
+  }
+</ul>
+
+<style is:global>
+  .changes-grid {
+    display: grid;
+    gap: var(--space-3);
+  }
+  .change {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    column-gap: var(--space-4);
+    row-gap: var(--space-1);
+    align-content: start;
+    padding: var(--space-4);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-card);
+    background-color: var(--surface);
+  }
+  .change__icon {
+    grid-row: span 2;
+    display: grid;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    background-color: var(--heading);
+    color: var(--em-sand);
+  }
+  .change__icon .icon {
+    stroke-width: 1.75;
+  }
+  .change__today {
+    color: var(--text-muted);
+    font-size: var(--fs-small);
+    line-height: 1.4;
+  }
+  .change__today s {
+    text-decoration-color: color-mix(in srgb, var(--error) 70%, transparent);
+    text-decoration-thickness: 1.5px;
+  }
+  .change__after {
+    color: var(--heading);
+    font-weight: 700;
+    line-height: 1.4;
+  }
+  @media (min-width: 768px) {
+    .changes-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: var(--space-4);
+    }
+    .change {
+      padding: var(--space-5);
+    }
+  }
+  @media (min-width: 1100px) {
+    .changes-grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+</style>

@@ -1,0 +1,169 @@
+---
+/** Home hero — Evergreen band, ledger grid, proof row, "many tools → one system" illustration. */
+import SumLine from '../SumLine.astro';
+import Button from '../Button.astro';
+import Icon from '../Icon.astro';
+import Stars from '../Stars.astro';
+import ScenarioIcon from '../illustrations/ScenarioIcon.astro';
+import HeroSystem from '../illustrations/HeroSystem.astro';
+import { getCollection } from 'astro:content';
+import { getTerms } from '../../lib/terms';
+import { settings } from '../../lib/site';
+
+const terms = await getTerms();
+const scenarios = (await getCollection('scenarios')).sort((a, b) => a.data.order - b.data.order);
+const { rating, certifications } = settings.proof;
+---
+
+<section class="hero tone-dark ledger" data-hero data-animate>
+  <div class="container hero__grid">
+    <div class="hero__copy">
+      <p class="eyebrow hero__eyebrow"><span class="hero__tick" aria-hidden="true"></span>Finance-first Odoo implementation</p>
+      <h1 class="display hero__title">
+        Sales, inventory, projects and books.<br />
+        One system.<br />
+        <SumLine text={'Everything adds\u00a0up.'} delay={250} />
+      </h1>
+      <p class="hero-sub hero__sub">
+        We implement Odoo for growing US companies — service firms, distributors and manufacturers. Fixed-price phases,
+        your accountant in the loop, and a founder on every project.
+      </p>
+      <div class="btn-row btn-row--stack hero__actions">
+        <Button href="/book">{terms.fmt('Book a {fitCallShort} fit call')}</Button>
+        <Button href="#pricing" variant="secondary">See pricing</Button>
+      </div>
+      <p class="hero__micro">No sales pitch. If Odoo isn’t right for you, we’ll say so.</p>
+      <ul class="hero__proof" role="list">
+        <li>
+          <Stars value={Number(rating.value)} size={16} />
+          <span><strong>{rating.value}</strong> · {rating.count} client reviews</span>
+        </li>
+        <li><Icon name="shield-check" size={20} />{certifications[0].caption}</li>
+      </ul>
+      <div class="hero__pick">
+        <p class="hero__pick-label" id="hero-pick">Start with your business</p>
+        <ul class="hero__chips" role="list" aria-labelledby="hero-pick">
+          {
+            scenarios.map((s) => (
+              <li>
+                <a class="chip hero__chip" href={`#familiar-${s.id}`} data-scenario-set={s.id}>
+                  <ScenarioIcon scenario={s.data.id} />
+                  {s.data.chip}
+                </a>
+              </li>
+            ))
+          }
+        </ul>
+      </div>
+    </div>
+    <div class="hero__art">
+      <HeroSystem />
+    </div>
+  </div>
+</section>
+
+<style is:global>
+  .hero {
+    padding-top: var(--space-6);
+    /* room for the proof card that overlaps the bottom edge */
+    padding-bottom: calc(var(--space-8) + var(--space-8));
+    overflow: hidden;
+  }
+  .hero__grid {
+    display: grid;
+    gap: var(--space-7);
+    align-items: center;
+  }
+  .hero__eyebrow {
+    color: var(--text-muted);
+    margin-bottom: var(--space-5);
+  }
+  /* Small sum-line tick (two short bars) — the motif, not a second logo. */
+  .hero__tick {
+    width: 22px;
+    height: 9px;
+    flex: none;
+    border-block: 3px solid var(--rule);
+    border-radius: 1px;
+  }
+  .hero h1 {
+    color: var(--heading);
+    max-width: 14.5em;
+  }
+  .hero__sub {
+    margin-top: var(--space-5);
+    color: var(--text);
+    max-width: 36em;
+  }
+  .hero__actions {
+    margin-top: var(--space-6);
+  }
+  .hero__micro {
+    margin-top: var(--space-4);
+    color: var(--text-muted);
+    font-size: 1rem;
+  }
+  .hero__proof {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2) var(--space-5);
+    margin-top: var(--space-3);
+    font-size: var(--fs-small);
+    font-weight: 600;
+    color: var(--text);
+  }
+  .hero__proof li {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+  }
+  .hero__proof strong {
+    font-weight: 800;
+  }
+  .hero__proof .icon {
+    color: var(--rule);
+  }
+  .hero__pick {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-3) var(--space-4);
+    margin-top: var(--space-6);
+    padding-top: var(--space-5);
+    border-top: 1px solid var(--border);
+  }
+  .hero__pick-label {
+    color: var(--text-muted);
+    font-size: var(--fs-small);
+    font-weight: 700;
+  }
+  .hero__chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+  }
+  .hero__chip .scenario-icon {
+    width: 20px;
+    height: 20px;
+    color: var(--rule);
+  }
+  .hero__art {
+    min-width: 0;
+  }
+  @media (min-width: 1024px) {
+    .hero {
+      padding-top: var(--space-8);
+      padding-bottom: calc(var(--space-9) + var(--space-8));
+    }
+  }
+  /* Two columns once the illustration can render near 1:1; it bleeds into the right margin. */
+  @media (min-width: 1200px) {
+    .hero__grid {
+      grid-template-columns: minmax(0, 1fr) minmax(0, 0.86fr);
+      gap: var(--space-7);
+    }
+    .hero__art {
+      margin-right: calc(-1 * clamp(0px, (100vw - 1200px) / 2 - 24px, 88px));
+    }
+  }
+</style>

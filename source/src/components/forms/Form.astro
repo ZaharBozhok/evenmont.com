@@ -1,0 +1,97 @@
+---
+/**
+ * Form shell — posts to settings.links.formEndpoint (progressive enhancement: works as a normal POST
+ * without JavaScript). Honeypot field, no CAPTCHA, inline success state, no page reload.
+ */
+import Icon from '../Icon.astro';
+import T from '../T.astro';
+import { settings } from '../../lib/site';
+
+interface Props {
+  name: string;
+  submitLabel: string;
+  successTitle: string;
+  successText: string;
+  class?: string;
+  compact?: boolean;
+}
+const { name, submitLabel, successTitle, successText, class: className, compact = false } = Astro.props;
+// "demo" (pre-release preview): submissions are simulated in the browser and go nowhere.
+const demo = settings.links.formEndpoint === 'demo';
+const endpoint = demo ? Astro.url.pathname : settings.links.formEndpoint;
+---
+
+<div class:list={['form-wrap', className]} data-form-wrap>
+  <form
+    class:list={['form', compact && 'form--compact']}
+    action={endpoint}
+    method="post"
+    data-form={name}
+    data-demo={demo ? '' : undefined}
+    aria-label={submitLabel}
+  >
+    <input type="hidden" name="form" value={name} />
+    <div class="hp-field" aria-hidden="true">
+      <label for={`${name}-website`}>Leave this field empty</label>
+      <input id={`${name}-website`} name="website" type="text" tabindex="-1" autocomplete="off" />
+    </div>
+    <slot />
+    <div class="form__submit">
+      <button class="btn btn--primary" type="submit">
+        <span>{submitLabel}</span>
+        <Icon name="arrow-right" size={20} class="arrow-nudge" />
+      </button>
+      <p class="form__status field__error" role="alert" data-form-status></p>
+    </div>
+  </form>
+  <div class="form-success" data-form-success tabindex="-1" hidden>
+    <span class="form-success__icon" aria-hidden="true"><Icon name="check" size={28} /></span>
+    <div>
+      <p class="form-success__title">{successTitle}</p>
+      <p><T v={successText} /></p>
+    </div>
+  </div>
+</div>
+
+<style is:global>
+  .form__submit {
+    display: grid;
+    gap: var(--space-3);
+    justify-items: start;
+  }
+  .form--compact .form__submit {
+    justify-items: stretch;
+  }
+  .form-success {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    gap: var(--space-4);
+    align-items: start;
+    padding: var(--space-5);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-card);
+    background-color: var(--surface);
+  }
+  .form-success:focus-visible {
+    outline: 2px solid var(--focus);
+    outline-offset: 2px;
+  }
+  .form-success__icon {
+    display: grid;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background-color: var(--surface-alt);
+    color: var(--success);
+  }
+  .form-success__title {
+    font-weight: 700;
+    font-size: var(--fs-h3);
+    color: var(--heading);
+  }
+</style>
+
+<script>
+  import '../../scripts/forms';
+</script>

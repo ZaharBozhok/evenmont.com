@@ -1,0 +1,9 @@
+{
+  "title": "Questions from service firms",
+  "items": [
+    { "q": "How do timesheets turn into invoices?", "a": "Your team logs hours against projects and tasks. Once a manager approves them, Odoo turns approved hours into draft invoices at the rates you agreed with the client. The exact billing rules we confirm in the Blueprint." },
+    { "q": "Can Odoo handle retainers and milestone billing?", "a": "Yes. Odoo supports fixed-price, milestone and time-and-materials billing, and recurring invoices for retainers. Which mix fits your contracts, we confirm in the Blueprint." },
+    { "q": "How do contractor payouts work?", "a": "Contractor rates, timesheets, invoices and payouts run in one flow with our contractor module, so nobody pays contractors from email threads. We map your payout rules in the Blueprint." },
+    { "q": "Can we keep our payroll provider?", "a": "Yes. Payroll can stay with your current provider. We agree with your accountant how payroll entries reach the books, and confirm the details in the Blueprint." }
+  ]
+}

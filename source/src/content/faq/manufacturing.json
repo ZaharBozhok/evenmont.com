@@ -1,0 +1,9 @@
+{
+  "title": "Questions from manufacturers",
+  "items": [
+    { "q": "Can you import our bills of materials?", "a": "Yes. We import bills of materials from spreadsheets or your current system, then check them with your team before go-live." },
+    { "q": "How is unit cost calculated?", "a": "Odoo rolls up the cost of components and operations — materials, labor and machine time — into each unit. The costing method is agreed with your accountant in the Blueprint." },
+    { "q": "Do we need tablets on the shop floor?", "a": "Not necessarily. Operators can work from tablets, shared computers or printed work orders. We recommend what fits your shop floor in the Blueprint." },
+    { "q": "How do we go live without stopping production?", "a": "We plan the cutover around your production schedule, move open orders and stock at an agreed date, and stay close during {hypercare} of hypercare." }
+  ]
+}

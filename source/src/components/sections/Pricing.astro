@@ -1,0 +1,85 @@
+---
+/** Pricing (id="pricing") — ⚑ package cards from terms.json, ledger grid background. */
+import Section from '../Section.astro';
+import PackageCard from '../PackageCard.astro';
+import Button from '../Button.astro';
+import { getTerms } from '../../lib/terms';
+import type { IconName } from '../../icons/lucide';
+
+const terms = await getTerms();
+const icons: Record<string, IconName> = {
+  'fit-call': 'video', blueprint: 'map', 'launch-services': 'kanban', 'launch-products': 'package',
+  'launch-make': 'factory', custom: 'puzzle', keep: 'life-buoy',
+};
+const card = (id: string) => {
+  const p = terms.pkg(id);
+  return { name: p.name, audience: p.for, includes: p.includes.map(terms.fmt), price: terms.price(p), from: p.price !== null, icon: icons[id] };
+};
+---
+
+<Section id="pricing" title="Clear prices, before you commit." class="pricing ledger">
+  <div class="pricing__grid" data-animate>
+    <div class="pricing__row pricing__row--2" data-reveal-children>
+      <PackageCard {...card('fit-call')} wide />
+      <PackageCard {...card('blueprint')} wide />
+    </div>
+    <div class="pricing__row pricing__row--3" data-reveal-children>
+      <PackageCard {...card('launch-services')} featured />
+      <PackageCard {...card('launch-products')} featured />
+      <PackageCard {...card('launch-make')} featured />
+    </div>
+    <div class="pricing__row pricing__row--2" data-reveal-children>
+      <PackageCard {...card('custom')} wide />
+      <PackageCard {...card('keep')} wide />
+    </div>
+  </div>
+  <div class="pricing__foot">
+    <p class="pricing__note">{terms.licensesNote}</p>
+    <Button href="/book" arrow>Book a fit call</Button>
+  </div>
+</Section>
+
+<style is:global>
+  /* #4 ledger grid fades in (0 → 7%) once the packages are in view */
+  @media (prefers-reduced-motion: no-preference) {
+    .js .pricing.ledger::before {
+      transition: opacity var(--dur-4) var(--ease-out);
+    }
+    .js .pricing.ledger:has(.pricing__grid:not(.is-in))::before {
+      opacity: 0;
+    }
+  }
+  .pricing__grid {
+    display: grid;
+    gap: var(--space-4);
+  }
+  .pricing__row {
+    display: grid;
+    gap: var(--space-4);
+  }
+  @media (min-width: 768px) {
+    .pricing__grid,
+    .pricing__row {
+      gap: var(--space-5);
+    }
+    .pricing__row--2 {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+  @media (min-width: 1024px) {
+    .pricing__row--3 {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+  .pricing__foot {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-4);
+    margin-top: var(--space-6);
+  }
+  .pricing__note {
+    font-weight: 700;
+  }
+</style>

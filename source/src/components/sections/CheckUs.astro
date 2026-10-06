@@ -1,0 +1,372 @@
+---
+/**
+ * "Check us before you call" — founder video, partner status, proof links, and what
+ * clients wrote (quotes from the case studies that aren't already on the page).
+ * The founder video: while settings.links.founderVideoUrl is "demo", the poster opens
+ * a dialog with the video script instead of a player.
+ */
+import { Picture } from 'astro:assets';
+import { getCollection } from 'astro:content';
+import Section from '../Section.astro';
+import Icon from '../Icon.astro';
+import PartnerBadge from '../PartnerBadge.astro';
+import Avatar from '../Avatar.astro';
+import Stars from '../Stars.astro';
+import poster from '../../assets/placeholders/video-poster.jpg';
+import { settings } from '../../lib/site';
+import type { IconName } from '../../icons/lucide';
+
+const items: { icon: IconName; title: string; href?: string; text: string; download?: boolean }[] = [
+  { icon: 'badge-check', title: 'Odoo certifications', href: settings.links.certLinks, text: 'Our consultants’ certificates, on Odoo’s site.' },
+  { icon: 'star', title: 'Reviews', href: '#reviews', text: 'What clients wrote about working with us.' },
+  { icon: 'phone', title: 'Ask for a reference call', href: '/book', text: 'Talk to a client we have worked with.' },
+  { icon: 'file-down', title: 'Sample SOW', href: settings.downloads.sampleSow, text: 'PDF · 3 pages', download: true },
+  { icon: 'file-down', title: 'Sample weekly report', href: settings.downloads.sampleWeeklyReport, text: 'PDF · 1 page', download: true },
+  { icon: 'lock', title: 'Security & data', href: '/security', text: 'Where your data lives and who can see it.' },
+];
+
+const founder = settings.founders[0];
+const isDemoVideo = settings.links.founderVideoUrl === 'demo';
+const reviews = (await getCollection('cases')).sort((a, b) => a.data.order - b.data.order).slice(3, 6);
+const script = [
+  `Hi, I’m ${founder.name.split(' ')[0]}, one of the two founders of Evenmont.`,
+  'We implement Odoo for growing US companies — service firms, distributors and small manufacturers — and we start where most partners finish: with the books.',
+  'Before we build anything, we map how you sell, deliver and get paid, measure where you are today, and give you a fixed price for each phase. Your accountant owns the chart of accounts and signs off on the setup.',
+  'One of us is on every project, from the Blueprint to go-live. If Odoo isn’t right for you, we’ll say so on the first call.',
+  'Book thirty minutes with us. You’ll leave with next steps, whoever you choose.',
+];
+---
+
+<Section id="check-us" title="Check us before you call.">
+  <div class="checkus">
+    <figure class="checkus__video tone-dark">
+      <Picture
+        src={poster}
+        alt=""
+        widths={[480, 800, 1200]}
+        sizes="(min-width: 1200px) 660px, (min-width: 1024px) 55vw, calc(100vw - 2 * clamp(20px, 4vw, 40px))"
+        formats={['avif', 'webp']}
+        loading="lazy"
+        decoding="async"
+        class="checkus__poster"
+        data-placeholder="true"
+      />
+      <a
+        class="checkus__video-play"
+        href={isDemoVideo ? '#founder-video' : settings.links.founderVideoUrl}
+        data-video-open={isDemoVideo ? '' : undefined}
+      >
+        <span class="checkus__video-button" aria-hidden="true"><Icon name="play" size={28} /></span>
+        <span class="checkus__video-label">
+          A message from {founder.name}
+          <span class="checkus__video-len">{founder.role} · 1:20</span>
+        </span>
+      </a>
+      <figcaption class="visually-hidden">Founder video</figcaption>
+    </figure>
+
+    <div class="checkus__side">
+      <div class="checkus__status">
+        <p class="checkus__status-title">Odoo partner status</p>
+        <PartnerBadge />
+      </div>
+      <ul class="checkus__proof" role="list" data-reveal-children>
+        {
+          items.map((item) => (
+            <li>
+              <a class="checkus__proof-link" href={item.href} download={item.download ? '' : undefined}>
+                <Icon name={item.icon} />
+                <span>
+                  <span class="checkus__proof-title">{item.title}</span>
+                  <span class="checkus__proof-text">{item.text}</span>
+                </span>
+                <Icon name="arrow-right" size={18} class="arrow-nudge checkus__proof-arrow" />
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </div>
+
+  <div class="reviews" id="reviews">
+    <div class="reviews__head">
+      <h3 class="reviews__title">What clients wrote</h3>
+      <p class="reviews__score">
+        <Stars value={Number(settings.proof.rating.value)} size={18} />
+        <span><strong>{settings.proof.rating.value}</strong> from {settings.proof.rating.count} reviews</span>
+      </p>
+    </div>
+    <ul class="reviews__list" role="list" data-reveal-children>
+      {
+        reviews.map((r) => (
+          <li class="card review">
+            <Stars size={16} />
+            <blockquote>
+              <p>“{r.data.quote.text}”</p>
+            </blockquote>
+            <p class="review__who">
+              <Avatar name={r.data.quote.name} size={40} />
+              <span>
+                {r.data.quote.name}
+                <span class="review__role">{r.data.quote.role}, {r.data.company}</span>
+              </span>
+            </p>
+            <a class="review__link link-arrow card-link" href={`/cases/${r.id}`}>
+              <span class="link-arrow__label">
+                Read the case<span class="visually-hidden">: {r.data.company}</span>
+              </span>
+              <Icon name="arrow-right" size={18} class="arrow-nudge" />
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+
+  {
+    isDemoVideo && (
+      <dialog id="founder-video" class="vdialog" aria-labelledby="founder-video-title">
+        <div class="vdialog__head">
+          <h3 id="founder-video-title">A message from {founder.name}</h3>
+          <button class="menu-toggle vdialog__close" type="button" data-video-close>
+            <Icon name="x" size={24} />
+            <span class="visually-hidden">Close</span>
+          </button>
+        </div>
+        <p class="vdialog__note">The video is being recorded. Here is what it says:</p>
+        <div class="vdialog__script">
+          {script.map((line) => <p>{line}</p>)}
+        </div>
+      </dialog>
+    )
+  }
+</Section>
+
+<script>
+  const dialog = document.getElementById('founder-video') as HTMLDialogElement | null;
+  if (dialog && typeof dialog.showModal === 'function') {
+    document.querySelector('[data-video-open]')?.addEventListener('click', (e) => {
+      e.preventDefault();
+      dialog.showModal();
+    });
+    dialog.querySelector('[data-video-close]')?.addEventListener('click', () => dialog.close());
+    dialog.addEventListener('click', (e) => e.target === dialog && dialog.close());
+  }
+</script>
+
+<style is:global>
+  .checkus {
+    display: grid;
+    gap: var(--space-6);
+  }
+  .checkus__video {
+    position: relative;
+    margin: 0;
+    aspect-ratio: 16 / 10;
+    overflow: hidden;
+    border-radius: var(--radius-card);
+    isolation: isolate;
+  }
+  .checkus__poster {
+    position: absolute;
+    inset: 0;
+    z-index: -2;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .checkus__video::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background: linear-gradient(to top, var(--bg) 8%, color-mix(in srgb, var(--bg) 55%, transparent) 60%, color-mix(in srgb, var(--bg) 25%, transparent));
+  }
+  .checkus__video-play {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: flex-end;
+    gap: var(--space-4);
+    padding: var(--space-5);
+    color: var(--text);
+    text-decoration: none;
+  }
+  .checkus__video-button {
+    display: grid;
+    place-items: center;
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    background-color: var(--accent);
+    color: var(--on-accent);
+    box-shadow: 0 0 0 10px color-mix(in srgb, var(--accent) 22%, transparent);
+    transition: transform var(--dur-1) var(--ease-out);
+  }
+  .checkus__video-button .icon {
+    margin-left: 3px;
+  }
+  .checkus__video-play:hover .checkus__video-button {
+    transform: scale(1.05);
+  }
+  .checkus__video-label {
+    display: grid;
+    font-weight: 700;
+    font-size: var(--fs-h3);
+  }
+  .checkus__video-len {
+    color: var(--text-muted);
+    font-size: var(--fs-small);
+    font-weight: 600;
+  }
+  .checkus__status {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-3);
+    padding-bottom: var(--space-4);
+    border-bottom: 1px solid var(--border);
+  }
+  .checkus__status-title {
+    font-weight: 700;
+  }
+  .checkus__proof li {
+    border-bottom: 1px solid var(--border);
+  }
+  .checkus__proof-link {
+    display: grid;
+    grid-template-columns: 24px minmax(0, 1fr) 18px;
+    align-items: center;
+    gap: var(--space-4);
+    min-height: 64px;
+    padding: var(--space-3) 0;
+    color: var(--text);
+    text-decoration: none;
+  }
+  .checkus__proof-link > .icon:first-child {
+    color: var(--link);
+  }
+  .checkus__proof-title {
+    display: block;
+    font-weight: 700;
+  }
+  .checkus__proof-text {
+    display: block;
+    color: var(--text-muted);
+    font-size: var(--fs-small);
+  }
+  .checkus__proof-link:hover .checkus__proof-title {
+    text-decoration: underline;
+    text-underline-offset: 0.2em;
+  }
+  .checkus__proof-arrow {
+    color: var(--text-muted);
+  }
+  .reviews {
+    margin-top: var(--space-8);
+    scroll-margin-top: var(--space-6);
+  }
+  .reviews__head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-3);
+    margin-bottom: var(--space-5);
+  }
+  .reviews__score {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    color: var(--text-muted);
+    font-size: var(--fs-small);
+    font-weight: 600;
+  }
+  .reviews__score strong {
+    color: var(--heading);
+    font-weight: 800;
+  }
+  .reviews__list {
+    display: grid;
+    gap: var(--space-4);
+  }
+  .review {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+  }
+  .review > * + * {
+    margin-top: 0;
+  }
+  .review__mark {
+    color: var(--rule);
+  }
+  .review blockquote {
+    margin: 0;
+    flex: 1;
+    color: var(--heading);
+    font-weight: 600;
+  }
+  .review__who {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    font-size: var(--fs-small);
+    font-weight: 700;
+    line-height: 1.4;
+  }
+  .review__role {
+    display: block;
+    color: var(--text-muted);
+    font-weight: 600;
+  }
+  .vdialog {
+    width: min(640px, calc(100% - 2 * var(--gutter)));
+    padding: var(--space-6);
+    border: 0;
+    border-radius: var(--radius-card);
+    background-color: var(--surface);
+    color: var(--text);
+    box-shadow: var(--shadow-card);
+  }
+  .vdialog::backdrop {
+    background: color-mix(in srgb, var(--dark-bg) 70%, transparent);
+  }
+  .vdialog__head {
+    display: flex;
+    align-items: start;
+    justify-content: space-between;
+    gap: var(--space-4);
+  }
+  .vdialog .vdialog__close {
+    display: inline-flex;
+    flex: none;
+  }
+  .vdialog__note {
+    margin: var(--space-2) 0 var(--space-5);
+    color: var(--text-muted);
+    font-size: var(--fs-small);
+  }
+  .vdialog__script p + p {
+    margin-top: var(--space-3);
+  }
+  @media (min-width: 768px) {
+    .reviews__list {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+  @media (min-width: 1024px) {
+    .checkus {
+      grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+      gap: var(--space-8);
+      align-items: start;
+    }
+    .checkus__video-play {
+      padding: var(--space-7);
+    }
+  }
+</style>

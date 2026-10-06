@@ -1,0 +1,76 @@
+---
+/**
+ * Certification seal — line-based badge (brand illustration style): double ring, ring
+ * text on a circular path, center label with the level-line accent.
+ * DEMO: stands in for the real certificates / Odoo's official partner badge.
+ */
+import { icons, type IconName } from '../../icons/lucide';
+
+interface Props {
+  ring: string;
+  center: string;
+  icon?: IconName;
+  id: string;
+  size?: number;
+}
+const { ring, center, icon = 'badge-check', id, size = 112 } = Astro.props;
+const pathId = `seal-${id}`;
+const ringText = `${ring.toUpperCase()} · `;
+---
+
+<svg class="seal" viewBox="0 0 120 120" width={size} height={size} aria-hidden="true" focusable="false">
+  <defs>
+    <path id={pathId} d="M60 60m-47 0a47 47 0 1 1 94 0a47 47 0 1 1-94 0" />
+  </defs>
+  <circle class="seal__outer" cx="60" cy="60" r="57" />
+  <circle class="seal__inner" cx="60" cy="60" r="38" />
+  <text class="seal__ring">
+    <textPath href={`#${pathId}`} textLength="292" lengthAdjust="spacing">{ringText}</textPath>
+  </text>
+  <g class="seal__icon" transform="translate(50 33) scale(0.8333)" set:html={icons[icon]} />
+  <text class="seal__center" x="60" y="70" text-anchor="middle">{center}</text>
+  <rect class="seal__level" x="47" y="77" width="26" height="3" rx="1.5" />
+</svg>
+
+<style is:global>
+  .seal {
+    display: block;
+    width: var(--seal, 112px);
+    height: auto;
+    overflow: visible;
+  }
+  .seal__outer,
+  .seal__inner {
+    fill: none;
+    stroke: var(--heading);
+  }
+  .seal__outer {
+    stroke-width: 1.75;
+  }
+  .seal__inner {
+    stroke-width: 1;
+    stroke-dasharray: 2 3;
+  }
+  .seal__ring {
+    fill: var(--heading);
+    font-family: var(--font-sans);
+    font-size: 9px;
+    font-weight: 700;
+  }
+  .seal__icon {
+    fill: none;
+    stroke: var(--link);
+    stroke-width: 1.8;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+  .seal__center {
+    fill: var(--heading);
+    font-family: var(--font-sans);
+    font-size: 15px;
+    font-weight: 800;
+  }
+  .seal__level {
+    fill: var(--rule);
+  }
+</style>

@@ -1,0 +1,36 @@
+/* .tone-light — a light card inside a dark band (e.g. the ledger card in the partner hero).
+   Imported only by the components that use it, so other pages don't carry it. */
+
+/* Capture the page's light values once, so .tone-light can restore them inside a dark band. */
+:root {
+  --light-bg: var(--bg);
+  --light-surface: var(--surface);
+  --light-surface-alt: var(--surface-alt);
+  --light-text: var(--text);
+  --light-text-muted: var(--text-muted);
+  --light-heading: var(--heading);
+  --light-link: var(--link);
+  --light-border: var(--border);
+  --light-accent-edge: var(--accent-edge);
+  --light-rule: var(--rule);
+  --light-focus: var(--focus);
+  --light-success: var(--success);
+}
+
+.tone-light {
+  --bg: var(--light-bg);
+  --surface: var(--light-surface);
+  --surface-alt: var(--light-surface-alt);
+  --text: var(--light-text);
+  --text-muted: var(--light-text-muted);
+  --heading: var(--light-heading);
+  --link: var(--light-link);
+  --focus: var(--light-focus);
+  --rule: var(--light-rule);
+  --border: var(--light-border);
+  --accent-edge: var(--light-accent-edge);
+  --success: var(--light-success);
+  --field-border: var(--light-text-muted);
+  color: var(--text);
+}
+

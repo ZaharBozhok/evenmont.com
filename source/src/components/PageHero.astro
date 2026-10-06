@@ -1,0 +1,56 @@
+---
+/** Compact hero band for inner pages (Evergreen / Night / dark), H1 + optional lead. */
+import SumLine from './SumLine.astro';
+import { noBreakHyphens } from '../lib/text';
+
+interface Props {
+  eyebrow?: string;
+  title: string;
+  /** Phrase at the end of the title to underline with the sum line. */
+  sum?: string;
+  lead?: string;
+  tone?: 'dark' | 'light';
+  ledger?: boolean;
+  /** Start the underlined phrase on its own line. */
+  breakBeforeSum?: boolean;
+}
+const { eyebrow, title, sum, lead, tone = 'dark', ledger = true, breakBeforeSum = false } = Astro.props;
+const before = sum && title.endsWith(sum) ? title.slice(0, title.length - sum.length).trimEnd() : title;
+---
+
+<section class:list={['phero', tone === 'dark' ? 'tone-dark' : 'phero--light', ledger && 'ledger']} data-hero data-animate={ledger ? '' : undefined}>
+  <div class="container phero__inner">
+    {eyebrow && <p class="eyebrow">{eyebrow}<slot name="eyebrow" /></p>}
+    <h1 class="hero-title">
+      <Fragment set:html={noBreakHyphens(before)} />
+      {breakBeforeSum && <br />}
+      {sum && title.endsWith(sum) && <SumLine text={sum} delay={200} />}
+    </h1>
+    {lead && <p class="hero-sub phero__lead">{lead}</p>}
+    <slot />
+  </div>
+</section>
+
+<style>
+  .phero {
+    padding-top: var(--space-6);
+    padding-bottom: var(--space-8);
+    overflow: hidden;
+  }
+  .phero--light {
+    border-bottom: 1px solid var(--border);
+  }
+  .phero h1 {
+    max-width: 18em;
+  }
+  .phero__lead {
+    margin-top: var(--space-5);
+    max-width: 38em;
+  }
+  @media (min-width: 1024px) {
+    .phero {
+      padding-top: var(--space-8);
+      padding-bottom: var(--space-9);
+    }
+  }
+</style>

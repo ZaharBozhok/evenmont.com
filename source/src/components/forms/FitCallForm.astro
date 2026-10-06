@@ -1,0 +1,31 @@
+---
+/** Fit call form: name, work email, company, scenario, team size, current tools, message. */
+import Form from './Form.astro';
+import Field from './Field.astro';
+
+const f = 'fit-call';
+---
+
+<Form name={f} submitLabel="Request a fit call" successTitle="Thank you." successText="We’ll email you to find a time for the call.">
+  <div class="form__row form__row--2">
+    <Field form={f} name="name" label="Name" required autocomplete="name" />
+    <Field form={f} name="email" label="Work email" type="email" required autocomplete="email" inputmode="email" />
+  </div>
+  <div class="form__row form__row--2">
+    <Field form={f} name="company" label="Company" required autocomplete="organization" />
+    <Field
+      form={f}
+      name="scenario"
+      label="Scenario"
+      type="select"
+      required
+      options={['Services & projects', 'Distribution & e-commerce', 'Light manufacturing', 'Not sure yet']}
+      error="Please choose the scenario closest to your business."
+    />
+  </div>
+  <div class="form__row form__row--2">
+    <Field form={f} name="team_size" label="Team size" type="select" required options={['1–10', '11–50', '51–200', '200+']} error="Please choose your team size." />
+    <Field form={f} name="current_tools" label="What you use today" hint="For example: QuickBooks, spreadsheets, Shopify" maxlength={200} />
+  </div>
+  <Field form={f} name="message" label="Message" type="textarea" optional rows={4} maxlength={2000} />
+</Form>

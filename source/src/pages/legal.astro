@@ -1,0 +1,63 @@
+---
+/** /legal — legal notice (operator details from src/content/settings.json). */
+import LegalPage from '../components/LegalPage.astro';
+import T from '../components/T.astro';
+import { settings } from '../lib/site';
+
+const l = settings.legal;
+const rows = [
+  { k: 'Operator', v: l.legalName },
+  { k: 'Company registration', v: `${l.country} company, reg. no. ${l.regNo}` },
+  { k: 'Business name', v: `“Evenmont”, reg. no. ${l.businessNameRegNo}` },
+  { k: 'Registered office', v: l.registeredOffice },
+  { k: 'VAT', v: l.vatNo },
+  { k: 'Directors', v: l.directors },
+  { k: 'Email', v: settings.contact.email },
+  { k: 'Phone (US)', v: settings.contact.phoneUs },
+];
+---
+
+<LegalPage title="Legal notice" metaTitle="Legal notice | Evenmont" description="Legal notice: Evenmont is a registered business name of JITO LTD, a company registered in Cyprus.">
+  <dl class="notice">
+    {
+      rows.map((r) => (
+        <div>
+          <dt>{r.k}</dt>
+          <dd>
+            <T v={r.v} />
+          </dd>
+        </div>
+      ))
+    }
+  </dl>
+  <h2>Trademarks</h2>
+  <p>Odoo is a trademark of Odoo S.A.</p>
+</LegalPage>
+
+<style>
+  .notice {
+    display: grid;
+    border-top: 1px solid var(--border);
+  }
+  .notice div {
+    display: grid;
+    gap: var(--space-1);
+    padding: var(--space-4) 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .notice dt {
+    color: var(--text-muted);
+    font-size: var(--fs-small);
+    font-weight: 700;
+  }
+  .notice dd {
+    margin: 0;
+    font-weight: 600;
+  }
+  @media (min-width: 768px) {
+    .notice div {
+      grid-template-columns: 14rem minmax(0, 1fr);
+      gap: var(--space-5);
+    }
+  }
+</style>

@@ -1,0 +1,213 @@
+---
+/**
+ * Case card: photo with the client's wordmark and scenario, the headline result with its
+ * sum line, one before → after line, and a quiet footer (timeline, team size). The whole
+ * card is the link. Hover lift + sum line draws under the number (#7, desktop only).
+ */
+import { Picture } from 'astro:assets';
+import type { CollectionEntry } from 'astro:content';
+import SumLine from './SumLine.astro';
+import T from './T.astro';
+import Icon from './Icon.astro';
+import ClientLogo from './illustrations/ClientLogo.astro';
+
+interface Props {
+  entry: CollectionEntry<'cases'>;
+  scenarioName: string;
+  headingLevel?: 'h2' | 'h3';
+  /** First card above the fold (cases index): load eagerly, it is the LCP image. */
+  eager?: boolean;
+}
+const { entry, scenarioName, headingLevel = 'h3', eager = false } = Astro.props;
+const c = entry.data;
+const Heading = headingLevel;
+---
+
+<article class="case-card card" data-scenario={c.scenario} data-order={c.order}>
+  <div class="case-card__media">
+    <Picture
+      src={c.cover}
+      alt={c.coverAlt}
+      width={960}
+      height={640}
+      widths={[400, 720, 960]}
+      sizes="(min-width: 1200px) 370px, (min-width: 1024px) 30vw, (min-width: 768px) 45vw, calc(100vw - 2 * clamp(20px, 4vw, 40px))"
+      formats={['avif', 'webp']}
+      loading={eager ? 'eager' : 'lazy'}
+      fetchpriority={eager ? 'high' : undefined}
+      decoding="async"
+      data-placeholder={c.placeholder || c.demo ? 'true' : undefined}
+    />
+    <span class="case-card__scenario">{scenarioName}</span>
+    {c.placeholder && <span class="sample-label case-card__sample">Sample</span>}
+    <span class="case-card__logo"><ClientLogo name={c.company} /></span>
+  </div>
+  <div class="case-card__body">
+    <Heading class="case-card__result">
+      <span class="num case-card__number"><SumLine text={c.result.number} trigger="hover" /></span>
+      <span class="case-card__label">{c.result.label}</span>
+    </Heading>
+    <p class="case-card__ba">
+      <span class="case-card__before">{c.beforeAfter.before}</span>
+      <Icon name="arrow-down" size={16} />
+      <span class="case-card__after">{c.beforeAfter.after}</span>
+    </p>
+    <div class="case-card__foot">
+      <p class="case-card__meta">
+        <span><Icon name="clock" size={16} /><T v={c.timeline} /></span>
+        <span><Icon name="users" size={16} /><T v={c.profile.size} /></span>
+      </p>
+      <a class="case-card__link link-arrow card-link" href={`/cases/${entry.id}`}>
+        <span class="link-arrow__label">Read the story<span class="visually-hidden">: {c.company}</span></span>
+        <Icon name="arrow-right" size={18} class="arrow-nudge" />
+      </a>
+    </div>
+  </div>
+</article>
+
+<style is:global>
+  .case-card {
+    display: flex;
+    flex-direction: column;
+    padding: 0;
+    overflow: hidden;
+    transition:
+      transform var(--dur-2) var(--ease-out),
+      box-shadow var(--dur-2) var(--ease-out);
+  }
+  .case-card > * + * {
+    margin-top: 0;
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .case-card:hover,
+    .case-card:focus-within {
+      transform: translateY(-3px);
+      box-shadow: 0 2px 4px rgba(20, 32, 28, 0.05), 0 20px 40px -16px rgba(20, 32, 28, 0.28);
+    }
+    .case-card:hover .case-card__media img {
+      transform: scale(1.03);
+    }
+  }
+  .case-card__media {
+    position: relative;
+    aspect-ratio: 3 / 2;
+    background-color: var(--surface-alt);
+  }
+  .case-card__media picture {
+    display: block;
+    height: 100%;
+    overflow: hidden;
+  }
+  .case-card__media img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 600ms var(--ease-out);
+  }
+  .case-card__scenario {
+    position: absolute;
+    top: var(--space-3);
+    left: var(--space-3);
+    padding: 5px 10px;
+    border-radius: var(--radius-pill);
+    background-color: rgba(20, 32, 28, 0.72);
+    color: var(--em-sand);
+    font-size: var(--fs-xs);
+    font-weight: 700;
+  }
+  .case-card__sample {
+    position: absolute;
+    top: var(--space-3);
+    right: var(--space-3);
+  }
+  .case-card__logo {
+    position: absolute;
+    left: var(--space-4);
+    bottom: 0;
+    display: flex;
+    align-items: center;
+    height: 48px;
+    padding: 0 var(--space-4);
+    border-radius: 12px;
+    background-color: var(--surface);
+    color: var(--heading);
+    box-shadow: 0 8px 20px -8px rgba(20, 32, 28, 0.35);
+    transform: translateY(50%);
+  }
+  .case-card__logo .client-logo {
+    width: 132px;
+    height: 28px;
+    color: inherit;
+  }
+  .case-card__body {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+    flex: 1;
+    padding: calc(var(--space-6) + var(--space-3)) var(--space-5) var(--space-5);
+  }
+  .case-card__result {
+    display: grid;
+    gap: var(--space-1);
+  }
+  .case-card__number {
+    font-size: clamp(2.25rem, 1.8rem + 1.4vw, 2.75rem);
+    line-height: 1.05;
+    color: var(--heading);
+  }
+  .case-card__label {
+    font-family: var(--font-sans);
+    font-size: 1rem;
+    font-weight: 700;
+    line-height: 1.35;
+    color: var(--text);
+  }
+  .case-card__ba {
+    display: grid;
+    justify-items: start;
+    gap: 2px;
+    padding: var(--space-3) var(--space-4);
+    border-radius: 12px;
+    background-color: color-mix(in srgb, var(--surface-alt) 55%, var(--surface));
+    font-size: var(--fs-small);
+    line-height: 1.4;
+  }
+  .case-card__ba .icon {
+    color: var(--link);
+  }
+  .case-card__before {
+    color: var(--text-muted);
+  }
+  .case-card__after {
+    color: var(--heading);
+    font-weight: 700;
+  }
+  .case-card__foot {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-3);
+    margin-top: auto;
+    padding-top: var(--space-4);
+    border-top: 1px solid var(--border);
+  }
+  .case-card__meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-1) var(--space-4);
+    color: var(--text-muted);
+    font-size: var(--fs-small);
+    font-weight: 600;
+  }
+  .case-card__meta span {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+  @media (min-width: 768px) {
+    .case-card__body {
+      padding: calc(var(--space-6) + var(--space-3)) var(--space-6) var(--space-6);
+    }
+  }
+</style>

@@ -1,0 +1,62 @@
+---
+/**
+ * Mobile sticky CTA bar: appears after the hero, hides again when an element marked
+ * [data-sticky-hide] (final CTA, form section, footer) is on screen. Below 768px only.
+ */
+interface Props {
+  label: string;
+  href: string;
+}
+const { label, href } = Astro.props;
+---
+
+<div class="sticky-cta" data-sticky-cta>
+  <a class="btn btn--primary btn--block" href={href}>{label}</a>
+</div>
+
+<script>
+  const bar = document.querySelector<HTMLElement>('[data-sticky-cta]');
+  const hero = document.querySelector('[data-hero]');
+  if (bar && hero && 'IntersectionObserver' in window) {
+    const visible = new Set<Element>();
+    const update = () => bar.classList.toggle('is-visible', visible.size === 0);
+    const io = new IntersectionObserver((entries) => {
+      for (const e of entries) e.isIntersecting ? visible.add(e.target) : visible.delete(e.target);
+      update();
+    });
+    io.observe(hero);
+    document.querySelectorAll('[data-sticky-hide]').forEach((el) => io.observe(el));
+  }
+</script>
+
+<style is:global>
+  .sticky-cta {
+    position: fixed;
+    z-index: 30;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    padding: var(--space-3) max(var(--gutter), env(safe-area-inset-right)) max(var(--space-3), env(safe-area-inset-bottom))
+      max(var(--gutter), env(safe-area-inset-left));
+    background-color: var(--bg);
+    border-top: 1px solid var(--border);
+    box-shadow: 0 -8px 24px rgba(20, 32, 28, 0.08);
+    transform: translateY(110%);
+    visibility: hidden;
+    transition:
+      transform var(--dur-2) var(--ease-out),
+      visibility 0s linear var(--dur-2);
+  }
+  .sticky-cta.is-visible {
+    transform: none;
+    visibility: visible;
+    transition:
+      transform var(--dur-2) var(--ease-out),
+      visibility 0s;
+  }
+  @media (min-width: 768px) {
+    .sticky-cta {
+      display: none;
+    }
+  }
+</style>

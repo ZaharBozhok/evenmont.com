@@ -1,0 +1,526 @@
+---
+/**
+ * "What changes" compare slider: Today (a desk of spreadsheets, inbox, reconciliation and
+ * sticky notes) vs With Evenmont (one dashboard, the team and the accountant in it).
+ * Drag the handle (or use the arrow keys — it's a native range input) to compare.
+ * On first view the handle glides from the right to the middle, once. The reveal uses
+ * transforms only. Without JS the scene rests at the middle. DEMO data.
+ */
+import { icons, type IconName } from '../../icons/lucide';
+
+const ico = (name: IconName, x: number, y: number, s: number, cls = 'cs-ico') =>
+  `<svg class="${cls}" x="${x}" y="${y}" width="${s}" height="${s}" viewBox="0 0 24 24">${icons[name]}</svg>`;
+
+/* ---------- Today (wide 1000×560) ---------- */
+const sheetRows = [
+  ['Riverside survey', '48,000', '44,100', '41%'],
+  ['Hwy 36 assessment', '52,500', '54,240', '−13%'],
+  ['Clearwater permits', '31,200', '#REF!', '#REF!'],
+  ['Lakeview remediation', '27,800', '25,900', '44%'],
+  ['North Fork study', '40,100', '41,380', '32%'],
+  ['Total', '199,600', '#REF!', '??'],
+];
+const inbox = [
+  { ini: 'JA', who: 'J. Alvarez', what: 'Invoice — March (revised)', t: '9:12' },
+  { ini: 'RN', who: 'R. Novak', what: 'Re: stock count Friday?', t: '8:47' },
+  { ini: 'TB', who: 'T. Brooks', what: 'PO #4471 — which price?', t: 'Tue' },
+  { ini: 'MP', who: 'M. Patel', what: 'Fwd: timesheets + invoice', t: 'Mon' },
+];
+const recon = [
+  ['Sep 28', 'ACH deposit', '$12,400'],
+  ['Sep 28', 'Card 4417', '−$1,284'],
+  ['Sep 27', 'Wire in', '$8,020'],
+];
+
+/* ---------- With Evenmont (wide) ---------- */
+const nav: { label: string; icon: IconName }[] = [
+  { label: 'Dashboard', icon: 'layout-dashboard' },
+  { label: 'Sales', icon: 'receipt-text' },
+  { label: 'Projects', icon: 'kanban' },
+  { label: 'Inventory', icon: 'package' },
+  { label: 'Manufacturing', icon: 'factory' },
+  { label: 'Accounting', icon: 'calculator' },
+  { label: 'Reports', icon: 'chart-column' },
+];
+const kpis = [
+  { label: 'Gross margin', value: '38.4%', note: '+11 pts this year', sum: true },
+  { label: 'Month-end close', value: 'Day 3', note: 'was day 11' },
+  { label: 'Stock accuracy', value: '99.2%', note: 'cycle counts' },
+  { label: 'Unbilled hours', value: '1.2%', note: 'was 9.4%' },
+];
+const projects = [
+  { name: 'Riverside survey', w: 0.82, v: '41%' },
+  { name: 'Lakeview remediation', w: 0.88, v: '44%' },
+  { name: 'Clearwater permits', w: 0.74, v: '37%' },
+  { name: 'North Fork study', w: 0.64, v: '32%' },
+  { name: 'Hwy 36 assessment', w: 0.36, v: '18%', hi: true },
+];
+const feed = [
+  { ini: 'MC', who: 'Maya', what: 'approved 114.5 h', tone: 'a' },
+  { ini: 'PR', who: 'Priya, CPA', what: 'closed September ✓', tone: 'b' },
+  { ini: 'EV', who: 'Evenmont', what: 'sent INV-0142', tone: 'c' },
+  { ini: 'RN', who: 'Rachel', what: 'received PO-221', tone: 'a' },
+];
+---
+
+<figure class="cmp scene" data-animate data-compare>
+  <div class="cmp__stage">
+    <!-- Today -->
+    <div class="cmp__layer">
+      <svg class="cmp__svg cmp__svg--wide" viewBox="0 0 1000 560" aria-hidden="true" focusable="false">
+        <rect class="cs-desk" width="1000" height="560" />
+        <g transform="rotate(-2.5 290 215)">
+          <rect class="cs-shadow" x="74" y="88" width="440" height="276" rx="12" />
+          <rect class="cs-win" x="70" y="80" width="440" height="276" rx="12" />
+          <path class="cs-bar" d="M70.5 92a11.5 11.5 0 0 1 11.5-11.5h417a11.5 11.5 0 0 1 11.5 11.5v16h-440z" />
+          <circle class="cs-dot" cx="88" cy="95" r="4" /><circle class="cs-dot" cx="102" cy="95" r="4" /><circle class="cs-dot" cx="116" cy="95" r="4" />
+          <text class="cs-t" x="132" y="100">Margins_Q3_v12_FINAL.xlsx</text>
+          <rect class="cs-head" x="70.5" y="108" width="439" height="24" />
+          {['Project', 'Budget', 'Actual', 'Margin'].map((h, i) => <text class="cs-m cs-s" x={[112, 330, 410, 492][i]} y="124" text-anchor={i === 0 ? 'start' : 'end'}>{h}</text>)}
+          {sheetRows.map((r, i) => (
+            <g>
+              {i === 3 && <rect class="cs-hi" x="420" y={132 + i * 34} width="89" height="34" />}
+              <text class="cs-m cs-s" x="90" y={154 + i * 34} text-anchor="middle">{i + 2}</text>
+              <text class="cs-v" x="112" y={154 + i * 34}>{r[0]}</text>
+              {r.slice(1).map((c, j) => (
+                <text class:list={['cs-v', /^#|^\?|^−/.test(c) && 'cs-neg']} x={[330, 410, 492][j]} y={154 + i * 34} text-anchor="end">{c}</text>
+              ))}
+            </g>
+          ))}
+          <path class="cs-grid" d="M100 108v248M250 108v248M340 108v248M420 108v248M70.5 132h439M70.5 166h439M70.5 200h439M70.5 234h439M70.5 268h439M70.5 302h439M70.5 336h439" />
+        </g>
+        <g transform="rotate(3 610 150)">
+          <rect class="cs-shadow" x="454" y="48" width="320" height="214" rx="12" />
+          <rect class="cs-win" x="450" y="40" width="320" height="214" rx="12" />
+          <path class="cs-bar" d="M450.5 52a11.5 11.5 0 0 1 11.5-11.5h297a11.5 11.5 0 0 1 11.5 11.5v16h-320z" />
+          <circle class="cs-dot" cx="468" cy="55" r="4" /><circle class="cs-dot" cx="482" cy="55" r="4" /><circle class="cs-dot" cx="496" cy="55" r="4" />
+          <text class="cs-t" x="512" y="60">Inbox (214)</text>
+          {inbox.map((m, i) => (
+            <g>
+              <circle class="cs-sage" cx="478" cy={92 + i * 42} r="13" />
+              <text class="cs-ini" x="478" y={96 + i * 42} text-anchor="middle">{m.ini}</text>
+              <text class="cs-v" x="500" y={88 + i * 42}>{m.who}</text>
+              <text class="cs-m" x="500" y={104 + i * 42}>{m.what}</text>
+              <text class="cs-m cs-s" x="754" y={88 + i * 42} text-anchor="end">{m.t}</text>
+              {i < 2 && <circle class="cs-unread" cx="748" cy={100 + i * 42} r="4" />}
+              {i < 3 && <path class="cs-grid" d={`M466 ${113 + i * 42}h288`} />}
+            </g>
+          ))}
+        </g>
+        <g transform="rotate(-1.5 760 380)">
+          <rect class="cs-shadow" x="584" y="278" width="360" height="224" rx="12" />
+          <rect class="cs-win" x="580" y="270" width="360" height="224" rx="12" />
+          <path class="cs-bar" d="M580.5 282a11.5 11.5 0 0 1 11.5-11.5h337a11.5 11.5 0 0 1 11.5 11.5v16h-360z" />
+          <circle class="cs-dot" cx="598" cy="285" r="4" /><circle class="cs-dot" cx="612" cy="285" r="4" /><circle class="cs-dot" cx="626" cy="285" r="4" />
+          <text class="cs-t" x="642" y="290">Accounting · Bank reconciliation</text>
+          <text class="cs-big cs-neg" x="600" y="342">43</text>
+          <text class="cs-m" x="646" y="334">transactions to reconcile</text>
+          <text class="cs-m cs-s" x="646" y="350">oldest: 26 days</text>
+          {recon.map((r, i) => (
+            <g>
+              <path class="cs-grid" d={`M596 ${366 + i * 38}h328`} />
+              <text class="cs-m" x="600" y={390 + i * 38}>{r[0]}</text>
+              <text class="cs-v" x="660" y={390 + i * 38}>{r[1]}</text>
+              <text class="cs-v" x="822" y={390 + i * 38} text-anchor="end">{r[2]}</text>
+              <rect class="cs-bad" x="838" y={376 + i * 38} width="86" height="22" rx="11" />
+              <text class="cs-badt" x="881" y={391 + i * 38} text-anchor="middle">Unmatched</text>
+            </g>
+          ))}
+        </g>
+        <g>
+          <circle class="cs-amber-soft" cx="128" cy="424" r="16" />
+          <text class="cs-ini" x="128" y="428" text-anchor="middle">MC</text>
+          <rect class="cs-bubble" x="152" y="402" width="248" height="44" rx="14" />
+          <text class="cs-v" x="170" y="429">Which margin number is right?</text>
+          <circle class="cs-sage" cx="196" cy="486" r="16" />
+          <text class="cs-ini" x="196" y="490" text-anchor="middle">SL</text>
+          <rect class="cs-bubble cs-bubble--alt" x="220" y="464" width="236" height="44" rx="14" />
+          <text class="cs-v" x="238" y="491">Sam has the latest file…</text>
+        </g>
+        <g transform="rotate(5 865 118)">
+          <rect class="cs-note" x="800" y="70" width="132" height="96" rx="3" />
+          <text class="cs-hand" x="814" y="104">Count stock</text>
+          <text class="cs-hand" x="814" y="128">Friday!!</text>
+        </g>
+        <g transform="rotate(-6 100 345)">
+          <rect class="cs-note" x="36" y="300" width="124" height="90" rx="3" />
+          <text class="cs-hand" x="50" y="334">Ask Sam re:</text>
+          <text class="cs-hand" x="50" y="358">invoice</text>
+        </g>
+        <g transform="rotate(4 535 460)">
+          <rect class="cs-note cs-note--sage" x="470" y="416" width="132" height="90" rx="3" />
+          <text class="cs-hand" x="484" y="450">Close by</text>
+          <text class="cs-hand" x="484" y="474">the 11th?</text>
+        </g>
+      </svg>
+
+      <svg class="cmp__svg cmp__svg--tall" viewBox="0 0 360 460" aria-hidden="true" focusable="false">
+        <rect class="cs-desk" width="360" height="460" />
+        <g transform="rotate(-3 150 120)">
+          <rect class="cs-shadow" x="24" y="46" width="250" height="168" rx="10" />
+          <rect class="cs-win" x="20" y="40" width="250" height="168" rx="10" />
+          <path class="cs-bar" d="M20.5 50a9.5 9.5 0 0 1 9.5-9.5h231a9.5 9.5 0 0 1 9.5 9.5v12h-250z" />
+          <text class="cs-t" x="34" y="56">Margins_v12_FINAL.xlsx</text>
+          {sheetRows.slice(0, 5).map((r, i) => (
+            <g>
+              <text class="cs-v cs-s" x="34" y={84 + i * 26}>{r[0].split(' ')[0]}</text>
+              <text class="cs-v cs-s" x="178" y={84 + i * 26} text-anchor="end">{r[1]}</text>
+              <text class:list={['cs-v cs-s', /^#|^−/.test(r[3]) && 'cs-neg']} x="256" y={84 + i * 26} text-anchor="end">{r[3]}</text>
+              <path class="cs-grid" d={`M20.5 ${92 + i * 26}h249`} />
+            </g>
+          ))}
+        </g>
+        <g transform="rotate(3 230 245)">
+          <rect class="cs-shadow" x="124" y="176" width="222" height="146" rx="10" />
+          <rect class="cs-win" x="120" y="170" width="222" height="146" rx="10" />
+          <path class="cs-bar" d="M120.5 180a9.5 9.5 0 0 1 9.5-9.5h203a9.5 9.5 0 0 1 9.5 9.5v12h-222z" />
+          <text class="cs-t" x="134" y="186">Inbox (214)</text>
+          {inbox.slice(0, 3).map((m, i) => (
+            <g>
+              <circle class="cs-sage" cx="142" cy={214 + i * 34} r="10" />
+              <text class="cs-ini cs-ini--s" x="142" y={217 + i * 34} text-anchor="middle">{m.ini}</text>
+              <text class="cs-v cs-s" x="158" y={211 + i * 34}>{m.who}</text>
+              <text class="cs-m cs-s" x="158" y={223 + i * 34}>{m.what.slice(0, 24)}</text>
+            </g>
+          ))}
+        </g>
+        <g transform="rotate(-2 145 360)">
+          <rect class="cs-shadow" x="34" y="306" width="230" height="118" rx="10" />
+          <rect class="cs-win" x="30" y="300" width="230" height="118" rx="10" />
+          <path class="cs-bar" d="M30.5 310a9.5 9.5 0 0 1 9.5-9.5h211a9.5 9.5 0 0 1 9.5 9.5v12h-230z" />
+          <text class="cs-t" x="44" y="316">Bank reconciliation</text>
+          <text class="cs-big cs-neg" x="44" y="366">43</text>
+          <text class="cs-m cs-s" x="86" y="356">to reconcile</text>
+          <rect class="cs-bad" x="44" y="380" width="84" height="20" rx="10" />
+          <text class="cs-badt" x="86" y="394" text-anchor="middle">Unmatched</text>
+        </g>
+        <g transform="rotate(6 290 70)">
+          <rect class="cs-note" x="244" y="28" width="98" height="78" rx="3" />
+          <text class="cs-hand cs-hand--s" x="254" y="58">Count stock</text>
+          <text class="cs-hand cs-hand--s" x="254" y="78">Friday!!</text>
+        </g>
+        <g transform="rotate(-5 298 390)">
+          <rect class="cs-note cs-note--sage" x="252" y="352" width="94" height="74" rx="3" />
+          <text class="cs-hand cs-hand--s" x="262" y="382">Close by</text>
+          <text class="cs-hand cs-hand--s" x="262" y="402">the 11th?</text>
+        </g>
+      </svg>
+    </div>
+
+    <!-- With Evenmont -->
+    <div class="cmp__after">
+      <div class="cmp__after-inner">
+        <svg class="cmp__svg cmp__svg--wide" viewBox="0 0 1000 560" aria-hidden="true" focusable="false">
+          <rect class="cs-clean" width="1000" height="560" />
+          <rect class="cs-shadow cs-shadow--soft" x="56" y="44" width="900" height="492" rx="18" />
+          <rect class="cs-win" x="50" y="34" width="900" height="492" rx="18" />
+          <path class="cs-grid" d="M50.5 86h899M230 86v439.5" />
+          <rect class="cs-ever" x="72" y="48" width="26" height="26" rx="7" />
+          <rect class="cs-amber" x="79" y="59" width="12" height="2.6" rx="1.3" />
+          <rect class="cs-amber" x="79" y="64" width="12" height="2.6" rx="1.3" />
+          <text class="cs-brand" x="110" y="66">One system</text>
+          <rect class="cs-search" x="300" y="48" width="260" height="26" rx="13" />
+          <g set:html={ico('search', 312, 54, 14, 'cs-ico cs-ico--m')} />
+          <text class="cs-m" x="334" y="65">Search orders, projects, invoices…</text>
+          <circle class="cs-av cs-av--a" cx="804" cy="61" r="14" /><text class="cs-ini" x="804" y="65" text-anchor="middle">MC</text>
+          <circle class="cs-av cs-av--b" cx="826" cy="61" r="14" /><text class="cs-ini" x="826" y="65" text-anchor="middle">PR</text>
+          <circle class="cs-av cs-av--c" cx="848" cy="61" r="14" /><text class="cs-ini cs-ini--light" x="848" y="65" text-anchor="middle">EV</text>
+          <rect class="cs-live" x="876" y="50" width="54" height="22" rx="11" />
+          <circle class="cs-pine" cx="890" cy="61" r="3.5" />
+          <text class="cs-livet" x="898" y="65.5">Live</text>
+          {nav.map((n, i) => (
+            <g>
+              {i === 0 && <rect class="cs-navon" x="62" y={100 + i * 40} width="156" height="32" rx="8" />}
+              <g set:html={ico(n.icon, 76, 108 + i * 40, 16, i === 0 ? 'cs-ico cs-ico--on' : 'cs-ico cs-ico--m')} />
+              <text class:list={['cs-nav', i === 0 && 'is-on']} x="102" y={121 + i * 40}>{n.label}</text>
+            </g>
+          ))}
+          <text class="cs-h" x="254" y="124">Good morning, Maya</text>
+          <text class="cs-m" x="254" y="146">September · everything adds up</text>
+          {kpis.map((k, i) => (
+            <g>
+              <rect class="cs-tile" x={254 + i * 170} y="162" width="158" height="96" rx="12" />
+              <text class="cs-m cs-s" x={270 + i * 170} y="186">{k.label}</text>
+              <text class="cs-num" x={270 + i * 170} y="222">{k.value}</text>
+              {k.sum && <rect class="cs-amber" x={270 + i * 170} y="230" width="70" height="3.5" rx="1.75" />}
+              {k.sum && <rect class="cs-amber" x={270 + i * 170} y="236" width="70" height="3.5" rx="1.75" />}
+              <text class="cs-pinet cs-s" x={k.sum ? 350 + i * 170 : 270 + i * 170} y={k.sum ? 239 : 244}>{k.note}</text>
+            </g>
+          ))}
+          <rect class="cs-tile" x="254" y="274" width="398" height="236" rx="12" />
+          <text class="cs-v" x="272" y="302">Margin by project</text>
+          {projects.map((p, i) => (
+            <g>
+              <text class="cs-m cs-s" x="272" y={336 + i * 36}>{p.name}</text>
+              <rect class="cs-track" x="420" y={326 + i * 36} width="180" height="12" rx="6" />
+              <rect class={p.hi ? 'cs-amber' : i % 2 ? 'cs-pine-soft' : 'cs-ever'} x="420" y={326 + i * 36} width={180 * p.w} height="12" rx="6" />
+              <text class="cs-v cs-s" x="636" y={336 + i * 36} text-anchor="end">{p.v}</text>
+            </g>
+          ))}
+          <rect class="cs-tile" x="666" y="274" width="264" height="236" rx="12" />
+          <text class="cs-v" x="684" y="302">Today</text>
+          {feed.map((f, i) => (
+            <g>
+              <circle class={`cs-av cs-av--${f.tone}`} cx="700" cy={334 + i * 44} r="14" />
+              <text class:list={['cs-ini', f.tone === 'c' && 'cs-ini--light']} x="700" y={338 + i * 44} text-anchor="middle">{f.ini}</text>
+              <text class="cs-v cs-s" x="722" y={331 + i * 44}>{f.who}</text>
+              <text class="cs-m cs-s" x="722" y={346 + i * 44}>{f.what}</text>
+            </g>
+          ))}
+          <rect class="cs-pill" x="720" y="122" width="210" height="28" rx="14" />
+          <text class="cs-pillt" x="825" y="140.5" text-anchor="middle">Every number entered once</text>
+          <rect class="cs-pill" x="600" y="498" width="330" height="28" rx="14" />
+          <text class="cs-pillt" x="765" y="516.5" text-anchor="middle">Your accountant works in the same system</text>
+        </svg>
+
+        <svg class="cmp__svg cmp__svg--tall" viewBox="0 0 360 460" aria-hidden="true" focusable="false">
+          <rect class="cs-clean" width="360" height="460" />
+          <rect class="cs-shadow cs-shadow--soft" x="20" y="30" width="328" height="412" rx="16" />
+          <rect class="cs-win" x="16" y="22" width="328" height="412" rx="16" />
+          <path class="cs-grid" d="M16.5 66h327" />
+          <rect class="cs-ever" x="32" y="33" width="22" height="22" rx="6" />
+          <rect class="cs-amber" x="38" y="42" width="10" height="2.4" rx="1.2" />
+          <rect class="cs-amber" x="38" y="46.5" width="10" height="2.4" rx="1.2" />
+          <text class="cs-brand cs-brand--s" x="62" y="49">One system</text>
+          <circle class="cs-av cs-av--a" cx="268" cy="44" r="11" /><text class="cs-ini cs-ini--s" x="268" y="47" text-anchor="middle">MC</text>
+          <circle class="cs-av cs-av--b" cx="286" cy="44" r="11" /><text class="cs-ini cs-ini--s" x="286" y="47" text-anchor="middle">PR</text>
+          <circle class="cs-av cs-av--c" cx="304" cy="44" r="11" /><text class="cs-ini cs-ini--s cs-ini--light" x="304" y="47" text-anchor="middle">EV</text>
+          {kpis.map((k, i) => (
+            <g>
+              <rect class="cs-tile" x={32 + (i % 2) * 152} y={82 + Math.floor(i / 2) * 92} width="144" height="82" rx="10" />
+              <text class="cs-m cs-s" x={46 + (i % 2) * 152} y={104 + Math.floor(i / 2) * 92}>{k.label}</text>
+              <text class="cs-num cs-num--s" x={46 + (i % 2) * 152} y={136 + Math.floor(i / 2) * 92}>{k.value}</text>
+              <text class="cs-pinet cs-s" x={46 + (i % 2) * 152} y={154 + Math.floor(i / 2) * 92}>{k.note}</text>
+            </g>
+          ))}
+          <rect class="cs-tile" x="32" y="268" width="296" height="150" rx="10" />
+          <text class="cs-v cs-s" x="46" y="290">Today</text>
+          {feed.slice(0, 3).map((f, i) => (
+            <g>
+              <circle class={`cs-av cs-av--${f.tone}`} cx="58" cy={316 + i * 34} r="11" />
+              <text class:list={['cs-ini cs-ini--s', f.tone === 'c' && 'cs-ini--light']} x="58" y={319 + i * 34} text-anchor="middle">{f.ini}</text>
+              <text class="cs-v cs-s" x="76" y={314 + i * 34}>{f.who}</text>
+              <text class="cs-m cs-s" x="76" y={326 + i * 34}>{f.what}</text>
+            </g>
+          ))}
+          <rect class="cs-pill" x="116" y="424" width="228" height="26" rx="13" />
+          <text class="cs-pillt cs-pillt--s" x="230" y="441" text-anchor="middle">Every number entered once</text>
+        </svg>
+      </div>
+    </div>
+
+    <input class="cmp__range" type="range" min="0" max="100" value="50" step="1" aria-label="Compare: drag left to see today, right to see with Evenmont" data-compare-range />
+    <div class="cmp__handle" aria-hidden="true">
+      <span class="cmp__knob" set:html={`<svg viewBox="0 0 24 24" width="22" height="22">${icons['move-horizontal']}</svg>`} />
+    </div>
+    <span class="cmp__label cmp__label--before" aria-hidden="true">Today</span>
+    <span class="cmp__label cmp__label--after" aria-hidden="true">With Evenmont</span>
+  </div>
+  <figcaption class="visually-hidden">
+    Today: margins in a spreadsheet full of errors, invoices in an inbox, 43 unreconciled bank transactions and sticky notes.
+    With Evenmont: one system with live margin, a three-day close, 99.2% stock accuracy and the accountant working in it.
+  </figcaption>
+</figure>
+
+<script>
+  document.querySelectorAll<HTMLElement>('[data-compare]').forEach((fig) => {
+    const range = fig.querySelector<HTMLInputElement>('[data-compare-range]');
+    if (!range) return;
+    range.addEventListener('input', () => {
+      fig.classList.add('is-drag');
+      fig.style.setProperty('--p', `${range.value}%`);
+    });
+  });
+</script>
+
+<style is:global>
+  .cmp {
+    --p: 50%;
+    margin: 0;
+  }
+  .cmp__stage {
+    position: relative;
+    aspect-ratio: 360 / 460;
+    overflow: hidden;
+    border-radius: 20px;
+    border: 1px solid var(--border);
+    box-shadow: 0 24px 48px -24px rgba(20, 32, 28, 0.35);
+    isolation: isolate;
+  }
+  .cmp__layer,
+  .cmp__after,
+  .cmp__after-inner {
+    position: absolute;
+    inset: 0;
+  }
+  .cmp__after {
+    overflow: hidden;
+    transform: translateX(var(--p));
+  }
+  .cmp__after-inner {
+    transform: translateX(calc(-1 * var(--p)));
+  }
+  .cmp__svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+    font-family: var(--font-sans);
+    font-variant-numeric: tabular-nums;
+  }
+  .cmp__svg--wide {
+    display: none;
+  }
+  .cmp__handle {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    transform: translateX(var(--p));
+  }
+  .cmp__handle::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: -1.5px;
+    width: 3px;
+    background-color: var(--surface);
+    box-shadow: 0 0 0 1px rgba(20, 32, 28, 0.12);
+  }
+  .cmp__knob {
+    position: absolute;
+    top: 50%;
+    left: -24px;
+    display: grid;
+    place-items: center;
+    width: 48px;
+    height: 48px;
+    margin-top: -24px;
+    border-radius: 50%;
+    background-color: var(--accent);
+    color: var(--on-accent);
+    border: 3px solid var(--surface);
+    box-shadow: 0 6px 16px rgba(20, 32, 28, 0.25);
+  }
+  .cmp__knob svg {
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+  .cmp__range {
+    position: absolute;
+    inset: 0;
+    z-index: 3;
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    opacity: 0;
+    cursor: ew-resize;
+    touch-action: pan-y;
+  }
+  .cmp__range:focus-visible + .cmp__handle .cmp__knob {
+    outline: 3px solid var(--focus);
+    outline-offset: 3px;
+  }
+  .cmp__label {
+    position: absolute;
+    top: var(--space-4);
+    z-index: 2;
+    padding: 6px 12px;
+    border-radius: var(--radius-pill);
+    font-size: var(--fs-xs);
+    font-weight: 800;
+    pointer-events: none;
+  }
+  .cmp__label--before {
+    left: var(--space-4);
+    background-color: rgba(20, 32, 28, 0.72);
+    color: var(--em-sand);
+  }
+  .cmp__label--after {
+    right: var(--space-4);
+    background-color: var(--heading);
+    color: var(--em-sand);
+  }
+  @media (min-width: 640px) {
+    .cmp__stage {
+      aspect-ratio: 1000 / 560;
+    }
+    .cmp__svg--wide {
+      display: block;
+    }
+    .cmp__svg--tall {
+      display: none;
+    }
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .js .cmp:not(.is-in) {
+      --p: 86%;
+    }
+    .cmp:not(.is-drag) :is(.cmp__after, .cmp__after-inner, .cmp__handle) {
+      transition: transform 1.2s var(--ease-settle) 0.25s;
+    }
+  }
+
+  /* scene colors */
+  .cs-desk { fill: color-mix(in srgb, var(--surface-alt) 78%, var(--text) 6%); }
+  .cs-clean { fill: var(--bg); }
+  .cs-win { fill: var(--surface); stroke: var(--border); }
+  .cs-shadow { fill: rgba(20, 32, 28, 0.1); }
+  .cs-shadow--soft { fill: rgba(20, 32, 28, 0.06); }
+  .cs-bar,
+  .cs-head { fill: color-mix(in srgb, var(--surface-alt) 60%, var(--surface)); }
+  .cs-dot { fill: var(--text-muted); opacity: 0.35; }
+  .cmp text { font-size: 13px; font-weight: 600; }
+  .cmp .cs-t { fill: var(--text-muted); font-size: 12px; font-weight: 700; }
+  .cs-m { fill: var(--text-muted); }
+  .cs-v { fill: var(--text); }
+  .cmp .cs-v { font-weight: 700; }
+  .cmp .cs-s { font-size: 11.5px; }
+  .cs-neg { fill: var(--error); }
+  .cmp .cs-big { font-size: 38px; font-weight: 800; }
+  .cs-grid { fill: none; stroke: var(--border); }
+  .cs-hi { fill: color-mix(in srgb, var(--rule) 32%, var(--surface)); }
+  .cs-sage { fill: var(--surface-alt); }
+  .cs-amber-soft { fill: color-mix(in srgb, var(--rule) 45%, var(--surface)); }
+  .cmp .cs-ini { fill: var(--heading); font-size: 10.5px; font-weight: 800; }
+  .cmp .cs-ini--s { font-size: 8.5px; }
+  .cmp .cs-ini--light { fill: var(--em-sand); }
+  .cs-unread { fill: var(--link); }
+  .cs-bad { fill: color-mix(in srgb, var(--error) 8%, var(--surface)); stroke: color-mix(in srgb, var(--error) 45%, transparent); }
+  .cmp .cs-badt { fill: var(--error); font-size: 10.5px; font-weight: 800; }
+  .cs-bubble { fill: var(--surface); stroke: var(--border); }
+  .cs-bubble--alt { fill: color-mix(in srgb, var(--surface-alt) 70%, var(--surface)); }
+  .cs-note { fill: color-mix(in srgb, var(--rule) 48%, var(--surface)); }
+  .cs-note--sage { fill: color-mix(in srgb, var(--surface-alt) 85%, var(--surface)); }
+  .cmp .cs-hand { fill: var(--text); font-size: 17px; font-weight: 700; }
+  .cmp .cs-hand--s { font-size: 13px; }
+  .cs-ever { fill: var(--heading); }
+  .cs-amber { fill: var(--rule); }
+  .cs-pine { fill: var(--link); }
+  .cs-pine-soft { fill: color-mix(in srgb, var(--link) 60%, var(--surface)); }
+  .cs-track { fill: color-mix(in srgb, var(--surface-alt) 70%, var(--surface)); }
+  .cmp .cs-brand { fill: var(--text); font-size: 15px; font-weight: 800; }
+  .cmp .cs-brand--s { font-size: 13px; }
+  .cs-search { fill: var(--bg); stroke: var(--border); }
+  .cs-ico { fill: none; stroke: var(--text); stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+  .cs-ico--m { stroke: var(--text-muted); }
+  .cs-ico--on { stroke: var(--heading); }
+  .cs-navon { fill: var(--surface-alt); }
+  .cs-nav { fill: var(--text-muted); }
+  .cmp .cs-nav.is-on { fill: var(--heading); font-weight: 800; }
+  .cmp .cs-h { fill: var(--heading); font-size: 20px; font-weight: 800; }
+  .cs-tile { fill: var(--surface); stroke: var(--border); }
+  .cmp .cs-num { fill: var(--heading); font-family: var(--font-display); font-size: 30px; font-weight: 600; }
+  .cmp .cs-num--s { font-size: 26px; }
+  .cs-pinet { fill: var(--link); }
+  .cs-av--a { fill: var(--surface-alt); }
+  .cs-av--b { fill: color-mix(in srgb, var(--rule) 55%, var(--surface)); }
+  .cs-av--c { fill: var(--heading); }
+  .cs-live { fill: var(--surface-alt); }
+  .cmp .cs-livet { fill: var(--link); font-size: 11.5px; font-weight: 800; }
+  .cs-pill { fill: var(--rule); }
+  .cmp .cs-pillt { fill: var(--on-accent); font-size: 12.5px; font-weight: 800; }
+  .cmp .cs-pillt--s { font-size: 11.5px; }
+</style>

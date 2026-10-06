@@ -1,0 +1,302 @@
+---
+/**
+ * Final CTA (Evergreen) with quiet peaks, the call agenda as a card resting on the level
+ * line (desktop), and the readiness-checklist capture. Client pages only.
+ */
+import SumLine from '../SumLine.astro';
+import Button from '../Button.astro';
+import Form from '../forms/Form.astro';
+import Field from '../forms/Field.astro';
+import QuietPeaks from '../illustrations/QuietPeaks.astro';
+import Avatar from '../Avatar.astro';
+import Icon from '../Icon.astro';
+import { settings } from '../../lib/site';
+import { getTerms } from '../../lib/terms';
+import '../../styles/tone-light.css';
+
+interface Props {
+  /** Heading before and after the underlined phrase. */
+  before?: string;
+  sum?: string;
+  after?: string;
+  cta?: { label: string; href: string };
+  /** A second, quieter action (e.g. "Talk to this client" on a case). */
+  secondary?: { label: string; href: string };
+  checklist?: boolean;
+}
+const terms = await getTerms();
+const {
+  before = 'Let’s see if',
+  sum = 'everything adds up',
+  after = 'for you.',
+  cta = { label: terms.fmt('Book a {fitCallShort} fit call'), href: '/book' },
+  secondary,
+  checklist = true,
+} = Astro.props;
+const [f1, f2] = settings.founders;
+const firstName = (n: string) => n.split(' ')[0];
+// The same three steps as "What happens on the call" on /book.
+const agenda = [
+  { t: '0–10 min', text: 'We learn how you work.' },
+  { t: '10–20 min', text: 'We tell you honestly if Odoo fits.' },
+  { t: '20–30 min', text: 'You leave with next steps, even if we’re not the right partner.' },
+];
+---
+
+<section class="final tone-dark" data-final-cta data-sticky-hide>
+  <QuietPeaks />
+  <div class="container final__inner">
+    <div class="final__copy">
+      <h2 class="final__title">{before} <SumLine text={sum} /> {after}</h2>
+      <div class="btn-row btn-row--stack final__actions">
+        <Button href={cta.href} arrow>{cta.label}</Button>
+        {
+          secondary && (
+            <Button href={secondary.href} variant="secondary">
+              {secondary.label}
+            </Button>
+          )
+        }
+      </div>
+      {
+        checklist && (
+          <details class="final__checklist">
+            <summary>Not ready to talk? Get the Odoo readiness checklist</summary>
+            <Form
+              name="readiness-checklist"
+              submitLabel="Send me the checklist"
+              successTitle="Thank you."
+              successText="We’ll email you the checklist."
+              compact
+            >
+              <Field form="readiness-checklist" name="email" label="Work email" type="email" required autocomplete="email" inputmode="email" />
+            </Form>
+          </details>
+        )
+      }
+    </div>
+    <aside class="final__call tone-light" aria-labelledby="final-call-title" data-reveal>
+      <div class="final__call-head">
+        <span class="final__call-icon">
+          <Icon name="video" size={20} />
+        </span>
+        <p>
+          <strong id="final-call-title">{terms.fmt('The {fitCallLong} fit call')}</strong>
+          <span>On video · US business hours</span>
+        </p>
+        <span class="final__call-free">Free</span>
+      </div>
+      <ol class="final__call-steps" role="list">
+        {
+          agenda.map((a) => (
+            <li>
+              <span class="final__call-t">{a.t}</span>
+              <span>{a.text}</span>
+            </li>
+          ))
+        }
+      </ol>
+      <p class="final__people">
+        <span class="final__faces" aria-hidden="true">
+          <Avatar name={f1.name} size={40} tone={1} />
+          <Avatar name={f2.name} size={40} tone={3} />
+        </span>
+        <span>You’ll talk to {firstName(f1.name)} or {firstName(f2.name)} — a founder, not a sales team.</span>
+      </p>
+    </aside>
+  </div>
+</section>
+
+<style is:global>
+  .final {
+    position: relative;
+    overflow: hidden;
+    isolation: isolate;
+    padding-block: var(--section-y) calc(var(--section-y) + 32vw);
+  }
+  @media (min-width: 768px) {
+    .final {
+      padding-bottom: var(--section-y);
+    }
+  }
+  .final__inner {
+    display: grid;
+    gap: var(--space-6);
+  }
+  .final__copy {
+    display: grid;
+    gap: var(--space-6);
+    justify-items: start;
+    align-content: start;
+  }
+  .final__title {
+    max-width: 16em;
+    font-size: clamp(2rem, 1.5rem + 2.4vw, 3.25rem);
+    line-height: 1.12;
+  }
+  .final__checklist {
+    width: min(100%, 440px);
+  }
+  .final__checklist summary {
+    display: inline-flex;
+    align-items: center;
+    min-height: var(--tap);
+    color: var(--link);
+    font-weight: 700;
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 0.2em;
+    cursor: pointer;
+    list-style: none;
+  }
+  .final__checklist summary::-webkit-details-marker {
+    display: none;
+  }
+  .final__checklist summary:hover {
+    text-decoration-thickness: 2px;
+  }
+  .final__checklist[open] summary {
+    margin-bottom: var(--space-4);
+  }
+
+  /* The call agenda: a light card. On desktop it rests on the level line of the peaks. */
+  .final__call {
+    display: grid;
+    gap: var(--space-4);
+    width: min(100%, 440px);
+    padding: var(--space-5);
+    border-radius: 18px;
+    background-color: var(--surface);
+    box-shadow: 0 30px 60px -30px rgba(0, 0, 0, 0.55);
+  }
+  .final__call-head {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    align-items: center;
+    gap: var(--space-3);
+    padding-bottom: var(--space-4);
+    border-bottom: 1px solid var(--border);
+  }
+  .final__call-icon {
+    display: grid;
+    place-items: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 12px;
+    background-color: var(--heading);
+    color: var(--em-sand);
+  }
+  .final__call-head p {
+    display: grid;
+    line-height: 1.3;
+  }
+  .final__call-head strong {
+    color: var(--heading);
+    font-weight: 800;
+  }
+  .final__call-head p span {
+    color: var(--text-muted);
+    font-size: var(--fs-xs);
+    font-weight: 600;
+  }
+  .final__call-free {
+    padding: 4px 10px;
+    border-radius: var(--radius-pill);
+    background-color: var(--surface-alt);
+    color: var(--heading);
+    font-size: var(--fs-xs);
+    font-weight: 800;
+  }
+  .final__call-steps {
+    display: grid;
+    gap: var(--space-3);
+    counter-reset: none;
+  }
+  .final__call-steps li {
+    position: relative;
+    display: grid;
+    grid-template-columns: 76px minmax(0, 1fr);
+    gap: var(--space-3);
+    align-items: baseline;
+    font-weight: 700;
+    color: var(--text);
+    line-height: 1.4;
+  }
+  .final__call-t {
+    color: var(--link);
+    font-size: var(--fs-xs);
+    font-weight: 800;
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+  }
+  .final__people {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    padding-top: var(--space-4);
+    border-top: 1px solid var(--border);
+    color: var(--text-muted);
+    font-size: var(--fs-small);
+    font-weight: 600;
+    line-height: 1.4;
+  }
+  .final__faces {
+    display: inline-flex;
+    flex: none;
+  }
+  .final__faces .avatar {
+    border: 2px solid var(--surface);
+  }
+  .final__faces .avatar + .avatar {
+    margin-left: -10px;
+  }
+  @media (max-width: 1023.98px) {
+    /* One column: the agenda follows the button, the checklist comes last. */
+    .final__copy {
+      display: contents;
+    }
+    .final__title {
+      margin-bottom: 0;
+    }
+    .final__call {
+      order: 1;
+    }
+    .final__checklist {
+      order: 2;
+    }
+  }
+  @media (min-width: 1024px) {
+    /* Peaks width (see QuietPeaks) in vw so the card can be sized and placed from it. */
+    .final {
+      --pw: min(40vw, 520px);
+      --cw: 0.88;
+      /* The content ends on the top edge of the level line (y = 2 of 50, viewBox 120 wide). */
+      padding-bottom: calc(var(--pw) * 0.4 - 1px);
+    }
+    .final .quiet-peaks {
+      width: var(--pw);
+    }
+    .final__inner {
+      grid-template-columns: minmax(0, 1fr) auto;
+      align-items: end;
+      gap: var(--space-8);
+    }
+    .final__copy {
+      align-self: center;
+      padding-bottom: var(--space-6);
+    }
+    .final__call {
+      width: calc(var(--pw) * var(--cw));
+      margin-right: calc(var(--pw) * (1 - var(--cw)) / 2);
+      border-end-start-radius: 0;
+      border-end-end-radius: 0;
+      /* No drop shadow: it would shade the level line the card stands on. */
+      box-shadow: none;
+    }
+  }
+  @media (min-width: 1200px) {
+    .final {
+      --cw: 0.8;
+    }
+  }
+</style>

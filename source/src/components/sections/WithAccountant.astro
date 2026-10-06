@@ -1,0 +1,226 @@
+---
+/**
+ * "Built with your accountant, not around them." — two role cards with photos (people at
+ * work), the spirit level settling between them, and an accountant's quote from a case.
+ * Photos are placeholders (see placeholders.json).
+ */
+import { Picture } from 'astro:assets';
+import { getCollection } from 'astro:content';
+import Section from '../Section.astro';
+import SpiritLevel from '../illustrations/SpiritLevel.astro';
+import LinkArrow from '../LinkArrow.astro';
+import Icon from '../Icon.astro';
+import Avatar from '../Avatar.astro';
+import Stars from '../Stars.astro';
+import accountantPhoto from '../../assets/placeholders/accountant-desk.jpg';
+import teamPhoto from '../../assets/placeholders/team-building.jpg';
+import type { IconName } from '../../icons/lucide';
+
+const roles: { title: string; photo: ImageMetadata; alt: string; icon: IconName; items: { icon: IconName; text: string }[] }[] = [
+  {
+    title: 'Your accountant',
+    photo: accountantPhoto,
+    alt: 'An accountant at her desk with stacks of client files and a laptop',
+    icon: 'calculator',
+    items: [
+      { icon: 'book-open', text: 'Owns the chart of accounts' },
+      { icon: 'file-signature', text: 'Signs off on the setup' },
+      { icon: 'message-square', text: 'Keeps advising' },
+    ],
+  },
+  {
+    title: 'Evenmont',
+    photo: teamPhoto,
+    alt: 'Hands typing on a laptop on a white desk, a notebook beside it',
+    icon: 'layers',
+    items: [
+      { icon: 'layers', text: 'Builds and integrates the system' },
+      { icon: 'database', text: 'Migrates data' },
+      { icon: 'graduation-cap', text: 'Trains the team' },
+      { icon: 'life-buoy', text: 'Supports it' },
+    ],
+  },
+];
+const quoted = (await getCollection('cases')).find((c) => c.data.accountantQuote);
+const q = quoted?.data.accountantQuote;
+---
+
+<Section id="accountant" title="Built with your accountant, not around them." intro="The books stay with the person who knows them. We build the system around their rules.">
+  <div class="balance">
+    {
+      roles.map((role, i) => (
+        <article class="role card" style={`order:${i === 0 ? 0 : 2}`}>
+          <div class="role__photo">
+            <Picture
+              src={role.photo}
+              alt={role.alt}
+              widths={[480, 720, 960]}
+              sizes="(min-width: 1100px) 440px, (min-width: 900px) 40vw, calc(100vw - 2 * clamp(20px, 4vw, 40px))"
+              formats={['avif', 'webp']}
+              loading="lazy"
+              decoding="async"
+              data-placeholder="true"
+            />
+            <span class="role__tag">
+              <Icon name={role.icon} size={18} />
+              {role.title}
+            </span>
+          </div>
+          <h3 class="visually-hidden">{role.title}</h3>
+          <ul class="role__list" role="list">
+            {role.items.map((item) => (
+              <li>
+                <span class="role__icon">
+                  <Icon name={item.icon} size={18} />
+                </span>
+                {item.text}
+              </li>
+            ))}
+          </ul>
+        </article>
+      ))
+    }
+    <div class="balance__level">
+      <SpiritLevel />
+    </div>
+  </div>
+  {
+    q && quoted && (
+      <figure class="balance__quote" data-reveal>
+        <Stars size={16} />
+        <blockquote>
+          <p>“{q.text}”</p>
+        </blockquote>
+        <figcaption>
+          <Avatar name={q.name} size={44} />
+          <span>
+            <strong>{q.name}</strong>
+            {q.firm} · accountant for {quoted.data.company}
+          </span>
+        </figcaption>
+      </figure>
+    )
+  }
+  <p class="balance__link">
+    <LinkArrow href="/partners">Are you an accountant? See the partner program</LinkArrow>
+  </p>
+</Section>
+
+<style is:global>
+  .balance {
+    display: grid;
+    gap: var(--space-5);
+    align-items: center;
+  }
+  .balance__level {
+    order: 1;
+    padding-block: var(--space-2);
+  }
+  .role {
+    display: flex;
+    flex-direction: column;
+    padding: 0;
+    overflow: hidden;
+  }
+  .role > * + * {
+    margin-top: 0;
+  }
+  .role__photo {
+    position: relative;
+    aspect-ratio: 16 / 9;
+  }
+  .role__photo picture {
+    display: block;
+    height: 100%;
+  }
+  .role__photo img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .role__tag {
+    position: absolute;
+    left: var(--space-4);
+    bottom: var(--space-4);
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    padding: 8px 14px;
+    border-radius: var(--radius-pill);
+    background-color: var(--surface);
+    color: var(--heading);
+    font-weight: 800;
+    box-shadow: 0 8px 20px -8px rgba(20, 32, 28, 0.45);
+  }
+  .role__tag .icon {
+    color: var(--link);
+  }
+  .role__list {
+    display: grid;
+    gap: var(--space-3);
+    padding: var(--space-5);
+    font-weight: 700;
+  }
+  .role__list li {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+  }
+  .role__icon {
+    display: grid;
+    place-items: center;
+    width: 36px;
+    height: 36px;
+    flex: none;
+    border-radius: 10px;
+    background-color: var(--surface-alt);
+    color: var(--heading);
+  }
+  .balance__quote {
+    display: grid;
+    gap: var(--space-3);
+    max-width: 52rem;
+    margin: var(--space-7) auto 0;
+    text-align: center;
+    justify-items: center;
+  }
+  .balance__quote blockquote {
+    margin: 0;
+  }
+  .balance__quote blockquote p {
+    max-width: none;
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: clamp(1.375rem, 1.1rem + 1vw, 1.875rem);
+    line-height: 1.3;
+    color: var(--heading);
+  }
+  .balance__quote figcaption {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    text-align: left;
+    color: var(--text-muted);
+    font-size: var(--fs-small);
+    line-height: 1.4;
+  }
+  .balance__quote strong {
+    display: block;
+    color: var(--text);
+  }
+  .balance__link {
+    max-width: none;
+    margin-top: var(--space-6);
+    text-align: center;
+  }
+  @media (min-width: 900px) {
+    .balance {
+      grid-template-columns: minmax(0, 1fr) minmax(180px, 220px) minmax(0, 1fr);
+      gap: var(--space-5);
+      align-items: stretch;
+    }
+    .balance__level {
+      align-self: center;
+    }
+  }
+</style>

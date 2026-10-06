@@ -1,0 +1,133 @@
+---
+/** /cases — case studies index with CSS-only scenario filter chips (works without JS). */
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PageHero from '../../components/PageHero.astro';
+import CaseCard from '../../components/CaseCard.astro';
+import Icon from '../../components/Icon.astro';
+import FinalCta from '../../components/sections/FinalCta.astro';
+import Stars from '../../components/Stars.astro';
+import { settings } from '../../lib/site';
+
+const scenarios = (await getCollection('scenarios')).sort((a, b) => a.data.order - b.data.order);
+const cases = (await getCollection('cases')).sort((a, b) => a.data.order - b.data.order);
+const nameOf = (id: string) => scenarios.find((s) => s.id === id)?.data.name ?? id;
+const filters = [{ id: 'all', label: 'All' }, ...scenarios.map((s) => ({ id: s.id, label: s.data.tab }))];
+---
+
+<BaseLayout
+  title="Case studies | Evenmont"
+  description="Odoo projects for service firms, distributors and manufacturers: what changed, how long it took, and the numbers measured against the Blueprint."
+>
+  <PageHero eyebrow="Cases" title="Case studies" lead="What changed, how long it took, and the numbers — measured against the Blueprint.">
+    <p class="cases-proof">
+      <Stars value={Number(settings.proof.rating.value)} size={18} />
+      <strong>{settings.proof.rating.value}</strong>
+      <span>from {settings.proof.rating.count} client reviews on {settings.proof.rating.source}</span>
+    </p>
+  </PageHero>
+
+  <section class="section cases-index">
+    <div class="container">
+      <fieldset class="filter">
+        <legend class="filter__legend">Filter by scenario</legend>
+        <div class="filter__chips">
+          {
+            filters.map((f, i) => (
+              <Fragment>
+                <input class="filter__input" type="radio" name="scenario" id={`filter-${f.id}`} value={f.id} checked={i === 0} />
+                <label class="chip filter__chip" for={`filter-${f.id}`}>
+                  <Icon name="check" size={18} class="filter__check" />
+                  {f.label}
+                </label>
+              </Fragment>
+            ))
+          }
+        </div>
+      </fieldset>
+
+      <div class="cases-list" data-reveal-children>
+        {cases.map((entry, i) => <CaseCard entry={entry} scenarioName={nameOf(entry.data.scenario)} headingLevel="h2" eager={i === 0} />)}
+      </div>
+    </div>
+  </section>
+
+  <FinalCta />
+</BaseLayout>
+
+<style>
+  .cases-proof {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-2);
+    margin-top: var(--space-5);
+    color: var(--text-muted);
+    font-weight: 600;
+  }
+  .cases-proof strong {
+    color: var(--heading);
+    font-weight: 800;
+  }
+  .filter {
+    margin: 0 0 var(--space-6);
+    padding: 0;
+    border: 0;
+  }
+  .filter__legend {
+    margin-bottom: var(--space-3);
+    padding: 0;
+    color: var(--text-muted);
+    font-size: var(--fs-small);
+    font-weight: 700;
+  }
+  .filter__chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+  }
+  .filter__input {
+    position: absolute;
+    opacity: 0;
+    width: 1px;
+    height: 1px;
+    margin: 0;
+  }
+  .filter__chip {
+    cursor: pointer;
+  }
+  .filter__chip :global(.filter__check) {
+    display: none;
+  }
+  .filter__input:checked + .filter__chip {
+    border-color: var(--heading);
+    background-color: var(--heading);
+    color: var(--bg);
+  }
+  .filter__input:checked + .filter__chip :global(.filter__check) {
+    display: inline-block;
+  }
+  .filter__input:focus-visible + .filter__chip {
+    outline: 2px solid var(--focus);
+    outline-offset: 2px;
+  }
+  .cases-list {
+    display: grid;
+    gap: var(--space-5);
+  }
+  @media (min-width: 768px) {
+    .cases-list {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+  @media (min-width: 1024px) {
+    .cases-list {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+  .cases-index:has(#filter-services:checked) :global(.case-card:not([data-scenario='services'])),
+  .cases-index:has(#filter-distribution:checked) :global(.case-card:not([data-scenario='distribution'])),
+  .cases-index:has(#filter-manufacturing:checked) :global(.case-card:not([data-scenario='manufacturing'])) {
+    display: none;
+  }
+</style>

@@ -1,0 +1,212 @@
+---
+/**
+ * Proof band under the hero: a floating card that overlaps the hero edge — client rating
+ * with stars, certification seals, two delivery promises — then the client wordmarks.
+ * DEMO: rating, certifications and logos come from settings.proof / the demo cases.
+ */
+import Icon from '../Icon.astro';
+import Stars from '../Stars.astro';
+import Seal from '../illustrations/Seal.astro';
+import ClientLogo from '../illustrations/ClientLogo.astro';
+import { getCollection } from 'astro:content';
+import { settings } from '../../lib/site';
+import type { IconName } from '../../icons/lucide';
+
+const cases = (await getCollection('cases')).sort((a, b) => a.data.order - b.data.order);
+const { rating, certifications } = settings.proof;
+const sealIcons: Record<string, IconName> = { partner: 'shield-check', functional: 'badge-check', technical: 'code-xml' };
+const promises: { icon: IconName; text: string }[] = [
+  { icon: 'calculator', text: 'Built with your accountant' },
+  { icon: 'receipt-text', text: 'Fixed price per phase, in writing' },
+];
+---
+
+<section class="trust" aria-label="Why teams trust us">
+  <div class="container">
+    <div class="trust__card" data-reveal>
+      <div class="trust__rating">
+        <p class="trust__score num">{rating.value}</p>
+        <div>
+          <Stars value={Number(rating.value)} size={20} />
+          <p class="trust__rating-text">Average of {rating.count} client reviews on {rating.source}</p>
+        </div>
+      </div>
+      <ul class="trust__seals" role="list">
+        {
+          certifications.map((c) => (
+            <li>
+              <Seal id={c.id} ring={c.ring} center={c.center} icon={sealIcons[c.id]} />
+              <span>{c.caption}</span>
+            </li>
+          ))
+        }
+      </ul>
+      <ul class="trust__promises" role="list">
+        {
+          promises.map((p) => (
+            <li>
+              <span class="trust__promise-icon"><Icon name={p.icon} size={22} /></span>
+              {p.text}
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+    <div class="trust__clients">
+      <p class="trust__label">Teams we’ve put on one system</p>
+      <ul class="trust__logos" role="list" aria-label="Recent clients">
+        {
+          cases.map((c) => (
+            <li>
+              <a href={`/cases/${c.id}`} class="trust__logo">
+                <ClientLogo name={c.data.company} />
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </div>
+</section>
+
+<style is:global>
+  .trust {
+    position: relative;
+    z-index: 2;
+    margin-top: calc(-1 * var(--space-8));
+    padding-bottom: var(--space-7);
+  }
+  .trust__card {
+    display: grid;
+    gap: var(--space-6);
+    padding: var(--space-6) var(--space-5);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    background-color: var(--surface);
+    box-shadow: 0 2px 4px rgba(20, 32, 28, 0.04), 0 24px 48px -12px rgba(20, 32, 28, 0.18);
+  }
+  .trust__rating {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+  }
+  .trust__score {
+    font-size: 3.5rem;
+    line-height: 1;
+    color: var(--heading);
+  }
+  .trust__rating-text {
+    margin-top: var(--space-2);
+    max-width: 16em;
+    color: var(--text-muted);
+    font-size: var(--fs-small);
+    font-weight: 600;
+    line-height: 1.4;
+  }
+  .trust__seals {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--space-3);
+    --seal: 88px;
+  }
+  .trust__seals li {
+    display: grid;
+    justify-items: center;
+    gap: var(--space-2);
+    text-align: center;
+    color: var(--text);
+    font-size: var(--fs-xs);
+    font-weight: 700;
+    line-height: 1.3;
+  }
+  .trust__promises {
+    display: grid;
+    gap: var(--space-3);
+    font-size: var(--fs-small);
+    font-weight: 700;
+    line-height: 1.35;
+  }
+  .trust__promises li {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+  }
+  .trust__promise-icon {
+    display: grid;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    flex: none;
+    border-radius: 12px;
+    background-color: var(--surface-alt);
+    color: var(--heading);
+  }
+  .trust__clients {
+    display: grid;
+    gap: var(--space-3);
+    margin-top: var(--space-6);
+  }
+  .trust__label {
+    color: var(--text-muted);
+    font-size: var(--fs-small);
+    font-weight: 700;
+  }
+  .trust__logos {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--space-2) var(--space-4);
+  }
+  .trust__logo {
+    display: flex;
+    align-items: center;
+    min-height: var(--tap);
+    color: color-mix(in srgb, var(--text) 72%, transparent);
+    transition: color var(--dur-1) var(--ease-out);
+  }
+  .trust__logo:hover {
+    color: var(--heading);
+  }
+  .trust__logo .client-logo {
+    max-width: 100%;
+    color: inherit;
+  }
+  @media (min-width: 768px) {
+    .trust__card {
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      padding: var(--space-6);
+    }
+    .trust__seals {
+      grid-column: 1 / -1;
+      grid-row: 2;
+      --seal: 96px;
+    }
+    .trust__logos {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+  @media (min-width: 1100px) {
+    .trust {
+      margin-top: calc(-1 * var(--space-9) + var(--space-3));
+    }
+    .trust__card {
+      grid-template-columns: auto minmax(0, 1fr) auto;
+      align-items: center;
+      gap: var(--space-7);
+      padding: var(--space-6) var(--space-7);
+    }
+    .trust__seals {
+      grid-column: auto;
+      grid-row: auto;
+      padding-inline: var(--space-6);
+      border-inline: 1px solid var(--border);
+    }
+    .trust__clients {
+      grid-template-columns: auto minmax(0, 1fr);
+      align-items: center;
+      gap: var(--space-6);
+    }
+    .trust__logos {
+      grid-template-columns: repeat(6, minmax(0, 1fr));
+    }
+  }
+</style>

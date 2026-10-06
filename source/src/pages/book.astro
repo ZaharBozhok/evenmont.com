@@ -1,0 +1,351 @@
+---
+/** /book — book a fit call: booking link {{BOOKING_URL}} (Odoo Appointments) + fallback form. */
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PageHero from '../components/PageHero.astro';
+import Section from '../components/Section.astro';
+import Button from '../components/Button.astro';
+import Icon from '../components/Icon.astro';
+import T from '../components/T.astro';
+import FitCallForm from '../components/forms/FitCallForm.astro';
+import Avatar from '../components/Avatar.astro';
+import { settings } from '../lib/site';
+import { getTerms } from '../lib/terms';
+import { isPlaceholder } from '../lib/text';
+
+const terms = await getTerms();
+const bookingUrl = settings.links.bookingUrl;
+const canEmbed = !isPlaceholder(bookingUrl) && bookingUrl.startsWith('https://');
+// "demo" (pre-release preview): an in-page slot picker stands in for Odoo Appointments.
+const demoSlots = bookingUrl === 'demo';
+const times = ['10:00 AM', '11:30 AM', '1:00 PM', '2:30 PM', '4:00 PM'];
+const steps = [
+  'We learn how you work.',
+  'We tell you honestly if Odoo fits.',
+  'You leave with next steps, even if we’re not the right partner.',
+];
+---
+
+<BaseLayout
+  title="Book a 30-minute fit call | Evenmont"
+  description="A free 30-minute call during US business hours: we learn how you work, tell you honestly if Odoo fits, and you leave with next steps."
+  stickyCta={false}
+>
+  <PageHero eyebrow="Fit call" title={terms.fmt('Book a {fitCallLong} fit call.')} sum="fit call.">
+    <div class="book__meta">
+      <p class="book__people">
+        <span class="book__faces" aria-hidden="true">
+          <Avatar name={settings.founders[0].name} size={44} tone={1} />
+          <Avatar name={settings.founders[1].name} size={44} tone={3} />
+        </span>
+        <span>You’ll meet {settings.founders[0].name.split(' ')[0]} or {settings.founders[1].name.split(' ')[0]} — a founder, not a sales team.</span>
+      </p>
+      <p class="book__tz"><Icon name="clock" size={20} />Calls run during US business hours.</p>
+    </div>
+  </PageHero>
+
+  <Section id="call" title="What happens on the call">
+    <ol class="book__steps" role="list">
+      {
+        steps.map((step, i) => (
+          <li class="card">
+            <span class="book__num num">{i + 1}</span>
+            <p>{step}</p>
+          </li>
+        ))
+      }
+    </ol>
+  </Section>
+
+  <Section id="booking" title="Pick a time" tone="alt">
+    <div class="booking">
+      <div class="booking__cal card">
+        <Icon name="calendar" size={32} />
+        <p class="lead">Choose a slot that suits you in our calendar.</p>
+        {
+          demoSlots ? (
+            <div class="slots" data-slots>
+              <p class="slots__tz">Times in US Eastern · {terms.vars.fitCall}</p>
+              <div class="slots__days" role="group" aria-label="Day" data-slot-days>
+                {[0, 1, 2, 3, 4].map((i) => (
+                  <button class="slots__day" type="button" aria-pressed={i === 0 ? 'true' : 'false'} data-day={i}>
+                    <span class="slots__dow">—</span>
+                    <span class="slots__date">—</span>
+                  </button>
+                ))}
+              </div>
+              <div class="slots__times" role="group" aria-label="Time" data-slot-times>
+                {times.map((t) => (
+                  <button class="slots__time" type="button" aria-pressed="false" data-time={t}>
+                    {t}
+                  </button>
+                ))}
+              </div>
+              <p class="slots__picked" role="status" data-slot-picked />
+            </div>
+          ) : (
+            <Button href={bookingUrl} arrow data-booking-link>
+              Open the booking calendar
+            </Button>
+          )
+        }
+        {
+          canEmbed && (
+            <div class="booking__embed" data-booking-embed data-src={bookingUrl}>
+              <button class="btn btn--secondary" type="button" data-booking-show>
+                Show the calendar on this page
+              </button>
+            </div>
+          )
+        }
+        <p class="booking__contact muted">
+          Prefer email? <a href={`mailto:${settings.contact.email}`}><T v={settings.contact.email} /></a> · Phone (US):
+          <T v={settings.contact.phoneUs} />
+        </p>
+      </div>
+      <div class="booking__form card">
+        <h3>Or send us a few details</h3>
+        <p class="muted booking__form-intro">We’ll reply by email to find a time.</p>
+        <FitCallForm />
+      </div>
+    </div>
+  </Section>
+</BaseLayout>
+
+<script>
+  // Demo slot picker (pre-release): next five business days, a few slots "taken" per day.
+  // Picking a time writes it into the fit-call form, so the request carries it.
+  const slots = document.querySelector<HTMLElement>('[data-slots]');
+  if (slots) {
+    const days: Date[] = [];
+    const d = new Date();
+    while (days.length < 5) {
+      d.setDate(d.getDate() + 1);
+      if (d.getDay() % 6 !== 0) days.push(new Date(d));
+    }
+    const dayButtons = Array.from(slots.querySelectorAll<HTMLButtonElement>('[data-day]'));
+    const timeButtons = Array.from(slots.querySelectorAll<HTMLButtonElement>('[data-time]'));
+    const picked = slots.querySelector<HTMLElement>('[data-slot-picked]');
+    const form = document.querySelector<HTMLFormElement>('form[data-form="fit-call"]');
+    let field = form?.querySelector<HTMLInputElement>('input[name="preferred_time"]');
+    if (form && !field) {
+      field = document.createElement('input');
+      field.type = 'hidden';
+      field.name = 'preferred_time';
+      form.append(field);
+    }
+    let day = 0;
+    const label = (date: Date, opts: Intl.DateTimeFormatOptions) => date.toLocaleDateString('en-US', opts);
+    const renderTimes = () => {
+      timeButtons.forEach((b, i) => {
+        const taken = (days[day].getDate() + i) % 4 === 0;
+        b.disabled = taken;
+        b.setAttribute('aria-pressed', 'false');
+        b.title = taken ? 'Taken' : '';
+      });
+    };
+    dayButtons.forEach((b, i) => {
+      b.querySelector('.slots__dow')!.textContent = label(days[i], { weekday: 'short' });
+      b.querySelector('.slots__date')!.textContent = label(days[i], { month: 'short', day: 'numeric' });
+      b.addEventListener('click', () => {
+        day = i;
+        dayButtons.forEach((x) => x.setAttribute('aria-pressed', String(x === b)));
+        renderTimes();
+      });
+    });
+    timeButtons.forEach((b) =>
+      b.addEventListener('click', () => {
+        timeButtons.forEach((x) => x.setAttribute('aria-pressed', String(x === b)));
+        const text = `${label(days[day], { weekday: 'long', month: 'long', day: 'numeric' })}, ${b.dataset.time} ET`;
+        if (field) field.value = text;
+        if (picked) picked.textContent = `Selected: ${text}. Add your details and send the request.`;
+      }),
+    );
+    renderTimes();
+  }
+
+  // Click-to-load facade: the third-party booking iframe loads only when asked for.
+  document.querySelectorAll<HTMLElement>('[data-booking-embed]').forEach((box) => {
+    box.querySelector('[data-booking-show]')?.addEventListener('click', () => {
+      const frame = document.createElement('iframe');
+      frame.src = box.dataset.src ?? '';
+      frame.title = 'Booking calendar';
+      frame.loading = 'lazy';
+      frame.className = 'booking__frame';
+      box.replaceChildren(frame);
+    });
+  });
+</script>
+
+<style>
+  .book__meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-4) var(--space-7);
+    margin-top: var(--space-6);
+  }
+  .book__people {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    color: var(--text);
+    font-weight: 700;
+  }
+  .book__faces {
+    display: inline-flex;
+    flex: none;
+  }
+  .book__faces :global(.avatar) {
+    border: 2px solid var(--bg);
+  }
+  .book__faces :global(.avatar + .avatar) {
+    margin-left: -10px;
+  }
+  .book__tz {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    color: var(--text-muted);
+    font-weight: 600;
+  }
+  .book__steps {
+    display: grid;
+    gap: var(--space-4);
+  }
+  .book__steps li {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    gap: var(--space-4);
+    align-items: center;
+  }
+  .book__steps li > * + * {
+    margin-top: 0;
+  }
+  .book__steps p {
+    font-size: var(--fs-h3);
+    font-weight: 700;
+    line-height: var(--lh-snug);
+    color: var(--heading);
+  }
+  .book__num {
+    display: grid;
+    place-items: center;
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background-color: var(--surface-alt);
+    color: var(--heading);
+    font-size: 1.5rem;
+  }
+  @media (min-width: 900px) {
+    .book__steps {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: var(--space-5);
+    }
+    .book__steps li {
+      grid-template-columns: minmax(0, 1fr);
+      align-items: start;
+    }
+  }
+  .booking {
+    display: grid;
+    gap: var(--space-5);
+    align-items: start;
+  }
+  .booking__cal {
+    display: grid;
+    gap: var(--space-4);
+    justify-items: start;
+  }
+  .booking__cal > * + * {
+    margin-top: 0;
+  }
+  .booking__cal :global(.icon) {
+    color: var(--link);
+  }
+  .booking__embed {
+    width: 100%;
+  }
+  .booking__embed :global(.booking__frame) {
+    display: block;
+    width: 100%;
+    height: 720px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-btn);
+    background-color: var(--surface);
+  }
+  .slots {
+    display: grid;
+    gap: var(--space-4);
+    width: 100%;
+  }
+  .slots__tz {
+    color: var(--text-muted);
+    font-size: var(--fs-small);
+    font-weight: 600;
+  }
+  .slots__days {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: var(--space-2);
+  }
+  .slots__day,
+  .slots__time {
+    min-height: var(--tap);
+    border: 1px solid var(--field-border);
+    border-radius: var(--radius-btn);
+    background-color: var(--surface);
+    color: var(--text);
+    font-weight: 700;
+  }
+  .slots__day {
+    display: grid;
+    padding: var(--space-2) 0;
+    line-height: 1.25;
+  }
+  .slots__dow {
+    color: var(--text-muted);
+    font-size: var(--fs-xs);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+  .slots__times {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--space-2);
+  }
+  .slots__day[aria-pressed='true'],
+  .slots__time[aria-pressed='true'] {
+    border-color: var(--heading);
+    background-color: var(--heading);
+    color: var(--bg);
+  }
+  .slots__day[aria-pressed='true'] .slots__dow {
+    color: inherit;
+  }
+  .slots__time:disabled {
+    border-style: dashed;
+    color: var(--text-muted);
+    text-decoration: line-through;
+    cursor: not-allowed;
+  }
+  .slots__picked {
+    font-weight: 700;
+    color: var(--success);
+  }
+  .slots__picked:empty {
+    display: none;
+  }
+  .booking__contact {
+    font-size: var(--fs-small);
+  }
+  .booking__form-intro {
+    margin-bottom: var(--space-5);
+  }
+  @media (min-width: 1024px) {
+    .booking {
+      grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+      gap: var(--space-6);
+    }
+  }
+</style>

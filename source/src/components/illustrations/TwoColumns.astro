@@ -1,0 +1,129 @@
+---
+/**
+ * #13 Two columns, one total — two short ledger columns fade up, one double line draws
+ * across both, then a single "Balanced" label appears. Neutral values, no money figures.
+ */
+import '../../styles/tone-light.css';
+const firm = ['Books', 'Advice', 'Client relationship'];
+const evenmont = ['System', 'Migration', 'Support'];
+---
+
+<figure
+  class="twocol tone-light"
+  data-animate
+  role="img"
+  aria-label="Your firm keeps the books, the advice and the client relationship. Evenmont handles the system, migration and support. Balanced."
+>
+  <div class="twocol__cols" aria-hidden="true">
+    {
+      [
+        { head: 'Your firm', rows: firm },
+        { head: 'Evenmont', rows: evenmont },
+      ].map((col, i) => (
+        <div class="twocol__col fade-up" style={`--i:${i}`}>
+          <p class="twocol__head">{col.head}</p>
+          <ul role="list">
+            {col.rows.map((row) => (
+              <li>
+                <span>{row}</span>
+                <svg viewBox="0 0 24 24" class="twocol__check" focusable="false">
+                  <path d="M5 12.5l4.2 4.2L19 7" />
+                </svg>
+              </li>
+            ))}
+          </ul>
+        </div>
+      ))
+    }
+  </div>
+  <div class="twocol__total" aria-hidden="true"><span></span><span></span></div>
+  <p class="twocol__label" aria-hidden="true">Balanced</p>
+</figure>
+
+<style is:global>
+  .twocol {
+    margin: 0;
+    padding: var(--space-5);
+    border-radius: var(--radius-card);
+    background-color: var(--bg);
+    box-shadow: var(--shadow-card);
+  }
+  .twocol__cols {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--space-4);
+  }
+  .twocol__head {
+    padding-bottom: var(--space-2);
+    border-bottom: 1px solid var(--border);
+    color: var(--heading);
+    font-weight: 700;
+    font-size: var(--fs-small);
+  }
+  .twocol__col li {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-2);
+    min-height: 40px;
+    border-bottom: 1px solid var(--border);
+    font-size: var(--fs-small);
+    font-weight: 600;
+    color: var(--text);
+  }
+  .twocol__check {
+    flex: none;
+    width: 18px;
+    height: 18px;
+    fill: none;
+    stroke: var(--success);
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+  .twocol__total {
+    display: grid;
+    gap: 5px;
+    margin-top: var(--space-4);
+  }
+  .twocol__total span {
+    display: block;
+    height: 5px;
+    border-radius: 999px;
+    background-color: var(--accent);
+    transform-origin: left center;
+  }
+  .twocol__label {
+    margin-top: var(--space-3);
+    text-align: right;
+    color: var(--heading);
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 1.25rem;
+  }
+  @media (min-width: 768px) {
+    .twocol {
+      padding: var(--space-6);
+    }
+    .twocol__cols {
+      gap: var(--space-6);
+    }
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .js .twocol:not(.is-in) .twocol__total span {
+      transform: scaleX(0);
+    }
+    .js .twocol:not(.is-in) .twocol__label {
+      opacity: 0;
+    }
+    .js .twocol__total span {
+      transition: transform var(--dur-3) var(--ease-out) 450ms;
+    }
+    .js .twocol__total span + span {
+      transition-delay: 570ms;
+    }
+    .js .twocol__label {
+      transition: opacity var(--dur-3) var(--ease-out) 1000ms;
+    }
+  }
+</style>

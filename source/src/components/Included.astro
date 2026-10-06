@@ -1,0 +1,65 @@
+---
+/** "In every project": what every scenario includes, as a row of icon chips. */
+import Icon from './Icon.astro';
+import type { IconName } from '../icons/lucide';
+
+const items: { icon: IconName; text: string }[] = [
+  { icon: 'database-backup', text: 'Migration from QuickBooks and spreadsheets' },
+  { icon: 'calculator', text: 'Accounting set up with your accountant' },
+  { icon: 'plug', text: 'Integrations: Avalara, payments, storefronts' },
+  { icon: 'puzzle', text: 'Custom modules' },
+  { icon: 'globe', text: 'Client portals and mobile apps' },
+  { icon: 'graduation-cap', text: 'Training' },
+  { icon: 'life-buoy', text: 'Managed Odoo' },
+];
+---
+
+<div class="included">
+  <p class="included__title">In every project</p>
+  <ul class="included__list" role="list">
+    {
+      items.map((item) => (
+        <li>
+          <Icon name={item.icon} size={16} />
+          {item.text}
+        </li>
+      ))
+    }
+  </ul>
+</div>
+
+<style is:global>
+  .included {
+    display: grid;
+    gap: var(--space-3);
+    margin-top: var(--space-7);
+    padding-top: var(--space-5);
+    border-top: 1px solid var(--border);
+  }
+  .included__title {
+    color: var(--text-muted);
+    font-size: var(--fs-small);
+    font-weight: 800;
+  }
+  .included__list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+  }
+  .included__list li {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    border-radius: var(--radius-pill);
+    border: 1px solid var(--border);
+    background-color: var(--surface);
+    color: var(--heading);
+    font-size: var(--fs-xs);
+    font-weight: 700;
+  }
+  .included__list .icon {
+    flex: none;
+    color: var(--link);
+  }
+</style>
