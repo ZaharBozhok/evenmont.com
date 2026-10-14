@@ -1,0 +1,40 @@
+---
+/**
+ * Short request form: first and last name, work email, phone (optional), what they need
+ * (checkboxes) and a few words (optional). Used in the final CTA and on /book.
+ */
+import Form from './Form.astro';
+import Field from './Field.astro';
+
+interface Props {
+  /** Form name: prefixes the field ids and is sent as the hidden "form" value. */
+  name?: string;
+  submitLabel?: string;
+  compact?: boolean;
+}
+const { name: f = 'request', submitLabel = 'Send a request', compact = false } = Astro.props;
+const needs = ['Consultation', 'Odoo implementation', 'Customization', 'Something else'];
+---
+
+<Form name={f} submitLabel={submitLabel} successTitle="Thank you." successText="We’ll email you to find a time for the call." compact={compact}>
+  <div class="form__row form__row--2">
+    <Field form={f} name="first_name" label="First name" required autocomplete="given-name" />
+    <Field form={f} name="last_name" label="Last name" required autocomplete="family-name" />
+  </div>
+  <Field form={f} name="email" label="Work email" type="email" required autocomplete="email" inputmode="email" />
+  <Field form={f} name="phone" label="Phone" type="tel" optional autocomplete="tel" inputmode="tel" maxlength={40} />
+  <fieldset class="choice">
+    <legend class="field__label">What do you need?</legend>
+    <div class="choice__options">
+      {
+        needs.map((need) => (
+          <label class="choice__option">
+            <input type="checkbox" name="need" value={need} />
+            <span>{need}</span>
+          </label>
+        ))
+      }
+    </div>
+  </fieldset>
+  <Field form={f} name="message" label="In a few words" optional maxlength={300} />
+</Form>

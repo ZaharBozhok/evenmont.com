@@ -2,36 +2,6 @@
   "$comment": "Every placeholder image, mock and file on the site. Each one carries data-placeholder=\"true\" in the HTML. Replace the file (or component), then set status to \"replaced\" — the build warning lists everything that is still open.",
   "items": [
     {
-      "slot": "Scenario card — Services & projects",
-      "page": "/",
-      "file": "src/assets/placeholders/scenario-services.jpg",
-      "ratio": "4:3",
-      "source": "https://www.pexels.com/photo/a-group-of-people-having-a-meeting-in-the-office-7651804/",
-      "license": "Pexels License",
-      "replaceWith": "A real client team (agency or consultancy) at work, natural light",
-      "status": "placeholder"
-    },
-    {
-      "slot": "Scenario card — Distribution & e-commerce",
-      "page": "/",
-      "file": "src/assets/placeholders/scenario-distribution.jpg",
-      "ratio": "4:3",
-      "source": "https://www.pexels.com/photo/photo-of-a-man-scanning-products-in-a-warehouse-4483942/",
-      "license": "Pexels License",
-      "replaceWith": "A client warehouse: shelves and barcode scanning",
-      "status": "placeholder"
-    },
-    {
-      "slot": "Scenario card — Light manufacturing",
-      "page": "/",
-      "file": "src/assets/placeholders/scenario-manufacturing.jpg",
-      "ratio": "4:3",
-      "source": "https://www.pexels.com/photo/workers-handling-detail-by-pneumatic-tool-in-workshop-3846262/",
-      "license": "Pexels License",
-      "replaceWith": "A client workshop or small assembly line",
-      "status": "placeholder"
-    },
-    {
       "slot": "Case cover — Fieldwork Collective (demo case)",
       "page": "/, /services, /cases, /cases/fieldwork-collective",
       "file": "src/assets/placeholders/case-services.jpg",
@@ -112,28 +82,8 @@
       "status": "placeholder"
     },
     {
-      "slot": "Home “Built with your accountant” — accountant card",
-      "page": "/",
-      "file": "src/assets/placeholders/accountant-desk.jpg",
-      "ratio": "16:9",
-      "source": "https://www.pexels.com/photo/7654448/",
-      "license": "Pexels License",
-      "replaceWith": "A partner accountant at work (with permission), or a neutral desk shot",
-      "status": "placeholder"
-    },
-    {
-      "slot": "Home “Built with your accountant” — Evenmont card",
-      "page": "/",
-      "file": "src/assets/placeholders/team-building.jpg",
-      "ratio": "16:9",
-      "source": "https://www.pexels.com/photo/5940721/",
-      "license": "Pexels License",
-      "replaceWith": "The Evenmont team configuring a real system",
-      "status": "placeholder"
-    },
-    {
-      "slot": "Founders photo (home “Who we are” and /about)",
-      "page": "/, /about",
+      "slot": "Founders photo (“Who we are” on /about)",
+      "page": "/about",
       "file": "src/assets/placeholders/founders-at-work.jpg",
       "ratio": "4:5",
       "source": "https://www.pexels.com/photo/12899155/",
@@ -149,16 +99,6 @@
       "source": "Invented for the preview",
       "license": "—",
       "replaceWith": "The real review score and count (with a link to the source), real certification counts; the official Odoo partner badge file",
-      "status": "placeholder"
-    },
-    {
-      "slot": "Founders’ signatures on the guarantees certificate",
-      "page": "/",
-      "file": "src/components/sections/Guarantees.astro (two drawn SVG paths)",
-      "ratio": "—",
-      "source": "Drawn placeholders",
-      "license": "—",
-      "replaceWith": "Real signatures (SVG traced from a scan), or remove the signature row",
       "status": "placeholder"
     },
     {

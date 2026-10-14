@@ -16,7 +16,6 @@ import Timeline from '../components/Timeline.astro';
 import PackageCard from '../components/PackageCard.astro';
 import Faq from '../components/sections/Faq.astro';
 import FinalCta from '../components/sections/FinalCta.astro';
-import NotAFit from '../components/sections/NotAFit.astro';
 import ScreenMock from '../components/illustrations/ScreenMock.astro';
 import PainVisual from '../components/illustrations/PainVisual.astro';
 import Icon from '../components/Icon.astro';
@@ -162,18 +161,6 @@ const screen = { services: 'projects', distribution: 'inventory', manufacturing:
       <LinkArrow href="/#pricing">All packages</LinkArrow>
     </div>
   </Section>
-
-  {
-    s.id === 'manufacturing' && (
-      <NotAFit
-        tight
-        items={[
-          'You need validated manufacturing for pharma or medical devices.',
-          'You run several plants and need advanced production scheduling.',
-        ]}
-      />
-    )
-  }
 
   <Faq id={s.id} />
   <FinalCta />

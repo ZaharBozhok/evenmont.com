@@ -69,8 +69,6 @@ prices, fees and timelines come from the brief and are still ⚑ to confirm.
 | “Sound familiar?” screens (`PainVisual.astro`) | Nine small problem screens with demo figures and annotations (“Found 34 days after close”, “Day 11 of the close” …) |
 | “What changes” slider (`CompareSlider.astro`) | Both scenes: the spreadsheet `Margins_Q3_v12_FINAL.xlsx`, inbox and chat on the left; the dashboard (38.4% margin, Day 3 close, 99.2% stock accuracy, “Good morning, Maya”, the activity feed) on the right |
 | Calculator (`Calculator.astro`) | “Where those hours usually go” examples |
-| Guarantees (`Guarantees.astro`) | The founders’ signatures (drawn SVG placeholders) |
-| Founders (`Founders.astro`) | Working hours: Evenmont 3 am–1 pm ET (10:00–20:00 in Limassol), overlap 9 am–1 pm ET |
 | Final CTA (`FinalCta.astro`) | The call agenda split into 0–10 / 10–20 / 20–30 min (the three steps from `/book`) |
 | `/about` | The three-step story (“We built a software company …”) and the numbers band (`proof.stats`) |
 | Product screens (`ScreenMock.astro`) | Project names, people, orders and costs in the SVG screens |
@@ -85,10 +83,9 @@ prices, fees and timelines come from the brief and are still ⚑ to confirm.
 
 Stock photos (Pexels License) stand in for real photography; every one is listed in
 `src/content/placeholders.json` with its source and what to replace it with. New for the preview:
-three extra case covers, the founder video poster, and four photos of people at work — the Blueprint
-workshop (home “How we work”), the accountant and Evenmont cards (“Built with your accountant”) and
-the founders photo (home “Who we are” and `/about`). The founders photo matters most: replace it with
-a real photo of both founders.
+three extra case covers, the founder video poster, and two photos of people at work — the Blueprint
+workshop (home “How we work”) and the founders photo (“Who we are” on `/about`). The founders photo
+matters most: replace it with a real photo of both founders.
 
 Founders are shown as initials avatars (no stock faces, on purpose). Add real portraits via
 `quote.photo` (cases) and the `Avatar` component.

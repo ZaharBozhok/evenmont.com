@@ -1,0 +1,62 @@
+---
+/**
+ * CTA band on the home page, roughly every second screen: one short line and one button
+ * that leads to the request form at the end of the page. Placed at the end of a section
+ * (inherits its spacing), or between sections with `standalone`.
+ */
+import Button from './Button.astro';
+
+interface Props {
+  title: string;
+  label: string;
+  href?: string;
+  standalone?: boolean;
+}
+const { title, label, href = '#request', standalone = false } = Astro.props;
+---
+
+<div class:list={['cta-band-wrap', standalone && 'container cta-band-wrap--standalone']}>
+  <div class="cta-band tone-dark ledger" data-reveal>
+    <p class="cta-band__title">{title}</p>
+    <Button href={href} arrow>{label}</Button>
+  </div>
+</div>
+
+<style is:global>
+  .cta-band-wrap {
+    margin-top: var(--space-8);
+  }
+  .cta-band-wrap--standalone {
+    margin-top: 0;
+  }
+  .cta-band {
+    display: grid;
+    gap: var(--space-5);
+    justify-items: start;
+    padding: var(--space-6) var(--space-5);
+    border-radius: 20px;
+    overflow: hidden;
+  }
+  .cta-band__title {
+    max-width: 22em;
+    font-family: var(--font-display);
+    font-size: clamp(1.5rem, 1.25rem + 1.2vw, 2.125rem);
+    font-weight: 600;
+    line-height: 1.2;
+    letter-spacing: var(--tracking-display);
+    color: var(--heading);
+  }
+  @media (max-width: 479.98px) {
+    .cta-band .btn {
+      width: 100%;
+    }
+  }
+  @media (min-width: 768px) {
+    .cta-band {
+      grid-template-columns: minmax(0, 1fr) auto;
+      align-items: center;
+      gap: var(--space-7);
+      padding: var(--space-7) var(--space-8);
+    }
+  }
+</style>

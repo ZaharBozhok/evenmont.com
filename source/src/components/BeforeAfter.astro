@@ -1,94 +1,151 @@
 ---
 /**
- * Before → after as change cards: an icon, today's way (struck through, muted) and what
- * it becomes with Evenmont (bold). Cards rise in as they scroll into view.
+ * Before → after in two columns: how it works today (left, muted) and with Evenmont
+ * (right, bold), one row per change so each pair reads together. On phones the rows
+ * stack and each line gets a small Before / After label. Rows rise in as they scroll into view.
  */
 import Icon from './Icon.astro';
-import type { IconName } from '../icons/lucide';
 
 interface Props {
-  rows: { today: string; after: string; icon?: string }[];
+  rows: { today: string; after: string }[];
   caption?: string;
   class?: string;
 }
 const { rows, caption = 'Today compared with Evenmont', class: className } = Astro.props;
 ---
 
-<ul class:list={['changes-grid', className]} role="list" aria-label={caption} data-reveal-children>
-  {
-    rows.map((row) => (
-      <li class="change">
-        <span class="change__icon" aria-hidden="true">
-          <Icon name={(row.icon ?? 'check') as IconName} size={22} />
-        </span>
-        <p class="change__today">
-          <span class="visually-hidden">Today: </span>
-          <s>{row.today}</s>
-        </p>
-        <p class="change__after">
-          <span class="visually-hidden">With Evenmont: </span>
-          {row.after}
-        </p>
-      </li>
-    ))
-  }
-</ul>
+<div class:list={['ba', className]}>
+  <div class="ba__heads" aria-hidden="true">
+    <span class="ba__head ba__head--before"><Icon name="circle-x" size={20} />Before</span>
+    <span class="ba__head ba__head--after"><Icon name="circle-check" size={20} />After, with Evenmont</span>
+  </div>
+  <ul class="ba__rows" role="list" aria-label={caption} data-reveal-children>
+    {
+      rows.map((row) => (
+        <li class="ba__row">
+          <p class="ba__before">
+            <Icon name="circle-x" size={18} />
+            <span>
+              <span class="ba__tag">Before</span> {row.today}
+            </span>
+          </p>
+          <p class="ba__after">
+            <Icon name="circle-check" size={18} />
+            <span>
+              <span class="ba__tag">After</span> {row.after}
+            </span>
+          </p>
+        </li>
+      ))
+    }
+  </ul>
+</div>
 
 <style is:global>
-  .changes-grid {
-    display: grid;
-    gap: var(--space-3);
-  }
-  .change {
-    display: grid;
-    grid-template-columns: auto minmax(0, 1fr);
-    column-gap: var(--space-4);
-    row-gap: var(--space-1);
-    align-content: start;
-    padding: var(--space-4);
+  .ba {
+    overflow: hidden;
     border: 1px solid var(--border);
     border-radius: var(--radius-card);
     background-color: var(--surface);
   }
-  .change__icon {
-    grid-row: span 2;
+  .ba__heads {
+    display: none;
+  }
+  .ba__row {
     display: grid;
-    place-items: center;
-    width: 44px;
-    height: 44px;
-    border-radius: 12px;
-    background-color: var(--heading);
-    color: var(--em-sand);
+    gap: var(--space-2);
+    max-width: none;
+    padding: var(--space-4) var(--space-5);
   }
-  .change__icon .icon {
-    stroke-width: 1.75;
+  .ba__row + .ba__row {
+    border-top: 1px solid var(--border);
   }
-  .change__today {
+  .ba__before,
+  .ba__after {
+    display: grid;
+    grid-template-columns: 18px minmax(0, 1fr);
+    gap: var(--space-3);
+    align-items: start;
+    max-width: none;
+    line-height: 1.45;
+  }
+  .ba__before .icon,
+  .ba__after .icon {
+    margin-top: 0.15em;
+  }
+  .ba__before {
     color: var(--text-muted);
     font-size: var(--fs-small);
-    line-height: 1.4;
   }
-  .change__today s {
-    text-decoration-color: color-mix(in srgb, var(--error) 70%, transparent);
-    text-decoration-thickness: 1.5px;
+  .ba__before .icon {
+    color: color-mix(in srgb, var(--error) 75%, var(--text-muted));
   }
-  .change__after {
+  .ba__after {
     color: var(--heading);
     font-weight: 700;
-    line-height: 1.4;
+  }
+  .ba__after .icon {
+    color: var(--success);
+  }
+  /* Phones: a small label before each line. Wider: visually hidden, the column heads show it. */
+  .ba__tag {
+    display: block;
+    margin-bottom: 2px;
+    color: var(--text-muted);
+    font-size: var(--fs-xs);
+    font-weight: 800;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
   }
   @media (min-width: 768px) {
-    .changes-grid {
+    .ba__heads,
+    .ba__row {
+      display: grid;
       grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: var(--space-4);
     }
-    .change {
-      padding: var(--space-5);
+    .ba__head {
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+      padding: var(--space-4) var(--space-6);
+      border-bottom: 1px solid var(--border);
+      font-weight: 800;
     }
-  }
-  @media (min-width: 1100px) {
-    .changes-grid {
-      grid-template-columns: repeat(3, minmax(0, 1fr));
+    .ba__head--before {
+      color: var(--text-muted);
+    }
+    .ba__head--before .icon {
+      color: color-mix(in srgb, var(--error) 75%, var(--text-muted));
+    }
+    .ba__head--after {
+      color: var(--heading);
+      background-color: var(--surface-alt);
+    }
+    .ba__head--after .icon {
+      color: var(--success);
+    }
+    .ba__row {
+      gap: 0;
+      padding: 0;
+    }
+    .ba__before,
+    .ba__after {
+      align-content: center;
+      padding: var(--space-4) var(--space-6);
+    }
+    .ba__before {
+      font-size: var(--fs-body);
+    }
+    .ba__after {
+      background-color: color-mix(in srgb, var(--surface-alt) 45%, var(--surface));
+    }
+    .ba__tag {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      overflow: hidden;
+      clip-path: inset(50%);
+      white-space: nowrap;
     }
   }
 </style>

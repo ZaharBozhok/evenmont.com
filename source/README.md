@@ -88,10 +88,11 @@ Everything marked ⚑ in the site structure lives in **`src/content/terms.json`*
 - `packages` — the seven pricing cards (`price` is a number in USD; `null` + `priceLabel` for "Free" / "After Blueprint").
   Scenario pages pick their package by id (`scenarios.json` → `package`).
 - `process.steps` — the five "How we work" steps (time and price columns) and the 90-day note.
-- `guarantees` — "Our promises, in writing." Each one must exist in the contract.
+- `guarantees` — "Our promises, in writing." (a checklist under the home pricing cards). Each one must exist in the contract.
 - `partner` — fee rate (`feeRate: 0.1` = 10%), "What you get" list, economics examples (totals and fees are calculated).
 - `whiteLabel` — commercials and capacity.
-- `comparison` — the "Why Odoo" table. Qualitative only, no competitor prices. **Please review this wording.**
+- `comparison` — the "Why Odoo" battle card. Not shown on the site any more (kept for sales decks and objection handling).
+  Qualitative only, no competitor prices. **Please review this wording.**
 - `vars` — values reused in copy. Any text in `terms.json` or the FAQ files can say `{hypercare}`, `{buildServices}`,
   `{feePercent}`, … and the value is filled in everywhere. (`feePercent`, `keepPrice` and `blueprintFee` are computed.)
 
@@ -121,7 +122,8 @@ The home page shows the first three cases (by `order`) and puts the one matching
 
 ### Scenario pages
 `src/content/scenarios.json` drives `/services`, `/distribution`, `/manufacturing` and the scenario blocks on the home page
-(hero copy, the three pains, before/after rows, outcomes, apps, integrations, card text, package id, image).
+(hero copy, the three pains, before/after rows, outcomes, apps, integrations, package id). The `card`, `image` and `imageAlt`
+fields are no longer shown: the home scenario cards were removed.
 
 ### Site settings
 **`src/content/settings.json`** holds every value the team provides: legal details, contact, links (booking, form endpoint,
@@ -199,12 +201,12 @@ keyframes so a resize never replays them.
 | 3 | Sum line draw — one continuous sweep across the words | `SumLine.astro` |
 | 4 | Ledger grid fade | `.ledger` in `base.css` (heroes, pricing) |
 | 5 | Scenario icons redraw, cards cross-fade | `illustrations/ScenarioIcon.astro`, `sections/ScenarioSwitcher.astro` |
-| 6 | Before → after: a compare slider (twelve tools ↔ one system; drag or arrow keys, one gentle settle from 86% to 50% on first view) and change cards | `illustrations/CompareSlider.astro`, `BeforeAfter.astro` |
+| 6 | Before → after: a compare slider (twelve tools ↔ one system; drag or arrow keys, one gentle settle from 86% to 50% on first view) and a two-column Before / After list whose rows rise in | `illustrations/CompareSlider.astro`, `BeforeAfter.astro` |
 | 7 | Case card hover lift + sum line | `CaseCard.astro` |
 | 8 | Calculator result fade + bar | `sections/Calculator.astro` |
 | 9 | Timeline draw | `Timeline.astro` |
-| 10 | Spirit level | `illustrations/SpiritLevel.astro` |
-| 11 | Checkmarks draw, then both founders' signatures write themselves once | `sections/Guarantees.astro` |
+| 10 | Spirit level — **removed** with the "Built with your accountant" section (now one line under How we work) | — |
+| 11 | Guarantee checkmarks and signatures — **removed**: the promises are a short checklist under the pricing cards | — |
 | 12 | Quiet peaks | `illustrations/QuietPeaks.astro` |
 | 13 | Two columns, one total | `illustrations/TwoColumns.astro` |
 | 14 | Shield checks | `RiskTable.astro` |
@@ -222,8 +224,9 @@ see every final state immediately (the tokens also zero all durations). Nothing 
 
 ## Forms
 
-Fit call (`/book`), partner intro (`/partners#apply`), white-label scope (`/partners/white-label#scope`) and the readiness
-checklist (final CTA) post to `settings.links.formEndpoint` (later the Odoo website form / CRM).
+The request form (`forms/RequestForm.astro`: first and last name, work email, optional phone, what they need, a few words) —
+in the final CTA of every client page (`#request`) and on `/book` — plus the partner intro (`/partners#apply`) and the
+white-label scope (`/partners/white-label#scope`) post to `settings.links.formEndpoint` (later the Odoo website form / CRM).
 
 - Works without JavaScript (plain POST). With JavaScript: inline validation (text + color), `fetch` submit with
   `Accept: application/json`, inline success state, no page reload. Any 2xx response counts as success.
@@ -265,8 +268,13 @@ Budgets (mobile, Lighthouse simulated 4G) and results are in the QA report. How 
 - **People without fake faces:** testimonial authors, founders and the hero's sign-off toast use monogram avatars — no stock
   faces, because stock models can't be shown endorsing a company. Stock photos appear only as context (people at work, desks,
   warehouses), per the kit's photo rules; each is listed in `placeholders.json`.
-- **Visual first:** problems are shown as small product screens with an accent annotation, changes as a compare slider and icon
-  cards, the comparison as a scorecard, the process as an icon timeline, case results as before/after bars. Copy stays short.
+- **Visual first:** problems are shown as small product screens with an accent annotation, changes as a compare slider and a
+  Before / After list, the process as an icon timeline, case results as before/after bars. Copy stays short.
+- **A shorter home page that converts:** offer → problems → what changes → the cost of the problem (calculator) → cases →
+  process → prices → proof → FAQ → request form. A CTA band (`CtaBand.astro`) sits roughly every second screen and leads to the
+  request form (`#request`). Left out on purpose: the "Why Odoo" battle card (sales decks), fit / not fit lists and the
+  US-hours overlap chart (they disqualify visitors before a first conversation) and the scenario cards (the problem tabs
+  already link to the scenario pages). "Built with your accountant" and the guarantees are folded into short lines.
 - **Demo content, clearly fenced:** for the CEO preview every gap is filled with invented content (cases, quotes, names, legal
   details). It is flagged in the source (`demo: true`, `demo.fields`), listed by every build and in `docs/DEMO-CONTENT.md`, and the
   site stays `noindex` until `prerelease` is turned off. The scenario FAQ answers and the comparison table were written from

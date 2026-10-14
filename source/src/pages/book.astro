@@ -6,7 +6,7 @@ import Section from '../components/Section.astro';
 import Button from '../components/Button.astro';
 import Icon from '../components/Icon.astro';
 import T from '../components/T.astro';
-import FitCallForm from '../components/forms/FitCallForm.astro';
+import RequestForm from '../components/forms/RequestForm.astro';
 import Avatar from '../components/Avatar.astro';
 import { settings } from '../lib/site';
 import { getTerms } from '../lib/terms';
@@ -105,7 +105,7 @@ const steps = [
       <div class="booking__form card">
         <h3>Or send us a few details</h3>
         <p class="muted booking__form-intro">We’ll reply by email to find a time.</p>
-        <FitCallForm />
+        <RequestForm name="fit-call" submitLabel="Request a fit call" />
       </div>
     </div>
   </Section>

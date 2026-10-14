@@ -1,5 +1,8 @@
 ---
-/** "Sound familiar?" — scenario switcher (accessible tabs), 3 pain cards per scenario, each with a problem screen. */
+/**
+ * "The problems we fix" (eyebrow: Sound familiar?) — scenario switcher (accessible tabs),
+ * 3 pain cards per scenario, each with a problem screen.
+ */
 import ScenarioIcon from '../illustrations/ScenarioIcon.astro';
 import PainVisual from '../illustrations/PainVisual.astro';
 import LinkArrow from '../LinkArrow.astro';
@@ -11,7 +14,9 @@ const scenarios = (await getCollection('scenarios')).sort((a, b) => a.data.order
 <section class="section familiar" id="familiar" aria-labelledby="familiar-title">
   <div class="container">
     <div class="section-head">
-      <h2 id="familiar-title">Sound familiar?</h2>
+      <p class="eyebrow">Sound familiar?</p>
+      <h2 id="familiar-title">The problems we fix</h2>
+      <p class="lead">Profit you can’t see, stock you can’t trust and a month-end close that drags on.</p>
     </div>
     <div class="switcher" data-tabs>
       <div class="switcher__tabs" role="tablist" aria-label="Choose a scenario">

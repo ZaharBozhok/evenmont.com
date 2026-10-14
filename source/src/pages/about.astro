@@ -19,7 +19,6 @@ const how: { icon: IconName; title: string; text: string }[] = [
   { icon: 'receipt-text', title: 'Fixed phases', text: 'A fixed price per phase, agreed before the work starts.' },
   { icon: 'calendar', title: 'Weekly demos', text: 'A demo every week, so you see the system take shape.' },
   { icon: 'file-text', title: 'Written updates', text: 'You get a written update every week.' },
-  { icon: 'clock', title: 'US-hours overlap', text: 'Europe-based, with daily overlap with US business hours.' },
 ];
 const values: { icon: IconName; name: string; text: string }[] = [
   { icon: 'scale', name: 'Precision', text: 'Numbers instead of adjectives: a baseline in the Blueprint, results measured after go-live.' },
@@ -98,7 +97,7 @@ const stats = settings.proof.stats;
   <Founders more={false} />
 
   <Section id="how" title="How we work" tone="alt">
-    <ul class="grid grid--4 how" role="list" data-reveal-children>
+    <ul class="grid grid--3 how" role="list" data-reveal-children>
       {
         how.map((item) => (
           <li class="how__item card">

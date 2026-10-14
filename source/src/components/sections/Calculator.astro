@@ -2,9 +2,10 @@
 /**
  * Cost of chaos calculator (#8): people × hours × weeks × rate. On input the result fades
  * (150ms) and a bar scales to the new value (250ms). Numbers change instantly.
+ * A CTA band follows right after it: the cost of the problem is the moment to ask.
  */
 import Section from '../Section.astro';
-import Button from '../Button.astro';
+import CtaBand from '../CtaBand.astro';
 import { getTerms } from '../../lib/terms';
 import { usd } from '../../lib/text';
 import Icon from '../Icon.astro';
@@ -32,7 +33,7 @@ const monthsText = (m: number) =>
   m > 12 ? `≈ ${(m / 12).toFixed(1)} full-time people, all year` : `≈ ${m.toFixed(m % 1 ? 1 : 0)} months of one full-time person, every year`;
 ---
 
-<Section id="calculator" title="What the spreadsheets really cost." tone="alt">
+<Section id="calculator" title="What the spreadsheets really cost.">
   <div class="calc card" data-calc data-weeks={weeks} data-bar-max={BAR_MAX}>
     <div class="calc__side">
       <form class="calc__inputs form" aria-label="Your numbers" novalidate>
@@ -92,9 +93,9 @@ const monthsText = (m: number) =>
       </div>
       <p class="visually-hidden" aria-live="polite" data-calc-live></p>
       <p class="calc__note">A rough estimate. We measure the real number in your Blueprint.</p>
-      <Button href="/book" arrow>Book a fit call</Button>
     </div>
   </div>
+  <CtaBand title="Want to learn more? Book a call with our experts." label="Book a call" />
 </Section>
 
 <script>
@@ -260,9 +261,6 @@ const monthsText = (m: number) =>
   .calc__months-text {
     color: var(--heading);
     font-weight: 700;
-  }
-  .calc__result .btn {
-    justify-self: start;
   }
   @media (max-width: 1023.98px) {
     /* One column: the result follows the inputs; the examples come last. */

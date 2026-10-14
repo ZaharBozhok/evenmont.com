@@ -1,8 +1,12 @@
 ---
-/** Pricing (id="pricing") — ⚑ package cards from terms.json, ledger grid background. */
+/**
+ * Pricing (id="pricing") — ⚑ package cards from terms.json, ledger grid background, and the
+ * ⚑ guarantees ("Our promises, in writing.") as a short checklist under the packages.
+ */
 import Section from '../Section.astro';
 import PackageCard from '../PackageCard.astro';
 import Button from '../Button.astro';
+import Icon from '../Icon.astro';
 import { getTerms } from '../../lib/terms';
 import type { IconName } from '../../icons/lucide';
 
@@ -32,6 +36,21 @@ const card = (id: string) => {
       <PackageCard {...card('custom')} wide />
       <PackageCard {...card('keep')} wide />
     </div>
+  </div>
+  <div class="promises" data-reveal>
+    <h3 class="promises__title">
+      <Icon name="stamp" size={22} />Our promises, in writing.
+    </h3>
+    <ul class="checks promises__list" role="list">
+      {
+        terms.guarantees.map((text) => (
+          <li>
+            <Icon name="check" size={20} />
+            <span>{terms.fmt(text)}</span>
+          </li>
+        ))
+      }
+    </ul>
   </div>
   <div class="pricing__foot">
     <p class="pricing__note">{terms.licensesNote}</p>
@@ -68,6 +87,43 @@ const card = (id: string) => {
   }
   @media (min-width: 1024px) {
     .pricing__row--3 {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+  .promises {
+    display: grid;
+    gap: var(--space-4);
+    margin-top: var(--space-6);
+    padding: var(--space-5);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-card);
+    background-color: var(--surface);
+  }
+  .promises__title {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+  }
+  .promises__title .icon {
+    flex: none;
+    color: var(--link);
+  }
+  .promises__list li {
+    max-width: none;
+    font-weight: 600;
+    line-height: 1.45;
+  }
+  @media (min-width: 768px) {
+    .promises {
+      padding: var(--space-6);
+    }
+    .promises__list {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: var(--space-3) var(--space-6);
+    }
+  }
+  @media (min-width: 1024px) {
+    .promises__list {
       grid-template-columns: repeat(3, minmax(0, 1fr));
     }
   }

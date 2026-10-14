@@ -6,17 +6,14 @@ import ScenarioSwitcher from '../components/sections/ScenarioSwitcher.astro';
 import Section from '../components/Section.astro';
 import BeforeAfter from '../components/BeforeAfter.astro';
 import CompareSlider from '../components/illustrations/CompareSlider.astro';
+import CtaBand from '../components/CtaBand.astro';
 import CasesSection from '../components/sections/CasesSection.astro';
 import Calculator from '../components/sections/Calculator.astro';
-import ScenarioCards from '../components/sections/ScenarioCards.astro';
-import Comparison from '../components/sections/Comparison.astro';
 import Timeline from '../components/Timeline.astro';
-import WithAccountant from '../components/sections/WithAccountant.astro';
+import Icon from '../components/Icon.astro';
+import LinkArrow from '../components/LinkArrow.astro';
 import Pricing from '../components/sections/Pricing.astro';
-import Guarantees from '../components/sections/Guarantees.astro';
 import CheckUs from '../components/sections/CheckUs.astro';
-import NotAFit from '../components/sections/NotAFit.astro';
-import Founders from '../components/sections/Founders.astro';
 import Faq from '../components/sections/Faq.astro';
 import FinalCta from '../components/sections/FinalCta.astro';
 import { Picture } from 'astro:assets';
@@ -24,17 +21,19 @@ import workshop from '../assets/placeholders/blueprint-workshop.jpg';
 import { getTerms } from '../lib/terms';
 import type { IconName } from '../icons/lucide';
 
+// Home: offer → problems → what changes → the cost of the problem → cases → process → prices
+// → proof → FAQ → request form, with a CTA band roughly every second screen.
 const terms = await getTerms();
 const stepIcons: Record<string, IconName> = { 'fit-call': 'video', blueprint: 'map', build: 'layers', 'go-live': 'calendar-check', keep: 'life-buoy' };
 const steps = terms.process.steps.map((s) => ({ name: s.name, get: terms.fmt(s.get), time: terms.fmt(s.time), price: terms.fmt(s.price), icon: stepIcons[s.id] }));
 
 const whatChanges = [
-  { today: 'Twelve tools, copy-paste between them', after: 'One system, every number entered once', icon: 'layers' },
-  { today: 'Profit per project or product is a guess', after: 'Live margin by project, product and customer', icon: 'percent' },
-  { today: 'Stock counts nobody trusts', after: 'Real-time inventory with barcode scanning', icon: 'scan-barcode' },
-  { today: 'Production planned on a whiteboard', after: 'Work orders, bills of materials and real unit costs', icon: 'factory' },
-  { today: 'Contractors paid from email', after: 'Rates, timesheets, invoices and payouts in one flow', icon: 'users' },
-  { today: 'Close drags on', after: 'Close without spreadsheet marathons, together with your accountant', icon: 'calendar-check' },
+  { today: 'Twelve tools, copy-paste between them', after: 'One system, every number entered once' },
+  { today: 'Profit per project or product is a guess', after: 'Live margin by project, product and customer' },
+  { today: 'Stock counts nobody trusts', after: 'Real-time inventory with barcode scanning' },
+  { today: 'Production planned on a whiteboard', after: 'Work orders, bills of materials and real unit costs' },
+  { today: 'Contractors paid from email', after: 'Rates, timesheets, invoices and payouts in one flow' },
+  { today: 'Close drags on', after: 'Close without spreadsheet marathons, together with your accountant' },
 ];
 ---
 
@@ -51,12 +50,11 @@ const whatChanges = [
       <CompareSlider />
       <BeforeAfter rows={whatChanges} caption="What changes: today compared with Evenmont" />
     </div>
+    <CtaBand title="Want one system instead of twelve tools?" label="Book a free call" />
   </Section>
 
-  <CasesSection />
   <Calculator />
-  <ScenarioCards />
-  <Comparison />
+  <CasesSection />
 
   <Section id="process" title="How we work" intro="Five steps, a fixed price for each, and a founder on every one." tone="alt">
     <figure class="process__photo" data-reveal>
@@ -78,21 +76,22 @@ const whatChanges = [
     </figure>
     <Timeline steps={steps} />
     <p class="process__note">{terms.fmt(terms.process.note)}</p>
+    <div class="accountant" data-reveal>
+      <span class="accountant__icon">
+        <Icon name="calculator" size={24} />
+      </span>
+      <div>
+        <h3>Built with your accountant, not around them.</h3>
+        <p>The books stay with the person who knows them. We build the system around their rules.</p>
+      </div>
+      <LinkArrow href="/partners" class="accountant__link">Are you an accountant? See the partner program</LinkArrow>
+    </div>
+    <CtaBand title="Want your process on one page, with a fixed price?" label="Get a quick Blueprint" />
   </Section>
 
-  <WithAccountant />
   <Pricing />
-  <Guarantees />
   <CheckUs />
-  <NotAFit
-    fit={[
-      'You’re a US company with 10–200 people.',
-      'You sell services, distribute products or make them in one plant.',
-      'You want your accountant in the loop, not around it.',
-      'You want to own your system, your code and your data.',
-    ]}
-  />
-  <Founders />
+  <CtaBand standalone title="Questions? Talk to a founder, not a sales team." label="Talk to a founder" />
   <Faq id="home" />
   <FinalCta />
 </BaseLayout>
@@ -158,5 +157,45 @@ const whatChanges = [
     padding-top: var(--space-5);
     border-top: 1px solid var(--border);
     font-weight: 700;
+  }
+  /* "Built with your accountant" folded into one line under the process. */
+  .accountant {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    gap: var(--space-3) var(--space-4);
+    align-items: start;
+    margin-top: var(--space-6);
+    padding: var(--space-5);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-card);
+    background-color: var(--surface);
+  }
+  .accountant__icon {
+    display: grid;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    background-color: var(--heading);
+    color: var(--em-sand);
+  }
+  .accountant p {
+    margin-top: var(--space-1);
+    color: var(--text-muted);
+  }
+  .accountant :global(.accountant__link) {
+    grid-column: 2;
+    padding-block: 0;
+  }
+  @media (min-width: 1024px) {
+    .accountant {
+      grid-template-columns: auto minmax(0, 1fr) auto;
+      align-items: center;
+      gap: var(--space-5);
+      padding: var(--space-5) var(--space-6);
+    }
+    .accountant :global(.accountant__link) {
+      grid-column: 3;
+    }
   }
 </style>
