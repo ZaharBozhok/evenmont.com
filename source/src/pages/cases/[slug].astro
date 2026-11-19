@@ -40,11 +40,11 @@ const terms = await getTerms();
 const snapshot: { label: string; value: string; icon: IconName }[] = [
   { label: 'Industry', value: c.profile.industry, icon: 'building-2' },
   { label: 'Size', value: c.profile.size, icon: 'users' },
-  { label: 'State', value: c.profile.state, icon: 'map-pin' },
+  { label: 'Location', value: c.profile.state, icon: 'map-pin' },
   { label: 'Apps', value: c.apps.join(', '), icon: 'layers' },
   { label: 'Integrations', value: c.integrations.length ? c.integrations.join(', ') : '—', icon: 'plug' },
   { label: 'Timeline', value: c.timeline, icon: 'clock' },
-  { label: 'Pricing model', value: c.pricingModel, icon: 'receipt-text' },
+  ...(c.pricingModel ? [{ label: 'Pricing model', value: c.pricingModel, icon: 'receipt-text' as IconName }] : []),
 ];
 const facts: { icon: IconName; text: string }[] = [
   { icon: 'clock', text: c.timeline },
@@ -80,7 +80,7 @@ const results = c.results.map((r) => {
         <h1 class="hero-title chero__title">{c.headline}</h1>
         <div class="chero__client">
           <span class="chero__logo tone-light">
-            <ClientLogo name={c.company} />
+            <ClientLogo name={c.company} anonymous={c.anonymous} />
             <span class="visually-hidden">{c.company}</span>
           </span>
           <ul class="chero__facts" role="list">
@@ -127,7 +127,7 @@ const results = c.results.map((r) => {
     <div class="container case-layout">
       <aside class="snapshot card card--flat" aria-labelledby="snapshot-title">
         <span class="snapshot__logo">
-          <ClientLogo name={c.company} />
+          <ClientLogo name={c.company} anonymous={c.anonymous} />
         </span>
         <h2 id="snapshot-title" class="snapshot__title">Snapshot</h2>
         <dl class="snapshot__list">
@@ -185,13 +185,15 @@ const results = c.results.map((r) => {
             </li>
           ))}
         </ul>
-        <p class="results__note">{terms.fmt('Measured against the Blueprint baseline, {resultsCheck} after go-live.')}</p>
+        <p class="results__note">{c.resultsNote ?? terms.fmt('Measured against the Blueprint baseline, {resultsCheck} after go-live.')}</p>
       </Section>
     )
   }
 
+  {(c.quote || c.accountantQuote) && (
   <Section id="quote">
-    <div class:list={['quotes', c.accountantQuote && 'quotes--two']}>
+    <div class:list={['quotes', c.quote && c.accountantQuote && 'quotes--two']}>
+      {c.quote && (
       <figure class="pull" data-reveal>
         <Stars size={18} />
         <blockquote>
@@ -202,6 +204,7 @@ const results = c.results.map((r) => {
           <span><strong><T v={c.quote.name} /></strong><br /><T v={`${c.quote.role}, ${c.company}`} /></span>
         </figcaption>
       </figure>
+      )}
       {
         c.accountantQuote && (
           <figure class="pull pull--second" data-reveal>
@@ -229,6 +232,7 @@ const results = c.results.map((r) => {
       }
     </div>
   </Section>
+  )}
 
   {
     c.screenshots.length > 0 && (

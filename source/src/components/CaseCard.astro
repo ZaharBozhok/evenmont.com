@@ -40,7 +40,7 @@ const Heading = headingLevel;
     />
     <span class="case-card__scenario">{scenarioName}</span>
     {c.placeholder && <span class="sample-label case-card__sample">Sample</span>}
-    <span class="case-card__logo"><ClientLogo name={c.company} /></span>
+    <span class="case-card__logo"><ClientLogo name={c.company} anonymous={c.anonymous} /></span>
   </div>
   <div class="case-card__body">
     <Heading class="case-card__result">

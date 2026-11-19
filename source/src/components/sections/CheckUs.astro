@@ -27,7 +27,10 @@ const items: { icon: IconName; title: string; href?: string; text: string; downl
 
 const founder = settings.founders[0];
 const isDemoVideo = settings.links.founderVideoUrl === 'demo';
-const reviews = (await getCollection('cases')).sort((a, b) => a.data.order - b.data.order).slice(3, 6);
+const reviews = (await getCollection('cases'))
+  .filter((c): c is typeof c & { data: { quote: NonNullable<typeof c.data.quote> } } => !!c.data.quote)
+  .sort((a, b) => a.data.order - b.data.order)
+  .slice(3, 6);
 const script = [
   `Hi, I’m ${founder.name.split(' ')[0]}, one of the two founders of Evenmont.`,
   'We implement Odoo for growing US companies — service firms, distributors and small manufacturers — and we start where most partners finish: with the books.',

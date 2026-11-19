@@ -16,6 +16,8 @@ const cases = defineCollection({
       placeholder: z.boolean().default(false),
       /** Invented for the pre-release preview: no label on the site, but listed by the build report. */
       demo: z.boolean().default(false),
+      /** Client under NDA: no wordmark (an "Under NDA" mark instead) and left out of the client logo strip. */
+      anonymous: z.boolean().default(false),
       scenario: scenarioId,
       order: z.number().default(0),
       company: z.string(),
@@ -26,13 +28,17 @@ const cases = defineCollection({
       apps: z.array(z.string()),
       integrations: z.array(z.string()).default([]),
       timeline: z.string(),
-      pricingModel: z.string(),
-      quote: z.object({ text: z.string(), name: z.string(), role: z.string(), photo: image().optional() }),
+      /** Optional: the snapshot row is left out without it. */
+      pricingModel: z.string().optional(),
+      /** Optional: without it the case has no pull quote and is skipped by "What clients wrote". */
+      quote: z.object({ text: z.string(), name: z.string(), role: z.string(), photo: image().optional() }).optional(),
       cover: image(),
       coverAlt: z.string(),
       results: z
         .array(z.object({ metric: z.string(), before: z.string(), after: z.string(), measured: z.string() }))
         .default([]),
+      /** Replaces the default note under the results ("Measured against the Blueprint baseline, …"). */
+      resultsNote: z.string().optional(),
       /** Screens with client data blurred. Without `image`, an on-brand SVG mock of `kind` is shown. */
       screenshots: z
         .array(
