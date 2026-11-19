@@ -12,7 +12,7 @@ import { getCollection } from 'astro:content';
 import { settings } from '../../lib/site';
 import type { IconName } from '../../icons/lucide';
 
-const cases = (await getCollection('cases')).sort((a, b) => a.data.order - b.data.order);
+const cases = (await getCollection('cases', (c) => !c.data.anonymous)).sort((a, b) => a.data.order - b.data.order);
 const { rating, certifications } = settings.proof;
 const sealIcons: Record<string, IconName> = { partner: 'shield-check', functional: 'badge-check', technical: 'code-xml' };
 const promises: { icon: IconName; text: string }[] = [

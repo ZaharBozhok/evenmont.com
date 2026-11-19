@@ -114,8 +114,11 @@ Copy a sample file and edit it:
   **Sample** label. Remove both only for real, approved content.
 - `referenceCall: true` adds the "Talk to this client" button — only with the client's permission.
 - `coDelivery: true` + `accountantQuote` lists the case as partner proof on `/partners`.
+- `anonymous: true` for a client under NDA: an "Under NDA" mark replaces the wordmark and the case is left out of the client logo strip.
+  `quote` and `pricingModel` are optional (a case without a quote has no pull quote and is skipped by "What clients wrote");
+  `resultsNote` replaces the default note under the results.
 - Screenshots: add `image: ../../assets/cases/<file>.png` to a screenshot entry to use a real (blurred) screenshot; without `image`, an on-brand SVG mock is shown.
-- The six current cases are **demo content** (fictional companies, people and numbers) — see `docs/DEMO-CONTENT.md`.
+- `animal-life-sciences-lab.md` is a real project (client under NDA). The six other cases are **demo content** (fictional companies, people and numbers) — see `docs/DEMO-CONTENT.md`.
 
 The home page shows the first three cases (by `order`) and puts the one matching the selected scenario first; cases 4–6 feed
 "What clients wrote" in *Check us*. Scenario pages show that scenario's cases.
