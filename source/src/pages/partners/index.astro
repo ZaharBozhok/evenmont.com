@@ -18,18 +18,22 @@ import Avatar from '../../components/Avatar.astro';
 import Faq from '../../components/sections/Faq.astro';
 import PartnerIntroForm from '../../components/forms/PartnerIntroForm.astro';
 import TwoColumns from '../../components/illustrations/TwoColumns.astro';
-import { settings } from '../../lib/site';
+import { isPublicCase, settings, show } from '../../lib/site';
 import { getTerms } from '../../lib/terms';
 import { usd } from '../../lib/text';
 import type { IconName } from '../../icons/lucide';
+import { service } from '../../lib/schema';
 
 const terms = await getTerms();
 const fmt = terms.fmt;
-const coDelivery = (await getCollection('cases'))
+const coDelivery = (await getCollection('cases', isPublicCase))
   .filter((c) => c.data.coDelivery && c.data.accountantQuote)
   .sort((a, b) => a.data.order - b.data.order)
   .slice(0, 2);
 
+const showSamples = show('downloads.samplePartnerAgreement') && show('downloads.samplePayoutStatement');
+const showFirms = show('partnerFirms') && settings.partnerFirms.length > 0;
+// The proof section is left out when none of its proof is verified yet (the FAQ card has the contact).
 const problems: { icon: IconName; text: string; note: string }[] = [
   { icon: 'trending-up', text: 'Your clients outgrew QuickBooks.', note: 'More people, more stock, more workarounds.' },
   { icon: 'package', text: 'Inventory doesn’t match the books.', note: 'And you’re the one asked to explain the gap.' },
@@ -91,6 +95,8 @@ const clientPromise = [
 ---
 
 <BaseLayout
+  breadcrumb="Partner program"
+  jsonLd={[service(Astro.site!, { id: 'partners', name: 'Odoo partner program for CPAs, bookkeepers and fractional CFOs', description: 'Refer a client or co-deliver Odoo projects with Evenmont: the accountant keeps the client relationship and the books; Evenmont does the technical work.', url: '/partners', audience: 'Accounting firms, bookkeepers and fractional CFOs' })]}
   mood="partner"
   title="Partner program for CPAs & bookkeepers | Evenmont"
   description="Refer a client or co-deliver Odoo projects with us. Fixed-price phases, no quotas, no fees to join — and your client stays your client."
@@ -109,7 +115,7 @@ const clientPromise = [
         </p>
         <div class="btn-row btn-row--stack phero__actions">
           <Button href="#apply">{fmt('Book a {partnerIntroShort} partner intro')}</Button>
-          <Button href={settings.downloads.partnerOnePager} variant="secondary" icon="file-down" download>Get the partner one-pager</Button>
+          {show('downloads.partnerOnePager') && <Button href={settings.downloads.partnerOnePager} variant="secondary" icon="file-down" download>Get the partner one-pager</Button>}
         </div>
       </div>
       <div class="phero__art">
@@ -182,7 +188,7 @@ const clientPromise = [
             Designed around AICPA rules on referral fees: written disclosure for every fee, and a no-fee option for attest
             clients. State rules can be stricter — our agreement asks you to confirm yours.
           </p>
-          <p class="cpa__link"><LinkArrow href={settings.links.cpaRulesNoteUrl}>Read our note on CPA rules</LinkArrow></p>
+          {show('links.cpaRulesNoteUrl') && <p class="cpa__link"><LinkArrow href={settings.links.cpaRulesNoteUrl}>Read our note on CPA rules</LinkArrow></p>}
         </div>
       </div>
       <div class="cpa__media">
@@ -253,7 +259,7 @@ const clientPromise = [
         </p>
         <div class="client__links">
           <LinkArrow href="/">See the site for businesses</LinkArrow>
-          <LinkArrow href={settings.downloads.clientOnePager} download>Download the client one-pager</LinkArrow>
+          {show('downloads.clientOnePager') && <LinkArrow href={settings.downloads.clientOnePager} download>Download the client one-pager</LinkArrow>}
         </div>
       </div>
       <div class="card">
@@ -264,6 +270,7 @@ const clientPromise = [
     </div>
   </Section>
 
+  {(coDelivery.length > 0 || showSamples || showFirms) && (
   <Section id="proof" title="Proof for partners">
     <div class="proofp">
       {
@@ -288,32 +295,43 @@ const clientPromise = [
           </article>
         ))
       }
+      {(showSamples || showFirms) && (
       <article class="proofp__docs card">
-        <h3>Samples to check</h3>
-        <ul class="proofp__list" role="list">
-          <li>
-            <a href={settings.downloads.samplePartnerAgreement} download><Icon name="file-down" />Sample partner agreement (PDF)</a>
-          </li>
-          <li>
-            <a href={settings.downloads.samplePayoutStatement} download><Icon name="file-down" />Sample payout statement (PDF)</a>
-          </li>
-        </ul>
-        <h3 class="proofp__sub">Partner list</h3>
-        <p class="muted proofp__firms-intro">Firms that agreed to be listed:</p>
-        <ul class="proofp__firms" role="list">
-          {settings.partnerFirms.map((firm) => <li>{firm}</li>)}
-        </ul>
+        {showSamples && (
+          <Fragment>
+            <h3>Samples to check</h3>
+            <ul class="proofp__list" role="list">
+              <li>
+                <a href={settings.downloads.samplePartnerAgreement} download><Icon name="file-down" />Sample partner agreement (PDF)</a>
+              </li>
+              <li>
+                <a href={settings.downloads.samplePayoutStatement} download><Icon name="file-down" />Sample payout statement (PDF)</a>
+              </li>
+            </ul>
+          </Fragment>
+        )}
+        {showFirms && (
+          <Fragment>
+            <h3 class="proofp__sub">Partner list</h3>
+            <p class="muted proofp__firms-intro">Firms that agreed to be listed:</p>
+            <ul class="proofp__firms" role="list">
+              {settings.partnerFirms.map((firm) => <li>{firm}</li>)}
+            </ul>
+          </Fragment>
+        )}
       </article>
+      )}
       <article class="proofp__contact card">
-        <Avatar name={settings.partnerContact.name} size={72} />
+        {show('partnerContact.name') && <Avatar name={settings.partnerContact.name} size={72} />}
         <div>
-          <h3><T v={settings.partnerContact.name} /></h3>
-          <p class="muted">{settings.partnerContact.role}</p>
+          <h3>{show('partnerContact.name') ? <T v={settings.partnerContact.name} /> : 'Partnerships'}</h3>
+          <p class="muted">{show('partnerContact.name') ? settings.partnerContact.role : <a href={`mailto:${settings.contact.email}`}>{settings.contact.email}</a>}</p>
           <p class="proofp__reply">{fmt('We reply within {replyTime}.')}</p>
         </div>
       </article>
     </div>
   </Section>
+  )}
 
   <Faq id="partners" />
 
@@ -324,7 +342,7 @@ const clientPromise = [
         <p class="lead">
           {fmt('Tell us about your firm, or book the {partnerIntroShort} intro directly. No quotas, no fees to join.')}
         </p>
-        <Button href={settings.links.partnerBookingUrl === 'demo' ? '/book#booking' : settings.links.partnerBookingUrl} variant="secondary" icon="calendar">{fmt('Book a {partnerIntroShort} partner intro')}</Button>
+        <Button href={settings.links.partnerBookingUrl.startsWith('https://') && show('links.partnerBookingUrl') ? settings.links.partnerBookingUrl : '/book#booking'} variant="secondary" icon="calendar">{fmt('Book a {partnerIntroShort} partner intro')}</Button>
         <p class="apply__alt"><LinkArrow href="/">For businesses</LinkArrow></p>
       </div>
       <div class="apply__form tone-light card">

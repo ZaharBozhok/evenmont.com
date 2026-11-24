@@ -12,6 +12,10 @@
  * shows as is. Decorative: the same message is in the H1 and the sub copy.
  */
 import { icons, type IconName } from '../../icons/lucide';
+import { showUnverified } from '../../lib/site';
+
+// The sign-off toast names a demo accountant in preview builds only; production shows a generic role.
+const signer = showUnverified ? { name: 'Priya Raman, CPA', ini: 'PR' } : { name: 'Your CPA', ini: 'CPA' };
 
 /** Inline scene timing for one part: keyframes, duration, delay, easing. */
 const k = (name: string, t: number, d: number, e?: string) =>
@@ -158,8 +162,8 @@ const mBars = [14, 21, 18, 26, 24, 33, 42];
       <rect class="hs__toast-shadow" x="204" y="4" width="244" height="52" rx="14" />
       <rect class="hs__white" x="200" y="-2" width="244" height="52" rx="14" />
       <circle class="hs__toast-av" cx="226" cy="24" r="15" />
-      <text class="hs__toast-ini" x="226" y="28" text-anchor="middle">PR</text>
-      <text x="250" y="20" font-size="12" font-weight="800">Priya Raman, CPA</text>
+      <text class="hs__toast-ini" x="226" y="28" text-anchor="middle" font-size={signer.ini.length > 2 ? '9' : undefined}>{signer.ini}</text>
+      <text x="250" y="20" font-size="12" font-weight="800">{signer.name}</text>
       <text class="hs__stone" x="250" y="37" font-size="11">Signed off the September close</text>
       <g class="hs__ok" set:html={icon('circle-check', 418, 14, 18)} />
     </g>

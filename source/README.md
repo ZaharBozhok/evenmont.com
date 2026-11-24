@@ -8,10 +8,12 @@ Two audiences, one brand: **clients** (business owners) and **partners** (accoun
 - **Source of truth:** the brand kit, copied into [`brand-kit/`](brand-kit/) (brand guide, site structure, motion spec, placeholder policy, tokens).
 - **QA:** [`docs/qa/QA-REPORT.md`](docs/qa/QA-REPORT.md) — Lighthouse scores, screenshots at 390 px and 1440 px, remaining placeholders.
 
-> **Pre-release preview.** The site is filled end to end with **invented demo content** (six fictional case studies, quotes,
-> founder names, legal details, partner firms, PDFs) so the final look is clear. Everything invented is listed in
-> [`docs/DEMO-CONTENT.md`](docs/DEMO-CONTENT.md) and in the build report. Pre-release mode keeps every page out of search
-> engines (`noindex` + `robots.txt` Disallow) until `settings.prerelease` is set to `false`.
+> **Demo content is fenced.** The preview is filled end to end with **invented demo content** (six fictional case studies,
+> quotes, founder names, legal details, partner firms, PDFs) so the final look is clear. Everything invented is flagged
+> (`settings.json → demo.fields`, `demo: true`) and listed in [`docs/DEMO-CONTENT.md`](docs/DEMO-CONTENT.md),
+> [`docs/CONTENT-AUDIT.md`](docs/CONTENT-AUDIT.md) and the build report.
+> **Production builds** (`SITE_ENV=production`, what GitHub Pages serves) are indexable and render **none** of it;
+> **preview builds** show it and stay `noindex` + `robots.txt` Disallow. See [`docs/SEO-AND-DEPLOYMENT.md`](docs/SEO-AND-DEPLOYMENT.md).
 
 ---
 
@@ -21,32 +23,35 @@ Requires **Node.js 22.12+**.
 
 ```bash
 npm install
-npm run dev        # http://localhost:4321 — live reload
-npm run build      # static site in dist/ (+ placeholder report in the terminal)
-npm run preview    # serve dist/ locally
-npm run check      # TypeScript / Astro diagnostics
+npm run dev               # http://localhost:4321 — live reload (pre-release mode, demo content shown)
+npm run build             # static site in dist/ in the mode of settings.prerelease (+ placeholder report)
+npm run build:production  # the public site: indexable, demo content hidden, then validated (what CI deploys)
+npm run build:preview     # pre-release preview: noindex everywhere, demo content shown, then validated
+npm run validate          # validate the current dist/ (scripts/validate-build.mjs)
+npm run preview           # serve dist/ locally
+npm run check             # TypeScript / Astro diagnostics
 ```
 
 The build prints a **placeholder report**: pre-release status, every piece of demo content (`demo: true` cases and the settings
 in `settings.json → demo.fields`), any `{{TOKEN}}` left, and every placeholder image. It is a warning, not an error.
-`PRERELEASE=false npm run build` makes a launch-mode build (indexable) without editing the settings file.
+The mode comes from `SITE_ENV` (`production` | `preview`), else `PRERELEASE` (`false` = indexable), else `settings.prerelease`.
 
 Downloadable PDFs are generated from the site data: `npm install --no-save playwright-core && node scripts/pdfs/build.mjs`.
 
 QA helpers (optional, not site dependencies): `npm install --no-save playwright-core`, then with `npm run preview` running,
 `node scripts/qa/check-layout.mjs` (no horizontal scroll, one H1, no errors at 320–1440 px) and `node scripts/qa/screenshots.mjs`.
 
-### Deploy (static files)
+### Deploy (GitHub Pages)
 
-| Host | Settings |
-| --- | --- |
-| **Cloudflare Pages** | Build command `npm run build`, output directory `dist`, env `NODE_VERSION=22`. Headers from `public/_headers`. |
-| **Netlify** | `netlify.toml` is included (build + publish dir). Headers from `public/_headers`. |
-| **Vercel** | Framework preset "Astro" or "Other", output `dist`. `vercel.json` sets clean URLs and headers. |
+The site is hosted on **GitHub Pages** (branch deploy of the repository root; see the root `README.md`). The workflow runs
+`npm run check`, a production build and `scripts/validate-build.mjs --production`; only a passing build is published.
+`public/CNAME` and `public/.nojekyll` are part of every build. GitHub Pages cannot set response headers, so the former
+`_headers` / `netlify.toml` / `vercel.json` files were removed.
 
-URLs have no trailing slash (`/services`, `/partners/white-label`); pages are emitted as `services.html` etc. (`build.format: 'file'`).
-Caching: hashed assets in `/_astro/*` and fonts in `/fonts/*` are `immutable` for a year; stable-URL files (favicons, OG images, PDFs) get short caches.
-If the production domain changes, update `site` in `astro.config.mjs` (canonical URLs, sitemap, OG image URLs).
+URLs have no trailing slash (`/services`, `/partners/white-label`); pages are emitted as `services.html` etc. (`build.format: 'file'`),
+plus a `services/index.html` alias so `/services/` works on GitHub Pages too. robots.txt, sitemap.xml (generated from the built,
+indexable pages), llms.txt and JSON-LD are described in [`docs/SEO-AND-DEPLOYMENT.md`](docs/SEO-AND-DEPLOYMENT.md).
+If the production domain changes, update `site` in `astro.config.mjs` and `public/CNAME`.
 
 ---
 
@@ -54,7 +59,7 @@ If the production domain changes, update `site` in `astro.config.mjs` (canonical
 
 ```
 brand-kit/                  The kit as delivered (docs, tokens.css/json, OG sources) — reference only
-public/                     Copied as-is: fonts, favicons, manifest, OG images, PDFs, _headers
+public/                     Copied as-is: fonts, favicons, manifest, OG images, PDFs, CNAME, .nojekyll
 scripts/pdfs/               PDF generator for public/downloads (HTML → PDF with the site's fonts and data)
 docs/DEMO-CONTENT.md        Everything invented for the preview, and how to replace it
 src/
@@ -266,8 +271,8 @@ Budgets (mobile, Lighthouse simulated 4G) and results are in the QA report. How 
   Below 520 px the call to action is in the hero, the menu sheet and the sticky bottom bar.
 - **Partner footer logo:** the descriptor lock-up exists only with the Amber accent, so partner pages use the partner logo with the
   descriptor set as text beside it (no Amber on partner pages).
-- **Sample label:** shown on `placeholder: true` cases in development *and* production builds, so sample content can never go live
-  unlabeled.
+- **Sample label:** shown on `placeholder: true` cases in development and preview builds; production builds leave
+  sample and demo cases out entirely, so sample content can never go live.
 - **People without fake faces:** testimonial authors, founders and the hero's sign-off toast use monogram avatars — no stock
   faces, because stock models can't be shown endorsing a company. Stock photos appear only as context (people at work, desks,
   warehouses), per the kit's photo rules; each is listed in `placeholders.json`.
@@ -279,8 +284,8 @@ Budgets (mobile, Lighthouse simulated 4G) and results are in the QA report. How 
   US-hours overlap chart (they disqualify visitors before a first conversation) and the scenario cards (the problem tabs
   already link to the scenario pages). "Built with your accountant" and the guarantees are folded into short lines.
 - **Demo content, clearly fenced:** for the CEO preview every gap is filled with invented content (cases, quotes, names, legal
-  details). It is flagged in the source (`demo: true`, `demo.fields`), listed by every build and in `docs/DEMO-CONTENT.md`, and the
-  site stays `noindex` until `prerelease` is turned off. The scenario FAQ answers and the comparison table were written from
+  details). It is flagged in the source (`demo: true`, `demo.fields`), listed by every build and in `docs/DEMO-CONTENT.md`, production builds hide every flagged
+  item (`show()` / `isPublicCase()` in `src/lib/site.ts`) while preview builds stay `noindex`. The scenario FAQ answers and the comparison table were written from
   facts in the brand kit and are flagged for review.
 
 ---

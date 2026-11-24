@@ -10,7 +10,7 @@ import Avatar from '../Avatar.astro';
 import Icon from '../Icon.astro';
 import T from '../T.astro';
 import photo from '../../assets/placeholders/founders-at-work.jpg';
-import { settings } from '../../lib/site';
+import { settings, show } from '../../lib/site';
 import { getTerms } from '../../lib/terms';
 
 interface Props {
@@ -47,6 +47,7 @@ const slots = Number(terms.vars.projectsPerQuarter) || 0;
       <h2>Two founders, both on your project.</h2>
       <p class="lead">We moved our own company to Odoo first. Europe-based, with daily overlap with US business hours.</p>
 
+      {show('founders') && (
       <ul class="founders__people" role="list">
         {
           settings.founders.map((f, i) => (
@@ -65,6 +66,7 @@ const slots = Number(terms.vars.projectsPerQuarter) || 0;
           ))
         }
       </ul>
+      )}
 
       <div class="capacity-row">
         <span class="capacity-row__slots" aria-hidden="true">

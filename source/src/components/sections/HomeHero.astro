@@ -8,7 +8,7 @@ import ScenarioIcon from '../illustrations/ScenarioIcon.astro';
 import HeroSystem from '../illustrations/HeroSystem.astro';
 import { getCollection } from 'astro:content';
 import { getTerms } from '../../lib/terms';
-import { settings } from '../../lib/site';
+import { settings, show } from '../../lib/site';
 
 const terms = await getTerms();
 const scenarios = (await getCollection('scenarios')).sort((a, b) => a.data.order - b.data.order);
@@ -33,13 +33,19 @@ const { rating, certifications } = settings.proof;
         <Button href="#pricing" variant="secondary">See pricing</Button>
       </div>
       <p class="hero__micro">No sales pitch. If Odoo isn’t right for you, we’ll say so.</p>
-      <ul class="hero__proof" role="list">
-        <li>
-          <Stars value={Number(rating.value)} size={16} />
-          <span><strong>{rating.value}</strong> · {rating.count} client reviews</span>
-        </li>
-        <li><Icon name="shield-check" size={20} />{certifications[0].caption}</li>
-      </ul>
+      {
+        (show('proof.rating') || show('proof.certifications')) && (
+          <ul class="hero__proof" role="list">
+            {show('proof.rating') && (
+              <li>
+                <Stars value={Number(rating.value)} size={16} />
+                <span><strong>{rating.value}</strong> · {rating.count} client reviews</span>
+              </li>
+            )}
+            {show('proof.certifications') && <li><Icon name="shield-check" size={20} />{certifications[0].caption}</li>}
+          </ul>
+        )
+      }
       <div class="hero__pick">
         <p class="hero__pick-label" id="hero-pick">Start with your business</p>
         <ul class="hero__chips" role="list" aria-labelledby="hero-pick">

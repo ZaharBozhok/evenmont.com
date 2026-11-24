@@ -5,10 +5,11 @@ For the CEO preview the site is filled end to end, so the structure and the fina
 is a real client, a real result or a real claim yet. Replace each item with real, approved content
 before launch. `npm run build` prints the open list every time.
 
-The site is in **pre-release mode** (`settings.prerelease: true` in `src/content/settings.json`):
-every page carries `<meta name="robots" content="noindex, nofollow">` and `robots.txt` disallows
-everything, so nothing can be indexed by accident. Set it to `false` at launch.
-(`PRERELEASE=false npm run build` makes a one-off launch-mode build without touching the file.)
+**Production builds** (`SITE_ENV=production`, what GitHub Pages serves) are indexable and render none of the
+items below: flagged settings are hidden, demo cases get no page, flagged PDFs are left out, and
+`scripts/validate-build.mjs` fails the deploy if any of it slips through. **Preview builds**
+(`npm run build:preview`, and local builds while `settings.prerelease` is `true`) show everything and carry
+`noindex, nofollow` + `robots.txt` Disallow. Status per item: [`CONTENT-AUDIT.md`](CONTENT-AUDIT.md).
 
 ## 1. Case studies — `src/content/cases/*.md` (`demo: true`)
 
@@ -104,4 +105,5 @@ prices or names, or replace the files with real documents.
 4. Legal review of `/privacy` and `/terms`; remove the `draft` prop in both pages.
 5. Replace stock photos and wordmarks (`placeholders.json`, set `status: "replaced"`).
 6. Re-generate or replace the PDFs.
-7. Set `prerelease` to `false`, build, and check `robots.txt` allows crawling.
+7. Production indexing needs no switch: each verified item appears on the public site as soon as it is
+   removed from `demo.fields` (or loses `demo: true`). `settings.prerelease` only controls local/preview builds.

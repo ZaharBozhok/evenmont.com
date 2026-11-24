@@ -1,0 +1,43 @@
+name: IndexNow
+
+# Optional. After GitHub Pages has published a new build, tells IndexNow-enabled search engines
+# (Bing, Yandex, Seznam, Naver …) which URLs to recrawl. Google does not use IndexNow.
+#
+# Off until the repository variable INDEXNOW_KEY is set (Settings → Secrets and variables →
+# Actions → Variables): 8–128 characters of a-z, A-Z, 0-9 and "-". The Build site workflow
+# publishes the matching key file at https://evenmont.com/<key>.txt. The key is public by design.
+
+on:
+  page_build:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  submit:
+    if: vars.INDEXNOW_KEY != ''
+    runs-on: ubuntu-latest
+    env:
+      KEY: ${{ vars.INDEXNOW_KEY }}
+      HOST: evenmont.com
+    steps:
+      - name: Wait for the key file to be live
+        run: |
+          for i in $(seq 1 20); do
+            if [ "$(curl -fsS "https://$HOST/$KEY.txt" 2>/dev/null)" = "$KEY" ]; then exit 0; fi
+            sleep 15
+          done
+          echo "Key file https://$HOST/$KEY.txt is not live yet." >&2
+          exit 1
+
+      - name: Submit the sitemap URLs
+        run: |
+          urls=$(curl -fsS "https://$HOST/sitemap.xml" | grep -o '<loc>[^<]*</loc>' | sed -e 's/<loc>//' -e 's/<\/loc>//')
+          body=$(jq -n --arg host "$HOST" --arg key "$KEY" --arg loc "https://$HOST/$KEY.txt" \
+            --argjson urls "$(printf '%s\n' $urls | jq -R . | jq -s .)" \
+            '{host: $host, key: $key, keyLocation: $loc, urlList: $urls}')
+          status=$(curl -sS -o response.txt -w '%{http_code}' -X POST https://api.indexnow.org/indexnow \
+            -H 'Content-Type: application/json; charset=utf-8' --data "$body")
+          echo "IndexNow responded $status"; cat response.txt
+          case "$status" in 200|202) ;; *) exit 1 ;; esac

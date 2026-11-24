@@ -2,19 +2,20 @@
 /** /legal — legal notice (operator details from src/content/settings.json). */
 import LegalPage from '../components/LegalPage.astro';
 import T from '../components/T.astro';
-import { settings } from '../lib/site';
+import { settings, show } from '../lib/site';
 
 const l = settings.legal;
+// Rows whose value is still unverified (settings.demo.fields) are left out of production builds.
 const rows = [
   { k: 'Operator', v: l.legalName },
-  { k: 'Company registration', v: `${l.country} company, reg. no. ${l.regNo}` },
-  { k: 'Business name', v: `“Evenmont”, reg. no. ${l.businessNameRegNo}` },
-  { k: 'Registered office', v: l.registeredOffice },
-  { k: 'VAT', v: l.vatNo },
-  { k: 'Directors', v: l.directors },
+  { k: 'Company registration', v: show('legal.regNo') ? `${l.country} company, reg. no. ${l.regNo}` : `${l.country} company` },
+  { k: 'Business name', v: show('legal.businessNameRegNo') ? `“Evenmont”, reg. no. ${l.businessNameRegNo}` : '“Evenmont”' },
+  { k: 'Registered office', v: l.registeredOffice, when: show('legal.registeredOffice') },
+  { k: 'VAT', v: l.vatNo, when: show('legal.vatNo') },
+  { k: 'Directors', v: l.directors, when: show('legal.directors') },
   { k: 'Email', v: settings.contact.email },
-  { k: 'Phone (US)', v: settings.contact.phoneUs },
-];
+  { k: 'Phone (US)', v: settings.contact.phoneUs, when: show('contact.phoneUs') },
+].filter((r) => r.when !== false);
 ---
 
 <LegalPage title="Legal notice" metaTitle="Legal notice | Evenmont" description="Legal notice: Evenmont is a registered business name of JITO LTD, a company registered in Cyprus.">

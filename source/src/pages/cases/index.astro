@@ -7,24 +7,29 @@ import CaseCard from '../../components/CaseCard.astro';
 import Icon from '../../components/Icon.astro';
 import FinalCta from '../../components/sections/FinalCta.astro';
 import Stars from '../../components/Stars.astro';
-import { settings } from '../../lib/site';
+import { isPublicCase, settings, show } from '../../lib/site';
 
 const scenarios = (await getCollection('scenarios')).sort((a, b) => a.data.order - b.data.order);
-const cases = (await getCollection('cases')).sort((a, b) => a.data.order - b.data.order);
+const cases = (await getCollection('cases', isPublicCase)).sort((a, b) => a.data.order - b.data.order);
 const nameOf = (id: string) => scenarios.find((s) => s.id === id)?.data.name ?? id;
 const filters = [{ id: 'all', label: 'All' }, ...scenarios.map((s) => ({ id: s.id, label: s.data.tab }))];
 ---
 
 <BaseLayout
+  pageType="CollectionPage"
   title="Case studies | Evenmont"
   description="Odoo projects for service firms, distributors and manufacturers: what changed, how long it took, and the numbers measured against the Blueprint."
 >
   <PageHero eyebrow="Cases" title="Case studies" lead="What changed, how long it took, and the numbers — measured against the Blueprint.">
-    <p class="cases-proof">
-      <Stars value={Number(settings.proof.rating.value)} size={18} />
-      <strong>{settings.proof.rating.value}</strong>
-      <span>from {settings.proof.rating.count} client reviews on {settings.proof.rating.source}</span>
-    </p>
+    {
+      show('proof.rating') && (
+        <p class="cases-proof">
+          <Stars value={Number(settings.proof.rating.value)} size={18} />
+          <strong>{settings.proof.rating.value}</strong>
+          <span>from {settings.proof.rating.count} client reviews on {settings.proof.rating.source}</span>
+        </p>
+      )
+    }
   </PageHero>
 
   <section class="section cases-index">

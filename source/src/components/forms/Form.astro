@@ -5,7 +5,7 @@
  */
 import Icon from '../Icon.astro';
 import T from '../T.astro';
-import { settings } from '../../lib/site';
+import { settings, show, showUnverified } from '../../lib/site';
 
 interface Props {
   name: string;
@@ -16,9 +16,13 @@ interface Props {
   compact?: boolean;
 }
 const { name, submitLabel, successTitle, successText, class: className, compact = false } = Astro.props;
-// "demo" (pre-release preview): submissions are simulated in the browser and go nowhere.
-const demo = settings.links.formEndpoint === 'demo';
-const endpoint = demo ? Astro.url.pathname : settings.links.formEndpoint;
+// "demo" (pre-release preview only): submissions are simulated in the browser and go nowhere.
+const demo = settings.links.formEndpoint === 'demo' && showUnverified;
+// Production without a verified https endpoint: never pretend to send. The form composes an email
+// to the contact address instead (works without JavaScript too: a mailto: form action).
+const connected = show('links.formEndpoint') && settings.links.formEndpoint.startsWith('https://');
+const mailto = !demo && !connected && !showUnverified ? settings.contact.email : undefined;
+const endpoint = demo ? Astro.url.pathname : mailto ? `mailto:${mailto}?subject=${encodeURIComponent(`Website: ${name}`)}` : settings.links.formEndpoint;
 ---
 
 <div class:list={['form-wrap', className]} data-form-wrap>
@@ -26,8 +30,10 @@ const endpoint = demo ? Astro.url.pathname : settings.links.formEndpoint;
     class:list={['form', compact && 'form--compact']}
     action={endpoint}
     method="post"
+    enctype={mailto ? 'text/plain' : undefined}
     data-form={name}
     data-demo={demo ? '' : undefined}
+    data-mailto={mailto}
     aria-label={submitLabel}
   >
     <input type="hidden" name="form" value={name} />

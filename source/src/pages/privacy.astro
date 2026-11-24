@@ -5,7 +5,7 @@
  * before launch; the draft notice stays until then.
  */
 import LegalPage from '../components/LegalPage.astro';
-import { settings } from '../lib/site';
+import { settings, show } from '../lib/site';
 
 const l = settings.legal;
 const email = settings.contact.email;
@@ -21,8 +21,7 @@ const email = settings.contact.email;
   <section>
     <h2>Who we are</h2>
     <p>
-      Evenmont is a registered business name of {l.legalName}, a company registered in {l.country} (reg. no. {l.regNo}),
-      registered office {l.registeredOffice}. We are the controller of the personal data described in this policy. Contact us
+      Evenmont is a registered business name of {l.legalName}, a company registered in {l.country}{show('legal.regNo') && ` (reg. no. ${l.regNo})`}{show('legal.registeredOffice') ? `, registered office ${l.registeredOffice}` : ''}. We are the controller of the personal data described in this policy. Contact us
       about privacy at <a href={`mailto:${email}`}>{email}</a>.
     </p>
   </section>

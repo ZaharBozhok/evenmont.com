@@ -1,7 +1,0 @@
-# Netlify: build settings. Headers come from public/_headers.
-[build]
-  command = "npm run build"
-  publish = "dist"
-
-[build.environment]
-  NODE_VERSION = "22"

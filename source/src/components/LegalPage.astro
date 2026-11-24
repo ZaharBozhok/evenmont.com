@@ -7,13 +7,13 @@ interface Props {
   metaTitle: string;
   description: string;
   lead?: string;
-  /** Draft text awaiting legal review: shows a notice above the content. */
+  /** Draft text awaiting legal review: shows a notice above the content and keeps the page out of search engines. */
   draft?: string;
 }
 const { title, metaTitle, description, lead, draft } = Astro.props;
 ---
 
-<BaseLayout title={metaTitle} description={description} headerTone="light" stickyCta={false}>
+<BaseLayout title={metaTitle} description={description} headerTone="light" stickyCta={false} noindex={!!draft}>
   <article class="legal">
     <div class="container legal__inner">
       <header class="legal__head">

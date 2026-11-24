@@ -9,12 +9,14 @@ import Stars from '../Stars.astro';
 import Seal from '../illustrations/Seal.astro';
 import ClientLogo from '../illustrations/ClientLogo.astro';
 import { getCollection } from 'astro:content';
-import { settings } from '../../lib/site';
+import { isPublicCase, settings, show } from '../../lib/site';
 import type { IconName } from '../../icons/lucide';
 
-const cases = (await getCollection('cases', (c) => !c.data.anonymous)).sort((a, b) => a.data.order - b.data.order);
+const cases = (await getCollection('cases', (c) => isPublicCase(c) && !c.data.anonymous)).sort((a, b) => a.data.order - b.data.order);
 const { rating, certifications } = settings.proof;
 const sealIcons: Record<string, IconName> = { partner: 'shield-check', functional: 'badge-check', technical: 'code-xml' };
+/** Only the promises are left when the rating and seals are hidden (unverified): lay them out in a row. */
+const lean = !show('proof.rating') && !show('proof.certifications');
 const promises: { icon: IconName; text: string }[] = [
   { icon: 'calculator', text: 'Built with your accountant' },
   { icon: 'receipt-text', text: 'Fixed price per phase, in writing' },
@@ -23,7 +25,8 @@ const promises: { icon: IconName; text: string }[] = [
 
 <section class="trust" aria-label="Why teams trust us">
   <div class="container">
-    <div class="trust__card" data-reveal>
+    <div class:list={['trust__card', lean && 'trust__card--lean']} data-reveal>
+      {show('proof.rating') && (
       <div class="trust__rating">
         <p class="trust__score num">{rating.value}</p>
         <div>
@@ -31,6 +34,8 @@ const promises: { icon: IconName; text: string }[] = [
           <p class="trust__rating-text">Average of {rating.count} client reviews on {rating.source}</p>
         </div>
       </div>
+      )}
+      {show('proof.certifications') && (
       <ul class="trust__seals" role="list">
         {
           certifications.map((c) => (
@@ -41,6 +46,7 @@ const promises: { icon: IconName; text: string }[] = [
           ))
         }
       </ul>
+      )}
       <ul class="trust__promises" role="list">
         {
           promises.map((p) => (
@@ -52,6 +58,7 @@ const promises: { icon: IconName; text: string }[] = [
         }
       </ul>
     </div>
+    {cases.length > 0 && (
     <div class="trust__clients">
       <p class="trust__label">Teams we’ve put on one system</p>
       <ul class="trust__logos" role="list" aria-label="Recent clients">
@@ -66,6 +73,7 @@ const promises: { icon: IconName; text: string }[] = [
         }
       </ul>
     </div>
+    )}
   </div>
 </section>
 
@@ -171,6 +179,14 @@ const promises: { icon: IconName; text: string }[] = [
     color: inherit;
   }
   @media (min-width: 768px) {
+    .trust__card.trust__card--lean {
+      grid-template-columns: minmax(0, 1fr);
+    }
+    .trust__card--lean .trust__promises {
+      grid-template-columns: repeat(2, auto);
+      justify-content: start;
+      column-gap: var(--space-8);
+    }
     .trust__card {
       grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
       padding: var(--space-6);
@@ -185,6 +201,9 @@ const promises: { icon: IconName; text: string }[] = [
     }
   }
   @media (min-width: 1100px) {
+    .trust__card.trust__card--lean {
+      grid-template-columns: minmax(0, 1fr);
+    }
     .trust {
       margin-top: calc(-1 * var(--space-9) + var(--space-3));
     }

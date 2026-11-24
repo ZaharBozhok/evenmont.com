@@ -13,24 +13,29 @@ import PartnerBadge from '../PartnerBadge.astro';
 import Avatar from '../Avatar.astro';
 import Stars from '../Stars.astro';
 import poster from '../../assets/placeholders/video-poster.jpg';
-import { settings } from '../../lib/site';
+import { isPublicCase, settings, show } from '../../lib/site';
 import type { IconName } from '../../icons/lucide';
-
-const items: { icon: IconName; title: string; href?: string; text: string; download?: boolean }[] = [
-  { icon: 'badge-check', title: 'Odoo certifications', href: settings.links.certLinks, text: 'Our consultants’ certificates, on Odoo’s site.' },
-  { icon: 'star', title: 'Reviews', href: '#reviews', text: 'What clients wrote about working with us.' },
-  { icon: 'phone', title: 'Ask for a reference call', href: '/book', text: 'Talk to a client we have worked with.' },
-  { icon: 'file-down', title: 'Sample SOW', href: settings.downloads.sampleSow, text: 'PDF · 3 pages', download: true },
-  { icon: 'file-down', title: 'Sample weekly report', href: settings.downloads.sampleWeeklyReport, text: 'PDF · 1 page', download: true },
-  { icon: 'lock', title: 'Security & data', href: '/security', text: 'Where your data lives and who can see it.' },
-];
 
 const founder = settings.founders[0];
 const isDemoVideo = settings.links.founderVideoUrl === 'demo';
-const reviews = (await getCollection('cases'))
+/** Founder video: needs a verified founder and a verified video link (pre-release builds show the demo dialog). */
+const showVideo = show('founders') && show('links.founderVideoUrl');
+const showStatus = show('odooPartnerBadge');
+const reviews = (await getCollection('cases', isPublicCase))
   .filter((c): c is typeof c & { data: { quote: NonNullable<typeof c.data.quote> } } => !!c.data.quote)
   .sort((a, b) => a.data.order - b.data.order)
   .slice(3, 6);
+const showReviews = reviews.length > 0;
+
+const itemsAll: { icon: IconName; title: string; href?: string; text: string; download?: boolean; when?: boolean }[] = [
+  { icon: 'badge-check', title: 'Odoo certifications', href: settings.links.certLinks, text: 'Our consultants’ certificates, on Odoo’s site.', when: show('links.certLinks') },
+  { icon: 'star', title: 'Reviews', href: '#reviews', text: 'What clients wrote about working with us.', when: showReviews },
+  { icon: 'phone', title: 'Ask for a reference call', href: '/book', text: 'Talk to a client we have worked with.' },
+  { icon: 'file-down', title: 'Sample SOW', href: settings.downloads.sampleSow, text: 'PDF · 3 pages', download: true, when: show('downloads.sampleSow') },
+  { icon: 'file-down', title: 'Sample weekly report', href: settings.downloads.sampleWeeklyReport, text: 'PDF · 1 page', download: true, when: show('downloads.sampleWeeklyReport') },
+  { icon: 'lock', title: 'Security & data', href: '/security', text: 'Where your data lives and who can see it.' },
+];
+const items = itemsAll.filter((item) => item.when !== false);
 const script = [
   `Hi, I’m ${founder.name.split(' ')[0]}, one of the two founders of Evenmont.`,
   'We implement Odoo for growing US companies — service firms, distributors and small manufacturers — and we start where most partners finish: with the books.',
@@ -41,7 +46,8 @@ const script = [
 ---
 
 <Section id="check-us" title="Check us before you call.">
-  <div class="checkus">
+  <div class:list={['checkus', !showVideo && 'checkus--novideo']}>
+    {showVideo && (
     <figure class="checkus__video tone-dark">
       <Picture
         src={poster}
@@ -67,12 +73,15 @@ const script = [
       </a>
       <figcaption class="visually-hidden">Founder video</figcaption>
     </figure>
+    )}
 
     <div class="checkus__side">
+      {showStatus && (
       <div class="checkus__status">
         <p class="checkus__status-title">Odoo partner status</p>
         <PartnerBadge />
       </div>
+      )}
       <ul class="checkus__proof" role="list" data-reveal-children>
         {
           items.map((item) => (
@@ -92,13 +101,16 @@ const script = [
     </div>
   </div>
 
+  {showReviews && (
   <div class="reviews" id="reviews">
     <div class="reviews__head">
       <h3 class="reviews__title">What clients wrote</h3>
+      {show('proof.rating') && (
       <p class="reviews__score">
         <Stars value={Number(settings.proof.rating.value)} size={18} />
         <span><strong>{settings.proof.rating.value}</strong> from {settings.proof.rating.count} reviews</span>
       </p>
+      )}
     </div>
     <ul class="reviews__list" role="list" data-reveal-children>
       {
@@ -126,9 +138,10 @@ const script = [
       }
     </ul>
   </div>
+  )}
 
   {
-    isDemoVideo && (
+    showVideo && isDemoVideo && (
       <dialog id="founder-video" class="vdialog" aria-labelledby="founder-video-title">
         <div class="vdialog__head">
           <h3 id="founder-video-title">A message from {founder.name}</h3>
@@ -239,6 +252,14 @@ const script = [
   }
   .checkus__proof li {
     border-bottom: 1px solid var(--border);
+  }
+  /* Without the founder video (production until it is recorded) the links use the full width. */
+  @media (min-width: 768px) {
+    .checkus--novideo .checkus__proof {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      column-gap: var(--space-7);
+    }
   }
   .checkus__proof-link {
     display: grid;
@@ -367,6 +388,9 @@ const script = [
       grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
       gap: var(--space-8);
       align-items: start;
+    }
+    .checkus--novideo {
+      grid-template-columns: minmax(0, 1fr);
     }
     .checkus__video-play {
       padding: var(--space-7);

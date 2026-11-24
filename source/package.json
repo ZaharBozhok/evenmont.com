@@ -10,6 +10,9 @@
   "scripts": {
     "dev": "astro dev",
     "build": "astro build",
+    "build:production": "SITE_ENV=production astro build && node scripts/validate-build.mjs --production",
+    "build:preview": "SITE_ENV=preview astro build && node scripts/validate-build.mjs --preview",
+    "validate": "node scripts/validate-build.mjs",
     "preview": "astro preview",
     "check": "astro check",
     "astro": "astro"
