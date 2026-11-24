@@ -12,7 +12,8 @@ import RiskTable from '../../components/RiskTable.astro';
 import Faq from '../../components/sections/Faq.astro';
 import ScopeForm from '../../components/forms/ScopeForm.astro';
 import BlueprintLayers from '../../components/illustrations/BlueprintLayers.astro';
-import { settings } from '../../lib/site';
+import { settings, show } from '../../lib/site';
+import { service } from '../../lib/schema';
 import { getTerms } from '../../lib/terms';
 import type { IconName } from '../../icons/lucide';
 
@@ -45,14 +46,19 @@ const risks = [
   { concern: 'Hiring for peaks.', answer: 'No headcount, capacity per project.' },
 ];
 
-const proof: { icon: IconName; title: string; href: string; text: string }[] = [
-  { icon: 'layers', title: 'Modules in the Odoo Apps Store', href: settings.links.odooAppsStoreUrl, text: 'Published modules you can inspect.' },
+// Links still listed in settings.demo.fields point at generic pages, not Evenmont's own: hidden in production.
+const proofAll: { icon: IconName; title: string; href: string; text: string; when?: boolean }[] = [
+  { icon: 'layers', title: 'Modules in the Odoo Apps Store', href: settings.links.odooAppsStoreUrl, text: 'Published modules you can inspect.', when: show('links.odooAppsStoreUrl') },
   { icon: 'code-xml', title: 'Code samples', href: settings.links.codeSamplesUrl, text: 'How we structure, test and document.' },
-  { icon: 'badge-check', title: 'Certifications', href: settings.links.certLinks, text: 'Our Odoo certifications, on Odoo’s site.' },
+  { icon: 'badge-check', title: 'Certifications', href: settings.links.certLinks, text: 'Our Odoo certifications, on Odoo’s site.', when: show('links.certLinks') },
 ];
+const proof = proofAll.filter((item) => item.when !== false);
+const whiteLabelCases = show('whiteLabelCases') ? settings.whiteLabelCases : [];
 ---
 
 <BaseLayout
+  breadcrumb="White-label"
+  jsonLd={[service(Astro.site!, { id: 'white-label', name: 'White-label Odoo delivery for agencies', description: 'Custom Odoo modules, integrations, migrations and US accounting setup, delivered under the agency’s brand and inside its process.', url: '/partners/white-label', audience: 'Digital agencies and Odoo integrators' })]}
   mood="partner-dark"
   title="White-label Odoo delivery for agencies | Evenmont"
   description="Custom modules, integrations, migrations and US accounting setup — delivered under your name, inside your process. Fixed quote before your proposal."
@@ -146,10 +152,11 @@ const proof: { icon: IconName; title: string; href: string; text: string }[] = [
           ))
         }
       </ul>
+      {whiteLabelCases.length > 0 && (
       <div class="wl-cases">
         <p class="wl-case__kicker">White-label cases · shared with the agency’s permission, names withheld</p>
         {
-          settings.whiteLabelCases.map((c) => (
+          whiteLabelCases.map((c) => (
             <article class="card wl-case">
               <p class="wl-case__who">{c.who}</p>
               <h3 class="wl-case__what">{c.what}</h3>
@@ -165,6 +172,7 @@ const proof: { icon: IconName; title: string; href: string; text: string }[] = [
           ))
         }
       </div>
+      )}
     </div>
   </Section>
 

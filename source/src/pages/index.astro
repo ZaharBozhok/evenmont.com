@@ -20,10 +20,34 @@ import { Picture } from 'astro:assets';
 import workshop from '../assets/placeholders/blueprint-workshop.jpg';
 import { getTerms } from '../lib/terms';
 import type { IconName } from '../icons/lucide';
+import { getCollection } from 'astro:content';
+import { orgId, service } from '../lib/schema';
 
 // Home: offer → problems → what changes → the cost of the problem → cases → process → prices
 // → proof → FAQ → request form, with a CTA band roughly every second screen.
 const terms = await getTerms();
+// Structured data: the implementation service and the three industry offers it is split into.
+const site = Astro.site!;
+const scenarioEntries = (await getCollection('scenarios')).sort((a, b) => a.data.order - b.data.order);
+const jsonLd = [
+  {
+    ...service(site, {
+      id: 'odoo-implementation',
+      name: 'Finance-first Odoo implementation',
+      description: 'Odoo ERP implementation for growing US companies in fixed-price phases (fit call, Blueprint, build, go-live, ongoing support), set up together with the client’s accountant.',
+      url: '/',
+    }),
+    hasOfferCatalog: {
+      '@type': 'OfferCatalog',
+      name: 'Odoo implementation by industry',
+      itemListElement: scenarioEntries.map((e) => ({
+        '@type': 'Offer',
+        itemOffered: { '@id': new URL(`/${e.id}#service`, site).href, '@type': 'Service', name: `Odoo implementation for ${e.data.name.toLowerCase()}` },
+        seller: { '@id': orgId(site) },
+      })),
+    },
+  },
+];
 const stepIcons: Record<string, IconName> = { 'fit-call': 'video', blueprint: 'map', build: 'layers', 'go-live': 'calendar-check', keep: 'life-buoy' };
 const steps = terms.process.steps.map((s) => ({ name: s.name, get: terms.fmt(s.get), time: terms.fmt(s.time), price: terms.fmt(s.price), icon: stepIcons[s.id] }));
 
@@ -38,6 +62,7 @@ const whatChanges = [
 ---
 
 <BaseLayout
+  jsonLd={jsonLd}
   title="Evenmont — Finance-first Odoo implementation"
   description="We implement Odoo for growing US service firms, distributors and manufacturers. Fixed-price phases, your accountant in the loop, a founder on every project."
 >

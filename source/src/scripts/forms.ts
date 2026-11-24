@@ -75,6 +75,18 @@ document.querySelectorAll<HTMLFormElement>('form[data-form]').forEach((form) => 
       return success();
     }
 
+    const mailto = form.dataset.mailto;
+    if (mailto) {
+      // No form endpoint connected yet: open the visitor's email app with the message filled in.
+      const lines = controls()
+        .filter((c) => c.value.trim())
+        .map((c) => `${c.labels?.[0]?.childNodes[0]?.textContent?.trim() || c.name}: ${c.value.trim()}`);
+      const subject = `Website: ${form.dataset.form}`;
+      window.location.href = `mailto:${mailto}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(lines.join('\n'))}`;
+      if (status) status.textContent = `Your email app should open with your message. If it doesn’t, write to ${mailto}.`;
+      return;
+    }
+
     const endpoint = form.getAttribute('action') ?? '';
     if (endpoint.includes('{{')) {
       // FORM_ENDPOINT is still a placeholder: show the success state in development only.

@@ -7,7 +7,7 @@ import Icon from '../components/Icon.astro';
 import T from '../components/T.astro';
 import Founders from '../components/sections/Founders.astro';
 import FinalCta from '../components/sections/FinalCta.astro';
-import { legalLine, settings } from '../lib/site';
+import { legalLine, settings, show } from '../lib/site';
 import type { IconName } from '../icons/lucide';
 
 const story: { icon: IconName; title: string; text: string }[] = [
@@ -26,10 +26,12 @@ const values: { icon: IconName; name: string; text: string }[] = [
   { icon: 'key-round', name: 'Ownership', text: 'A founder on every project. Your code, your data, full documentation.' },
   { icon: 'calendar-check', name: 'Calm', text: 'Fixed phases, weekly demos, written updates — a calm path to go-live.' },
 ];
-const stats = settings.proof.stats;
+const stats = show('proof.stats') ? settings.proof.stats : [];
 ---
 
 <BaseLayout
+  pageType="AboutPage"
+  breadcrumb="About"
   title="About Evenmont — two founders, one system"
   description="Two founders who moved their own software company to Odoo, now implementing it for growing US companies — finance-first, with your accountant."
 >
@@ -77,6 +79,7 @@ const stats = settings.proof.stats;
     </div>
   </Section>
 
+  {stats.length > 0 && (
   <section class="stats tone-dark" aria-label="Evenmont in numbers">
     <div class="container">
       <ul class="stats__list" role="list" data-reveal-children>
@@ -93,6 +96,7 @@ const stats = settings.proof.stats;
       </ul>
     </div>
   </section>
+  )}
 
   <Founders more={false} />
 

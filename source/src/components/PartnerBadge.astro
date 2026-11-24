@@ -6,14 +6,14 @@
  */
 import Icon from './Icon.astro';
 import T from './T.astro';
-import { settings } from '../lib/site';
+import { settings, show } from '../lib/site';
 import { isPlaceholder } from '../lib/text';
 
 const label = settings.odooPartnerBadge;
 ---
 
 {
-  isPlaceholder(label) ? (
+  !show('odooPartnerBadge') ? null : isPlaceholder(label) ? (
     <span class="badge-slot" data-placeholder="true" aria-label="Official Odoo partner badge — placeholder">
       <T v={label} />
     </span>

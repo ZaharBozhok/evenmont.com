@@ -2,9 +2,46 @@ import settings from '../content/settings.json';
 
 export { settings };
 
-/** Pre-release: noindex on every page + robots Disallow. PRERELEASE=false (env) overrides for a trial launch build. */
+/**
+ * Build environment.
+ *
+ *   SITE_ENV=production  → the public site: indexable (no noindex, robots.txt allows crawling) and
+ *                          unverified demo content is NOT rendered. Set by the GitHub Pages workflow.
+ *   SITE_ENV=preview     → pre-release preview: noindex everywhere + robots.txt Disallow, demo content shown.
+ *   (unset)              → local development / ad-hoc builds: PRERELEASE env if set, else settings.prerelease
+ *                          (true in the repository, so an accidental build is never indexable).
+ *
+ * Invariant: unverified content (settings.demo.fields, `demo: true` / `placeholder: true` cases) is only
+ * ever rendered in noindex builds. scripts/validate-build.mjs checks the generated site for this.
+ */
 const env = (globalThis as { process?: { env: Record<string, string | undefined> } }).process?.env ?? {};
-export const prerelease = env.PRERELEASE ? env.PRERELEASE !== 'false' : settings.prerelease === true;
+const siteEnvRaw = (env.SITE_ENV ?? '').trim().toLowerCase();
+if (siteEnvRaw && siteEnvRaw !== 'production' && siteEnvRaw !== 'preview') {
+  throw new Error(`SITE_ENV must be "production" or "preview" (got "${env.SITE_ENV}").`);
+}
+export const siteEnv: 'production' | 'preview' | 'development' = (siteEnvRaw || 'development') as never;
+if (siteEnv === 'production' && env.PRERELEASE && env.PRERELEASE !== 'false') {
+  throw new Error('SITE_ENV=production cannot be combined with PRERELEASE=true.');
+}
+
+/** Pre-release: noindex on every page + robots.txt Disallow. */
+export const prerelease =
+  siteEnv === 'production' ? false : siteEnv === 'preview' ? true : env.PRERELEASE ? env.PRERELEASE !== 'false' : settings.prerelease === true;
+
+/** Unverified (demo) content is shown only in pre-release builds, which are never indexable. */
+export const showUnverified = prerelease;
+
+const demoFields: string[] = settings.demo?.fields ?? [];
+
+/** True when a settings path (e.g. "legal.regNo", "proof.rating") is not listed, itself or via a parent, in settings.demo.fields. */
+export const isVerified = (field: string) => !demoFields.some((f) => field === f || field.startsWith(`${f}.`));
+
+/** Whether a settings value may be rendered in this build. */
+export const show = (field: string) => showUnverified || isVerified(field);
+
+/** Case studies that may be rendered in this build (demo and sample cases only in pre-release builds). */
+export const isPublicCase = (entry: { data: { demo?: boolean; placeholder?: boolean } }) =>
+  showUnverified || (!entry.data.demo && !entry.data.placeholder);
 
 export type Mood = 'client' | 'partner' | 'partner-dark';
 export type NavItem = { label: string; href: string };
@@ -77,7 +114,18 @@ export const footerNav: { title: string; links: NavItem[] }[] = [
   },
 ];
 
-export const legalLine = () =>
-  `Evenmont is a registered business name of ${settings.legal.legalName}, a company registered in ${settings.legal.country} ` +
-  `(reg. no. ${settings.legal.regNo}; business name reg. no. ${settings.legal.businessNameRegNo}; VAT ${settings.legal.vatNo}). ` +
-  `Registered office: ${settings.legal.registeredOffice}. Contact: ${settings.contact.email}.`;
+export const legalLine = () => {
+  const l = settings.legal;
+  const ids = [
+    show('legal.regNo') && `reg. no. ${l.regNo}`,
+    show('legal.businessNameRegNo') && `business name reg. no. ${l.businessNameRegNo}`,
+    show('legal.vatNo') && `VAT ${l.vatNo}`,
+  ].filter(Boolean);
+  return (
+    `Evenmont is a registered business name of ${l.legalName}, a company registered in ${l.country}` +
+    (ids.length ? ` (${ids.join('; ')})` : '') +
+    '.' +
+    (show('legal.registeredOffice') ? ` Registered office: ${l.registeredOffice}.` : '') +
+    ` Contact: ${settings.contact.email}.`
+  );
+};

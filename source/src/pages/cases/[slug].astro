@@ -21,11 +21,14 @@ import ScreenMock from '../../components/illustrations/ScreenMock.astro';
 import ClientLogo from '../../components/illustrations/ClientLogo.astro';
 import FinalCta from '../../components/sections/FinalCta.astro';
 import { getTerms } from '../../lib/terms';
+import { isPublicCase } from '../../lib/site';
+import { orgId } from '../../lib/schema';
+import { getImage } from 'astro:assets';
 import { noBreakHyphens } from '../../lib/text';
 import type { IconName } from '../../icons/lucide';
 
 export async function getStaticPaths() {
-  const cases = await getCollection('cases');
+  const cases = await getCollection('cases', isPublicCase);
   return cases.map((entry) => ({ params: { slug: entry.id }, props: { entry } }));
 }
 
@@ -37,6 +40,22 @@ const c = entry.data;
 const { Content } = await render(entry);
 const scenario = (await getCollection('scenarios')).find((s) => s.id === c.scenario)!;
 const terms = await getTerms();
+const site = Astro.site!;
+const caseUrl = new URL(`/cases/${entry.id}`, site).href;
+const coverImage = await getImage({ src: c.cover, width: 1200, format: 'jpg' });
+const article = {
+  '@type': 'Article',
+  '@id': `${caseUrl}#article`,
+  headline: c.title,
+  description: c.description,
+  articleSection: 'Case study',
+  image: new URL(coverImage.src, site).href,
+  mainEntityOfPage: { '@id': `${caseUrl}#webpage` },
+  author: { '@id': orgId(site) },
+  publisher: { '@id': orgId(site) },
+  about: [{ '@type': 'Thing', name: 'Odoo implementation' }, { '@type': 'Thing', name: c.profile.industry }],
+  inLanguage: 'en-US',
+};
 const snapshot: { label: string; value: string; icon: IconName }[] = [
   { label: 'Industry', value: c.profile.industry, icon: 'building-2' },
   { label: 'Size', value: c.profile.size, icon: 'users' },
@@ -65,7 +84,7 @@ const results = c.results.map((r) => {
 });
 ---
 
-<BaseLayout title={`${c.title} | Evenmont`} description={c.description}>
+<BaseLayout title={`${c.title} | Evenmont`} description={c.description} ogType="article" jsonLd={[article]}>
   <section class="chero tone-dark ledger" data-hero data-animate>
     <div class="container chero__grid">
       <div class="chero__copy">

@@ -1,11 +1,21 @@
 name: Build site
 
-# GitHub Pages publishes the root of `main` as-is. When the Astro project in source/
-# changes, rebuild it and commit the static output to the root; Pages then deploys it.
+# GitHub Pages publishes the root of `main` as-is ("Deploy from a branch": main, / (root)).
+# When the Astro project in source/ changes, this workflow builds it in production mode,
+# validates the output (indexing, robots.txt, sitemap, canonicals, links, assets, JSON-LD,
+# no unverified demo content) and only then commits the static output to the root.
+# A failed validation stops the deploy: the live site keeps the previous build.
+#
+# On pull requests the same build and validation run as a check, without publishing.
 
 on:
   push:
     branches: [main]
+    paths:
+      - 'source/**'
+      - '.github/scripts/publish-build.sh'
+      - '.github/workflows/build-site.yml'
+  pull_request:
     paths:
       - 'source/**'
       - '.github/scripts/publish-build.sh'
@@ -16,12 +26,21 @@ permissions:
   contents: write
 
 concurrency:
-  group: build-site
-  cancel-in-progress: false
+  group: build-site-${{ github.event_name == 'pull_request' && github.ref || 'main' }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
   build:
     runs-on: ubuntu-latest
+    env:
+      # The production switch: indexable pages, robots.txt allows crawling, unverified demo
+      # content is not rendered. Independent of settings.prerelease (which stays true for
+      # local and preview builds).
+      SITE_ENV: production
+      # Optional, set under Settings → Secrets and variables → Actions → Variables.
+      GOOGLE_SITE_VERIFICATION: ${{ vars.GOOGLE_SITE_VERIFICATION }}
+      BING_SITE_VERIFICATION: ${{ vars.BING_SITE_VERIFICATION }}
+      INDEXNOW_KEY: ${{ vars.INDEXNOW_KEY }}
     steps:
       - uses: actions/checkout@v5
 
@@ -35,14 +54,24 @@ jobs:
         working-directory: source
         run: npm ci
 
-      - name: Build
+      - name: Type check
         working-directory: source
-        run: npm run build
+        run: npm run check
+
+      - name: Build (production)
+        working-directory: source
+        run: npx astro build
+
+      - name: Validate the production build
+        working-directory: source
+        run: node scripts/validate-build.mjs --production
 
       - name: Copy the build to the repository root
+        if: github.event_name != 'pull_request'
         run: .github/scripts/publish-build.sh
 
       - name: Commit and push
+        if: github.event_name != 'pull_request'
         run: |
           git add -A
           if git diff --cached --quiet; then

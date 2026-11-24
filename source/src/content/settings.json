@@ -7,7 +7,7 @@
   "descriptor": "Finance-first Odoo implementation",
   "prerelease": true,
   "demo": {
-    "$comment": "Invented values for the CEO preview. Replace each one with the real value, then remove it from this list. `prerelease: true` keeps the whole site out of search engines (noindex + robots Disallow).",
+    "$comment": "Invented values for the CEO preview. Replace each one with the real value, then remove it from this list. downloads.*: PDFs generated with the demo founders/clients (re-generate them with real data, then remove). Production builds hide every listed value and leave listed PDFs out of the build. `prerelease: true` keeps the whole site out of search engines (noindex + robots Disallow).",
     "fields": [
       "legal.regNo",
       "legal.businessNameRegNo",
@@ -25,7 +25,15 @@
       "partnerContact.name",
       "partnerFirms",
       "whiteLabelCases",
-      "proof"
+      "proof",
+      "downloads.clientOnePager",
+      "downloads.partnerOnePager",
+      "downloads.sampleSow",
+      "downloads.sampleWeeklyReport",
+      "downloads.samplePartnerAgreement",
+      "downloads.samplePayoutStatement",
+      "downloads.cpaRulesNote",
+      "links.cpaRulesNoteUrl"
     ]
   },
   "legal": {
@@ -81,6 +89,11 @@
     "cpaRulesNote": "/downloads/evenmont-cpa-rules-note.pdf",
     "readinessChecklist": "/downloads/evenmont-odoo-readiness-checklist.pdf",
     "codeSample": "/downloads/evenmont-code-sample.pdf"
+  },
+  "verification": {
+    "$comment": "Search engine ownership tokens (meta tags, production builds only). Paste the content value from Google Search Console (HTML tag method) and Bing Webmaster Tools (msvalidate.01). The GitHub repository variables GOOGLE_SITE_VERIFICATION / BING_SITE_VERIFICATION override these. Empty = no tag. DNS verification needs no change here.",
+    "google": "",
+    "bing": ""
   },
   "analytics": {
     "$comment": "Slot for a cookieless analytics tool (e.g. Plausible, Fathom, Umami, Cloudflare Web Analytics). Disabled: nothing loads until enabled is true and src is set.",

@@ -10,7 +10,7 @@ import RequestForm from '../forms/RequestForm.astro';
 import QuietPeaks from '../illustrations/QuietPeaks.astro';
 import Avatar from '../Avatar.astro';
 import Icon from '../Icon.astro';
-import { settings } from '../../lib/site';
+import { settings, show } from '../../lib/site';
 import { getTerms } from '../../lib/terms';
 import '../../styles/tone-light.css';
 
@@ -49,6 +49,7 @@ const agenda = [
           ))
         }
       </ol>
+      {show('founders') && (
       <p class="final__people">
         <span class="final__faces" aria-hidden="true">
           <Avatar name={f1.name} size={40} tone={1} />
@@ -56,6 +57,7 @@ const agenda = [
         </span>
         <span>You’ll talk to {firstName(f1.name)} or {firstName(f2.name)} — a founder, not a sales team.</span>
       </p>
+      )}
       {
         secondary && (
           <Button href={secondary.href} variant="secondary">

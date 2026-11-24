@@ -8,15 +8,18 @@ import Icon from '../components/Icon.astro';
 import T from '../components/T.astro';
 import RequestForm from '../components/forms/RequestForm.astro';
 import Avatar from '../components/Avatar.astro';
-import { settings } from '../lib/site';
+import { settings, show, showUnverified } from '../lib/site';
 import { getTerms } from '../lib/terms';
 import { isPlaceholder } from '../lib/text';
 
 const terms = await getTerms();
 const bookingUrl = settings.links.bookingUrl;
-const canEmbed = !isPlaceholder(bookingUrl) && bookingUrl.startsWith('https://');
-// "demo" (pre-release preview): an in-page slot picker stands in for Odoo Appointments.
-const demoSlots = bookingUrl === 'demo';
+const canEmbed = show('links.bookingUrl') && !isPlaceholder(bookingUrl) && bookingUrl.startsWith('https://');
+// "demo" (pre-release preview only): an in-page slot picker stands in for Odoo Appointments.
+const demoSlots = bookingUrl === 'demo' && showUnverified;
+// Production without a verified booking calendar: book by email instead.
+const mailBooking = !canEmbed && !demoSlots;
+const mailHref = `mailto:${settings.contact.email}?subject=${encodeURIComponent('Fit call request')}`;
 const times = ['10:00 AM', '11:30 AM', '1:00 PM', '2:30 PM', '4:00 PM'];
 const steps = [
   'We learn how you work.',
@@ -26,12 +29,15 @@ const steps = [
 ---
 
 <BaseLayout
+  pageType="ContactPage"
+  breadcrumb="Book a fit call"
   title="Book a 30-minute fit call | Evenmont"
   description="A free 30-minute call during US business hours: we learn how you work, tell you honestly if Odoo fits, and you leave with next steps."
   stickyCta={false}
 >
   <PageHero eyebrow="Fit call" title={terms.fmt('Book a {fitCallLong} fit call.')} sum="fit call.">
     <div class="book__meta">
+      {show('founders') && (
       <p class="book__people">
         <span class="book__faces" aria-hidden="true">
           <Avatar name={settings.founders[0].name} size={44} tone={1} />
@@ -39,6 +45,7 @@ const steps = [
         </span>
         <span>You’ll meet {settings.founders[0].name.split(' ')[0]} or {settings.founders[1].name.split(' ')[0]} — a founder, not a sales team.</span>
       </p>
+      )}
       <p class="book__tz"><Icon name="clock" size={20} />Calls run during US business hours.</p>
     </div>
   </PageHero>
@@ -60,7 +67,7 @@ const steps = [
     <div class="booking">
       <div class="booking__cal card">
         <Icon name="calendar" size={32} />
-        <p class="lead">Choose a slot that suits you in our calendar.</p>
+        <p class="lead">{mailBooking ? 'Email us a few times that suit you and we’ll confirm one.' : 'Choose a slot that suits you in our calendar.'}</p>
         {
           demoSlots ? (
             <div class="slots" data-slots>
@@ -82,6 +89,10 @@ const steps = [
               </div>
               <p class="slots__picked" role="status" data-slot-picked />
             </div>
+          ) : mailBooking ? (
+            <Button href={mailHref} arrow>
+              Email us to pick a time
+            </Button>
           ) : (
             <Button href={bookingUrl} arrow data-booking-link>
               Open the booking calendar
@@ -98,8 +109,8 @@ const steps = [
           )
         }
         <p class="booking__contact muted">
-          Prefer email? <a href={`mailto:${settings.contact.email}`}><T v={settings.contact.email} /></a> · Phone (US):
-          <T v={settings.contact.phoneUs} />
+          Prefer email? <a href={`mailto:${settings.contact.email}`}><T v={settings.contact.email} /></a>
+          {show('contact.phoneUs') && (<Fragment> · Phone (US): <T v={settings.contact.phoneUs} /></Fragment>)}
         </p>
       </div>
       <div class="booking__form card">

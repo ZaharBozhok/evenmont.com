@@ -93,17 +93,24 @@ export default function placeholderReport() {
           /* no registry */
         }
 
-        if (!tokens.size && !samples.length && !images.length && !demo.length && !demoFields.length && !(settings.prerelease && process.env.PRERELEASE !== 'false')) {
+        // Same rule as src/lib/site.ts: SITE_ENV wins, then PRERELEASE, then settings.prerelease.
+        const siteEnv = (process.env.SITE_ENV ?? '').toLowerCase();
+        const prerelease =
+          siteEnv === 'production' ? false : siteEnv === 'preview' ? true : process.env.PRERELEASE ? process.env.PRERELEASE !== 'false' : settings.prerelease === true;
+
+        if (!tokens.size && !samples.length && !images.length && !demo.length && !demoFields.length && !prerelease) {
           logger.info('No placeholders left. Ready for launch.');
           return;
         }
 
         const lines = ['', 'Placeholders still in the build — replace before launch:'];
-        if (settings.prerelease && process.env.PRERELEASE !== 'false') {
-          lines.push('', '  PRE-RELEASE: settings.prerelease is true — every page is noindex and robots.txt disallows all.');
+        if (prerelease) {
+          lines.push('', '  PRE-RELEASE build — every page is noindex and robots.txt disallows all. Demo content is shown.');
+        } else {
+          lines.push('', '  PRODUCTION build — indexable. The demo content below is NOT rendered (hidden until verified).');
         }
         if (demo.length || demoFields.length) {
-          lines.push('', `  Demo content invented for the preview (${demo.length + demoFields.length}) — see docs/DEMO-CONTENT.md:`);
+          lines.push('', `  Demo content invented for the preview (${demo.length + demoFields.length}) — see docs/DEMO-CONTENT.md and docs/CONTENT-AUDIT.md:`);
           for (const s of demo) lines.push(`    ${s}  (demo: true)`);
           for (const f of demoFields) lines.push(`    settings.json → ${f}`);
         }

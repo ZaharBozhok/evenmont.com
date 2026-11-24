@@ -13,6 +13,7 @@ import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 import StickyCta from '../components/StickyCta.astro';
 import { clientNav, ctas, partnerNav, prerelease, settings, whiteLabelNav, type Cta, type Mood, type NavItem } from '../lib/site';
+import { breadcrumbs, graph, organization, webPage, website, type JsonLdNode, type PageType } from '../lib/schema';
 
 interface Props {
   title: string;
@@ -24,8 +25,17 @@ interface Props {
   navVariant?: 'client' | 'partner' | 'white-label';
   /** Mobile sticky CTA after the hero; false to hide it. */
   stickyCta?: Cta | false;
+  /** Keep this page out of search engines (also left out of the sitemap). */
   noindex?: boolean;
   ogImageAlt?: string;
+  /** schema.org type of the page (WebPage by default). */
+  pageType?: PageType;
+  /** Short page name for the breadcrumb trail (defaults to the title before " | "). */
+  breadcrumb?: string;
+  /** Extra JSON-LD nodes for this page (Service, Article …), added to the page's @graph. */
+  jsonLd?: JsonLdNode[];
+  /** og:type — "article" for case studies. */
+  ogType?: 'website' | 'article';
 }
 
 const {
@@ -37,6 +47,10 @@ const {
   stickyCta,
   noindex = false,
   ogImageAlt,
+  pageType = 'WebPage',
+  breadcrumb,
+  jsonLd = [],
+  ogType = 'website',
 } = Astro.props;
 
 const site = Astro.site ?? new URL(settings.siteUrl);
@@ -52,16 +66,26 @@ const altLink = partner ? { label: 'For businesses', href: '/' } : undefined;
 const sticky = stickyCta === false ? null : (stickyCta ?? { ...cta, label: cta.label });
 const themeColor = mood === 'client' ? '#0F3D34' : mood === 'partner' ? '#0C2621' : '#071A16';
 
-const organization = {
-  '@context': 'https://schema.org',
-  '@type': 'Organization',
-  name: settings.siteName,
-  legalName: settings.legal.legalName,
-  url: new URL('/', site).href,
-  logo: new URL('/icon-512.png', site).href,
-  description: `${settings.descriptor} for growing US companies.`,
-  sameAs: settings.links.socialLinks,
-};
+const crumbs = breadcrumbs(site, path, breadcrumb ?? title.split(' | ')[0]);
+const structuredData = graph([
+  organization(site),
+  website(site),
+  webPage({ site, canonical, path, type: pageType, title, description, breadcrumb: crumbs }),
+  crumbs,
+  ...jsonLd,
+]);
+
+// Search engine verification (production only). Values: env GOOGLE_SITE_VERIFICATION / BING_SITE_VERIFICATION
+// (GitHub repository variables), else settings.json → verification. Empty = no tag.
+const env = (globalThis as { process?: { env: Record<string, string | undefined> } }).process?.env ?? {};
+const verification = !prerelease
+  ? {
+      google: (env.GOOGLE_SITE_VERIFICATION || settings.verification?.google || '').trim(),
+      bing: (env.BING_SITE_VERIFICATION || settings.verification?.bing || '').trim(),
+    }
+  : { google: '', bing: '' };
+// Pre-release: nothing indexed or followed. A single excluded page (404, draft legal text): not indexed, links still followed.
+const robots = prerelease ? 'noindex, nofollow' : noindex ? 'noindex, follow' : 'index, follow, max-image-preview:large, max-snippet:-1';
 ---
 
 <!doctype html>
@@ -71,8 +95,10 @@ const organization = {
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <title>{title}</title>
     <meta name="description" content={description} />
-    <link rel="canonical" href={canonical} />
-    {(noindex || prerelease) && <meta name="robots" content="noindex, nofollow" />}
+    {!noindex && <link rel="canonical" href={canonical} />}
+    <meta name="robots" content={robots} />
+    {verification.google && <meta name="google-site-verification" content={verification.google} />}
+    {verification.bing && <meta name="msvalidate.01" content={verification.bing} />}
 
     <link rel="preload" href="/fonts/manrope-var-latin.woff2" as="font" type="font/woff2" crossorigin />
     <link rel="preload" href="/fonts/fraunces-600-latin.woff2" as="font" type="font/woff2" crossorigin />
@@ -84,7 +110,7 @@ const organization = {
     <meta name="theme-color" content={themeColor} />
     <meta name="color-scheme" content={mood === 'partner-dark' ? 'dark' : 'only light'} />
 
-    <meta property="og:type" content="website" />
+    <meta property="og:type" content={ogType} />
     <meta property="og:site_name" content="Evenmont" />
     <meta property="og:locale" content="en_US" />
     <meta property="og:title" content={title} />
@@ -101,7 +127,7 @@ const organization = {
     <meta name="twitter:image" content={ogImage} />
     <meta name="twitter:image:alt" content={ogAlt} />
 
-    <script type="application/ld+json" set:html={JSON.stringify(organization)} />
+    <script type="application/ld+json" set:html={structuredData} />
 
     <!-- Progressive enhancement flag, set before first paint (no flash, no layout shift). -->
     <script is:inline>document.documentElement.classList.add('js');</script>

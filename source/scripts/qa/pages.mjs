@@ -5,6 +5,8 @@ export const pages = [
   ['distribution', '/distribution'],
   ['manufacturing', '/manufacturing'],
   ['cases', '/cases'],
+  ['case-animal-life-sciences', '/cases/animal-life-sciences-lab'],
+  // Demo cases: pre-release builds only (production builds leave them out, so these are 404 there).
   ['case-fieldwork', '/cases/fieldwork-collective'],
   ['case-ridgeway', '/cases/ridgeway-engineering'],
   ['case-copperline', '/cases/copperline-home-goods'],

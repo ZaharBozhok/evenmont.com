@@ -24,6 +24,7 @@ import Included from '../components/Included.astro';
 import { getTerms } from '../lib/terms';
 import { appIcon, appLabel } from '../lib/apps';
 import type { IconName } from '../icons/lucide';
+import { service } from '../lib/schema';
 
 export async function getStaticPaths() {
   const scenarios = await getCollection('scenarios');
@@ -50,10 +51,14 @@ const steps = terms.process.steps.map((st) => ({
   icon: stepIcons[st.id],
 }));
 const before = s.h1.slice(0, s.h1.length - s.sumPhrase.length).trimEnd();
+const site = Astro.site!;
+const jsonLd = [
+  service(site, { id: s.id, name: `Odoo implementation for ${s.name.toLowerCase()}`, description: s.seo.description, url: `/${s.id}`, audience: s.profile }),
+];
 const screen = { services: 'projects', distribution: 'inventory', manufacturing: 'production' } as const;
 ---
 
-<BaseLayout title={s.seo.title} description={s.seo.description}>
+<BaseLayout title={s.seo.title} description={s.seo.description} breadcrumb={s.name} jsonLd={jsonLd}>
   <section class="shero tone-dark ledger" data-hero data-animate>
     <div class="container shero__grid">
       <div class="shero__copy">

@@ -10,8 +10,9 @@ import Icon from '../Icon.astro';
 import T from '../T.astro';
 import Avatar from '../Avatar.astro';
 import Button from '../Button.astro';
-import { settings } from '../../lib/site';
+import { settings, show } from '../../lib/site';
 import { getTerms } from '../../lib/terms';
+import { isPlaceholder } from '../../lib/text';
 
 interface Props {
   id: string;
@@ -26,12 +27,26 @@ if (!entry) throw new Error(`Missing FAQ file src/content/faq/${id}.json`);
 const terms = await getTerms();
 const partner = id === 'partners' || id === 'white-label';
 const person = partner ? settings.partnerContact : settings.founders[1];
+/** The named contact is shown only when the name is verified (see settings.demo.fields). */
+const named = show(partner ? 'partnerContact.name' : 'founders');
+// FAQPage structured data: exactly the questions and answers shown in the accordion below.
+const pageUrl = new URL(Astro.url.pathname.replace(/\.html$/, '').replace(/\/index$/, '') || '/', Astro.site).href;
+const faqLd = JSON.stringify({
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  '@id': `${pageUrl}#faq`,
+  mainEntity: entry.data.items
+    .map((item) => ({ q: terms.fmt(item.q), a: terms.fmt(item.a) }))
+    .filter((item) => !isPlaceholder(item.q) && !isPlaceholder(item.a))
+    .map((item) => ({ '@type': 'Question', name: item.q, acceptedAnswer: { '@type': 'Answer', text: item.a } })),
+}).replace(/</g, '\\u003c');
 const cta = partner
   ? { label: id === 'white-label' ? 'Send us a scope' : terms.fmt('Book a {partnerIntroShort} partner intro'), href: id === 'white-label' ? '#scope' : '#apply' }
   : { label: terms.fmt('Book a {fitCallShort} fit call'), href: '/book' };
 ---
 
 <Section id="faq" title={title ?? entry.data.title} tone={tone}>
+  <script type="application/ld+json" set:html={faqLd} />
   <div class:list={['faqwrap', contact && 'faqwrap--aside']}>
     <div class="faq">
       {
@@ -53,10 +68,10 @@ const cta = partner
     {
       contact && (
         <aside class="faqask" aria-label="Ask us directly">
-          <Avatar name={person.name} size={64} tone={1} />
+          {named && <Avatar name={person.name} size={64} tone={1} />}
           <p class="faqask__title">Didn’t find your question?</p>
           <p class="faqask__text">
-            Ask {person.name} ({person.role.toLowerCase()}). We reply within {terms.vars.replyTime}.
+            {named ? `Ask ${person.name} (${person.role.toLowerCase()}).` : 'Ask us directly.'} We reply within {terms.vars.replyTime}.
           </p>
           <Button href={cta.href} block>
             {cta.label}
